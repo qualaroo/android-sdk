@@ -1,0 +1,1 @@
+# Qualaroo Mobile SDK for Android
