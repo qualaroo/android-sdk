@@ -45,3 +45,4 @@ gradle/
 gradlew
 gradlew.bat
 settings.gradle
+app/
