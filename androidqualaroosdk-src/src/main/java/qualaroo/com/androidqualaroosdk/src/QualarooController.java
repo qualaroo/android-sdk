@@ -1,14 +1,16 @@
 package qualaroo.com.androidqualaroosdk.src;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.InflateException;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -17,6 +19,10 @@ import android.widget.LinearLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.UUID;
+
+import static android.view.Gravity.*;
 
 /**
  * Created by Artem Orynko on 23.08.16.
@@ -28,22 +34,31 @@ public class QualarooController {
     // Tag for debug
     private static final String TAG = QualarooController.class.getSimpleName();
 
-    private static final String mBaseURL = "file:///android_asset/qualaroo_host.html";
+    private static String mBaseURL = "file:///android_asset/qualaroo_host.html";
 
+    protected QualarooSurvey mDelegate;
     private Activity mHostActivity;
+    private boolean mIsTablet;
 
     private String  mScriptURL;
     protected float   mSuggestedHeight;
-    private boolean mKeyboardShowing;
     protected boolean mMinimized;
-    private boolean mHtmlLoaded;
+    protected boolean mHtmlLoaded;
+    protected boolean mQualarooScriptLoaded;
+    private QualarooSurveyPosition mPosition;
 
     LinearLayout    mLinearLayout;
     WebView         mWebView;
 
     //region Protected Methods
 
-    protected QualarooController initWithAPIKey(String APIKey, Activity activity) {
+    protected QualarooController(Activity hostActivity, QualarooSurvey delegate) {
+        mDelegate = delegate;
+        mHostActivity = hostActivity;
+        mIsTablet = mHostActivity.getResources().getBoolean(R.bool.isTablet);
+    }
+
+    protected QualarooController initWithAPIKey(String APIKey) {
 
         // Decode API key
         if (!decodeAPIKey(APIKey)) {
@@ -53,23 +68,19 @@ public class QualarooController {
 
         // Initialize properties
         mSuggestedHeight = 0;
-        mKeyboardShowing = false;
         mMinimized = false;
         mHtmlLoaded = false;
 
-        mHostActivity = activity;
-
         //TODO: OBserve to keyboard show/hide
+
+        initializeWebView();
 
         return this;
     }
 
     protected boolean attachToActivity(QualarooSurveyPosition surveyPosition) {
 
-        boolean isTablet = mHostActivity.getResources().getBoolean(R.bool.isTablet);
-        QualarooSurveyPosition position;
-
-        if (isTablet) {
+        if (mIsTablet) {
             if (surveyPosition == QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_TOP
                 || surveyPosition == QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM) {
                 Log.d(TAG, "ERROR: Supported positions on this platform are Bottom Left, Bottom Right, Top Left and Top Right.");
@@ -81,15 +92,38 @@ public class QualarooController {
             return false;
         }
 
-        setupLinearLayout(getPosition(surveyPosition));
+        mPosition = surveyPosition;
 
-        setupWebView();
+        if (mLinearLayout == null) {
+            initializeLinearLayout();
+        }
 
-        mLinearLayout.addView(mWebView);
-
+        mWebView.setVisibility(View.INVISIBLE);
         mWebView.loadUrl(mBaseURL);
 
+        mHostActivity.addContentView(mLinearLayout, mLinearLayout.getLayoutParams());
+
         //TODO: constaint
+
+        return true;
+    }
+
+    protected boolean removeFromActivity() {
+
+        boolean wasAttachedToActivity;
+
+        ViewParent view = mLinearLayout.getParent();
+        wasAttachedToActivity = view != null;
+
+        mLinearLayout.removeAllViews();
+        mWebView.clearCache(true);
+        mWebView.destroy();
+        mWebView = null;
+
+        if (wasAttachedToActivity) {
+            ((ViewGroup) view).removeView(mLinearLayout);
+            mLinearLayout = null;
+        }
 
         return true;
     }
@@ -101,15 +135,15 @@ public class QualarooController {
             return;
         }
 
-        mLinearLayout.setVisibility(View.VISIBLE);
-
         loadQualarooScriptIfNeeded();
 
-        String jsString;
+        if (mQualarooScriptLoaded) {
+            String jsString;
 
-        jsString = "triggerSurvey('" + surveyAlias + "', " + shouldForce + ")";
+            jsString = "triggerSurvey('" + surveyAlias + "', " + shouldForce + ")";
 
-        mWebView.evaluateJavascript(jsString, null);
+            mWebView.evaluateJavascript(jsString, null);
+        }
     }
 
     //endregion
@@ -159,14 +193,66 @@ public class QualarooController {
         return true;
     }
 
-    private void setupWebView() {
+    private void initializeLinearLayout() {
+        if (mLinearLayout != null) {
+            return;
+        }
+
+        mLinearLayout = new LinearLayout(mHostActivity);
+
+        mLinearLayout.setId(R.id.my_linear_layout);
+        mLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        mLinearLayout.setBackgroundColor(Color.TRANSPARENT);
+        mLinearLayout.setVisibility(View.INVISIBLE);
+        mLinearLayout.setGravity(getPosition(mPosition));
+
+        if (mWebView == null) {
+            initializeWebView();
+        }
+
+        mLinearLayout.addView(mWebView);
+
+        LinearLayout.LayoutParams layoutParams;
+        layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+
+        mLinearLayout.setLayoutParams(layoutParams);
+
+        mLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performHideSurveyAnimation(500);
+            }
+        });
+    }
+
+    private void initializeWebView() {
+        if (mWebView != null) {
+            return;
+        }
 
         mWebView = new WebView(mHostActivity);
-
+        mWebView.setId(R.id.my_webview);
         mWebView.setBackgroundColor(Color.TRANSPARENT);
         mWebView.setVisibility(View.INVISIBLE);
         mWebView.setWebChromeClient(new WebChromeClient());
-        mWebView.addJavascriptInterface(new QualarooJavaScriptInterface(mHostActivity), "Qualaroo");
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                if (url.equals(mBaseURL)) {
+                    loadQualarooScriptIfNeeded();
+                    mHtmlLoaded = true;
+                }
+            }
+        });
+        mWebView.addJavascriptInterface(
+                new QualarooJavaScriptInterface(mHostActivity, this),
+                "Qualaroo"
+        );
 
         WebSettings webSettings;
         webSettings = mWebView.getSettings();
@@ -175,94 +261,178 @@ public class QualarooController {
         webSettings.setAppCacheEnabled(false);
 
         LinearLayout.LayoutParams layoutParams;
+
         layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                300//(int) mSuggestedHeight
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        mSuggestedHeight,
+                        mHostActivity.getResources().getDisplayMetrics()
+                )
         );
 
         mWebView.setLayoutParams(layoutParams);
-
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-                if (url.equals(mBaseURL)) {
-                    mHtmlLoaded = true;
-
-                    loadQualarooScriptIfNeeded();
-                }
-            }
-        });
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mWebView.setWebContentsDebuggingEnabled(true);
+        }
     }
 
     private int getPosition(QualarooSurveyPosition position) {
 
+        Integer result;
         switch (position) {
             case QUALAROO_SURVEY_POSITION_TOP:
-                return Gravity.TOP;
+                result = TOP;
+                break;
             case QUALAROO_SURVEY_POSITION_BOTTOM:
-                return Gravity.BOTTOM;
+                result = BOTTOM;
+                break;
             case QUALAROO_SURVEY_POSITION_TOP_LEFT:
-                return Gravity.TOP | Gravity.START;
+                result = TOP|LEFT;
+                break;
             case QUALAROO_SURVEY_POSITION_TOP_RIGHT:
-                return Gravity.TOP | Gravity.END;
+                result = TOP|RIGHT;
+                break;
             case QUALAROO_SURVEY_POSITION_BOTTOM_LEFT:
-                return Gravity.BOTTOM | Gravity.START;
+                result = BOTTOM|LEFT;
+                break;
             case QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH:
-                return Gravity.BOTTOM | Gravity.END;
+                result = BOTTOM|RIGHT;
+                break;
             default:
+                result = 0;
                 break;
         }
 
-        return 0;
-    }
-
-    private void setupLinearLayout(int position) {
-
-        mLinearLayout = new LinearLayout(mHostActivity);
-
-        mLinearLayout.setOrientation(LinearLayout.VERTICAL);
-        mLinearLayout.setBackgroundColor(Color.TRANSPARENT);
-//        mLinearLayout.setVisibility(View.INVISIBLE);
-        mLinearLayout.setGravity(position);
-
-        LinearLayout.LayoutParams layoutParams;
-
-        layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        );
-
-        mHostActivity.addContentView(mLinearLayout, layoutParams);
-
-        mLinearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLinearLayout.setVisibility(View.INVISIBLE);
-            }
-        });
+        return result;
     }
 
     private void loadQualarooScriptIfNeeded(){
 
-        final Handler handler = new Handler();
+        String jsString = "loadQualarooScriptIfNeeded('" + mScriptURL + "');";
+        mWebView.evaluateJavascript(jsString, null);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mWebView.evaluateJavascript(mScriptURL, null);
-                        }
-                    });
-                } catch (InflateException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
     //endregion
+
+    //region Protected Methods
+
+    protected void setupIdentityCode() {
+        final String deviceUUID = UUID.randomUUID().toString();
+        String jsString = "_kiq.push(['identify', '" + deviceUUID + "'])";
+
+        mWebView.evaluateJavascript(jsString, null);
+    }
+
+    protected void updateHeight(){
+        int newHeight = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                mSuggestedHeight,
+                mHostActivity.getResources().getDisplayMetrics()
+        );
+        final LinearLayout.LayoutParams layoutParams;
+        layoutParams = (LinearLayout.LayoutParams) mWebView.getLayoutParams();
+        layoutParams.height = newHeight;
+
+        if (mIsTablet) {
+            layoutParams.width = mHostActivity.getResources().getDisplayMetrics().widthPixels / 2;
+        }
+        mHostActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                mWebView.setLayoutParams(layoutParams);
+            }
+        });
+    }
+
+    protected void performHideSurveyAnimation() {
+        performHideSurveyAnimation(50);
+    }
+
+    protected void performHideSurveyAnimation(final int duration) {
+        mHostActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TranslateAnimation animation;
+                animation = getHideAnimation();
+                animation.setDuration(duration);
+                animation.setFillAfter(true);
+
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mLinearLayout.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                mWebView.startAnimation(animation);
+                mWebView.setVisibility(View.GONE);
+
+            }
+        });
+    }
+
+    protected void performShowSurveyAnimation() {
+        mHostActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLinearLayout.setVisibility(View.VISIBLE);
+                TranslateAnimation animation;
+                animation = getShowAnimation();
+                animation.setDuration(500);
+                animation.setFillAfter(true);
+
+                mWebView.startAnimation(animation);
+                mWebView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private TranslateAnimation getShowAnimation() {
+        switch (mPosition) {
+            case QUALAROO_SURVEY_POSITION_TOP:
+                return new TranslateAnimation(0, 0, -mWebView.getHeight(), 0);
+            case QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH:
+                return new TranslateAnimation(mWebView.getWidth(), 0, 0, 0);
+            case QUALAROO_SURVEY_POSITION_TOP_RIGHT:
+                return new TranslateAnimation(mWebView.getWidth(), 0, 0, 0);
+            case QUALAROO_SURVEY_POSITION_BOTTOM_LEFT:
+                return new TranslateAnimation(-mWebView.getWidth(), 0, 0, 0);
+            case QUALAROO_SURVEY_POSITION_TOP_LEFT:
+                return new TranslateAnimation(-mWebView.getWidth(), 0, 0, 0);
+            default:
+                return new TranslateAnimation(0, 0, mWebView.getHeight(), 0);
+        }
+    }
+
+    private TranslateAnimation getHideAnimation() {
+        switch (mPosition) {
+            case QUALAROO_SURVEY_POSITION_TOP:
+                return new TranslateAnimation(0, 0, 0, -mWebView.getHeight());
+            case QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH:
+                return new TranslateAnimation(0, mWebView.getWidth(), 0, 0);
+            case QUALAROO_SURVEY_POSITION_TOP_RIGHT:
+                return new TranslateAnimation(0, mWebView.getWidth(), 0, 0);
+            case QUALAROO_SURVEY_POSITION_BOTTOM_LEFT:
+                return new TranslateAnimation(0, -mWebView.getWidth(), 0, 0);
+            case QUALAROO_SURVEY_POSITION_TOP_LEFT:
+                return new TranslateAnimation(0, -mWebView.getWidth(), 0, 0);
+            default:
+                return new TranslateAnimation(0, 0, 0, mWebView.getHeight());
+        }
+    }
+
+    //endregion
 }
+

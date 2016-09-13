@@ -1,12 +1,7 @@
 package qualaroo.com.androidqualaroosdk.src;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.util.Log;
 
 /**
  * Created by Artem Orynko on 23.08.16.
@@ -21,42 +16,17 @@ public class QualarooSurvey {
     private QualarooController mQualarooController;
     private String mAPIKey;
 
-    //region Accessors
-
-//    private QualarooController getQualarooSurvey() {
-//        if (mQualarooController == null) {
-//            mQualarooController = new QualarooController().initWithAPIKey(mAPIKey);
-//        }
-//        return mQualarooController;
-//    }
+    private Activity mHostActivity;
 
     //region Public Methods
 
-    public void showSurvey(String surveyAlias, String APIKey, Activity activity) {
-
-        showSurvey(surveyAlias, APIKey, activity, QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM);
+    public QualarooSurvey(Activity hostActivity) {
+        mHostActivity = hostActivity;
     }
 
-    public void showSurvey(String surveyAlias, String APIKey, Activity activity, QualarooSurveyPosition surveyPosition) {
+    public QualarooSurvey initWithAPIKey(String APIKey) {
 
-        showSurvey(surveyAlias, APIKey, activity, surveyPosition, false);
-    }
-
-    public void showSurvey(String surveyAlias, String APIKey, Activity activity, QualarooSurveyPosition surveyPosition, boolean shouldForce) {
-
-        initWithAPIKey(APIKey, activity);
-        mQualarooController.attachToActivity(surveyPosition);
-        mQualarooController.showSurvey(surveyAlias, shouldForce);
-    }
-
-
-    //endregion
-
-    //region Private Methods
-
-    private QualarooSurvey initWithAPIKey(String APIKey, Activity activity) {
-
-        mQualarooController = new QualarooController().initWithAPIKey(APIKey, activity);
+        mQualarooController = new QualarooController(mHostActivity, this).initWithAPIKey(APIKey);
 
         if (mQualarooController == null) {
             return null;
@@ -69,8 +39,48 @@ public class QualarooSurvey {
         return this;
     }
 
-    private void deinit() {
-        //TODO: destroy all
+    public boolean attachToActivity() {
+        return attachToActivity(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM);
+
+    }
+    public boolean attachToActivity(QualarooSurveyPosition position) {
+        return mQualarooController.attachToActivity(position);
+    }
+
+    public boolean removeFromActivity() {
+
+        if (mQualarooController == null) {
+            return true;
+        }
+        boolean success = mQualarooController.removeFromActivity();
+
+        mQualarooController = null;
+
+        return success;
+    }
+
+    public void showSurvey(String surveyAlias) {
+
+        mQualarooController.showSurvey(surveyAlias, false);
+    }
+
+    public void showSurvey(String surveyAlias, boolean shouldForce) {
+
+        mQualarooController.showSurvey(surveyAlias, shouldForce);
+    }
+
+    //endregion
+
+    //region Protected Methods
+
+
+    protected void errorSendingReportRequest(String reportRequestURL) {
+        Log.d(TAG, "Unable to send unfulfilled request with URL: " + reportRequestURL);
+
+    }
+
+    protected void errorLoadingQualarooScript(String scriptURL) {
+        Log.d(TAG, "Unable to load Qualaroo script at URL: " + scriptURL);
     }
 
     //endregion

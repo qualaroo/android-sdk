@@ -5,9 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * Created by Artem Orynko on 31.09.16.
  * Copyright © 2016 Qualaroo. All rights reserved.
@@ -15,43 +12,38 @@ import java.net.URL;
 
 class QualarooJavaScriptInterface {
 
-    private QualarooSurvey      mQualarooSurvey = new QualarooSurvey();
-    private QualarooController  mQualarooController = new QualarooController();
+    private QualarooController  mQualarooController;
+    Context mContext;
 
     // Tag for debug
     private static final String TAG = QualarooJavaScriptInterface.class.getSimpleName();
 
-    Context mContext;
 
-    QualarooJavaScriptInterface(Context context) {
+    QualarooJavaScriptInterface(Context context, QualarooController qualarooController) {
         mContext = context;
+        mQualarooController = qualarooController;
     }
 
     @JavascriptInterface
     public void surveyScreenerReady() {
         Log.d(TAG, "Screener is showing.");
-        mQualarooController.mLinearLayout.setVisibility(View.VISIBLE);
-    }
-
-    @JavascriptInterface
-    public void qualarooScriptLoadSuccess(String message) {
-        Log.d(TAG, "Load script: " + message);
-//        mQualarooController.setupIdentityCode();
+        mQualarooController.performShowSurveyAnimation();
     }
 
     @JavascriptInterface
     public void surveyShow() {
         Log.d(TAG, "Survey is showing.");
-        mQualarooController.mLinearLayout.setVisibility(View.VISIBLE);
+        mQualarooController.performShowSurveyAnimation();
     }
 
     @JavascriptInterface
     public void surveyClosed() {
         Log.d(TAG, "Survey closed.");
 
-//        if (mQualarooController.mLinearLayout.getVisibility() == View.VISIBLE) {
-//            //TODO: animation for hide
-//        }
+        if (mQualarooController.mWebView.getVisibility() == View.VISIBLE) {
+            Log.d(TAG, "Hiding survey.");
+            mQualarooController.performHideSurveyAnimation();
+        }
     }
 
     @JavascriptInterface
@@ -60,20 +52,23 @@ class QualarooJavaScriptInterface {
         Log.d(TAG, "Close/minimize/maximize tapped " + isMinimized);
 
         if (isMinimized) {
-            //TODO: setup constraint
+            mQualarooController.mSuggestedHeight = 48;
+            mQualarooController.updateHeight();
         } else {
-            //TODO: update height
+            mQualarooController.updateHeight();
         }
     }
 
     @JavascriptInterface
     public void surveyHeightChanged(float suggestedHeight) {
 
-        if (!mQualarooController.mMinimized) {
-            Log.d(TAG, "Survey height changed. New height suggested: " + suggestedHeight);
-            mQualarooController.mSuggestedHeight = suggestedHeight;
+        boolean minimized = mQualarooController.mMinimized;
 
-            //TODO: update height
+        if (!minimized) {
+            Log.d(TAG, "Survey height changed. New height suggested: " + suggestedHeight);
+
+            mQualarooController.mSuggestedHeight = suggestedHeight;
+            mQualarooController.updateHeight();
         }
     }
 
@@ -86,31 +81,27 @@ class QualarooJavaScriptInterface {
     public void surveyUndeliveredAnswerRequest(String request) {
         Log.d(TAG, "Undelivered answer request: " + request);
 
-        URL url = null;
-        try {
-            url = new URL(request);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        if (mQualarooController != null && !request.isEmpty()) {
+            mQualarooController.mDelegate.errorSendingReportRequest(request);
         }
+    }
 
-        if (mQualarooController != null && url != null) {
-//            mQualarooSurvey.surveyActivityErrorSendingReportRequest(url);
-        }
+    @JavascriptInterface
+    public void qualarooScriptLoadSuccess(String message) {
+        Log.d(TAG, "Load script: " + message);
+        mQualarooController.mQualarooScriptLoaded = true;
+        mQualarooController.setupIdentityCode();
     }
 
     @JavascriptInterface
     public void qualarooScriptLoadError(String message) {
         Log.d(TAG, "Failed to load script: " + message);
 
-        URL url = null;
-        try {
-            url = new URL(message);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        mQualarooController.mQualarooScriptLoaded = false;
+
+        if (mQualarooController != null && !message.isEmpty()) {
+            mQualarooController.mDelegate.errorLoadingQualarooScript(message);
         }
 
-        if (mQualarooSurvey != null && url != null) {
-//            mQualarooSurvey.surveyActivityErrorLoadingQualarooScript(url);
-        }
     }
 }

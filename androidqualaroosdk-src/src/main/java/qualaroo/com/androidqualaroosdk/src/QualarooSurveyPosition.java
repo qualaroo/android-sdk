@@ -10,7 +10,7 @@ package qualaroo.com.androidqualaroosdk.src;
  *
  * @note Please notice supported position vary depending on the platform.
  */
-enum QualarooSurveyPosition {
+public enum QualarooSurveyPosition {
 
     /**
      * Attach survey at the top of the host Activity's view
