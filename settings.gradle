@@ -1,1 +1,1 @@
-include ':androidqualaroosdk-src', ':androidqualaroosdkdemo'
+include ':androidqualaroosdk-src'
