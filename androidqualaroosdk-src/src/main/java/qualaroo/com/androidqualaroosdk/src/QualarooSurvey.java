@@ -8,6 +8,10 @@ import android.util.Log;
  * Copyright © 2016 Qualaroo. All rights reserved.
  */
 
+/**
+ * `QualarooMobile` provides an easy intarface to attach, remove and display Qualaroo Mobile surveys
+ * inside a Activity.
+ */
 public class QualarooSurvey {
 
     // Tag for debug
@@ -20,10 +24,21 @@ public class QualarooSurvey {
 
     //region Public Methods
 
+    /**
+     * Instantiates a new QualarooSurvey with Activity.
+     *
+     * @param hostActivity the Activity that will be used to host surveys.
+     */
     public QualarooSurvey(Activity hostActivity) {
         mHostActivity = hostActivity;
     }
 
+    /**
+     * Designated initializer with APIKey.
+     *
+     * @param APIKey the API key from Qualaroo.
+     * @return the QualarooSurvey.
+     */
     public QualarooSurvey initWithAPIKey(String APIKey) {
 
         mQualarooController = new QualarooController(mHostActivity, this).initWithAPIKey(APIKey);
@@ -39,14 +54,32 @@ public class QualarooSurvey {
         return this;
     }
 
+    /**
+     * Attaches Qualaroo's survey to a hostActivity.
+     *
+     * @see #attachToActivity(QualarooSurveyPosition)
+     * @return true if attached
+     */
     public boolean attachToActivity() {
         return attachToActivity(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM);
 
     }
+
+    /**
+     * Attaches Qualaroo's survey to a hostActivity and position.
+     *
+     * @param position the attachment position (see `QualarooSurveyPosition` for supported position).
+     * @see #attachToActivity()
+     * @return true if attached
+     */
     public boolean attachToActivity(QualarooSurveyPosition position) {
         return mQualarooController.attachToActivity(position);
     }
 
+    /**
+     * Removes a previously attached survey from Activity.
+     * @return true if removed
+     */
     public boolean removeFromActivity() {
 
         if (mQualarooController == null) {
@@ -59,11 +92,22 @@ public class QualarooSurvey {
         return success;
     }
 
+    /**
+     * Displays a survey with a given Alias inside a Activity.
+     *
+     * @param surveyAlias the survey Alias to display.
+     */
     public void showSurvey(String surveyAlias) {
 
         mQualarooController.showSurvey(surveyAlias, false);
     }
 
+    /**
+     * Displays a survey with a given Alias inside a Activity.
+     *
+     * @param surveyAlias the survey Alias to display.
+     * @param shouldForce force a survey to show ovverriding target settings.
+     */
     public void showSurvey(String surveyAlias, boolean shouldForce) {
 
         mQualarooController.showSurvey(surveyAlias, shouldForce);

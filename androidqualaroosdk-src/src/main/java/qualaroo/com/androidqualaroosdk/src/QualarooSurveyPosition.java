@@ -8,48 +8,48 @@ package qualaroo.com.androidqualaroosdk.src;
 /**
  * `QualarooSurveyPosition` enumerates all supportes attachment position for a Qualaroo Mobile survey.
  *
- * @note Please notice supported position vary depending on the platform.
+ * Please notice supported position vary depending on the platform.
  */
 public enum QualarooSurveyPosition {
 
     /**
      * Attach survey at the top of the host Activity's view
      *
-     * @note Phone only
+     * Phone only
      */
     QUALAROO_SURVEY_POSITION_TOP,
 
     /**
      * Attach survey at the bottom of the host Activity's view
      *
-     * @note Phone only
+     * Phone only
      */
     QUALAROO_SURVEY_POSITION_BOTTOM,
 
     /**
      * Attach survey at the top left corner of the host Activity's view
      *
-     * @note Tablet only
+     * Tablet only
      */
     QUALAROO_SURVEY_POSITION_TOP_LEFT,
 
     /**
      * Attach survey at the top right corner of the host Activity's view
      *
-     * @note Tablet only
+     * Tablet only
      */
     QUALAROO_SURVEY_POSITION_TOP_RIGHT,
 
     /**
      * Attach survey at the bottom right corner of the host Activity's view
      *
-     * @note Tablet only
+     * Tablet only
      */
     QUALAROO_SURVEY_POSITION_BOTTOM_LEFT,
 
     /**
      * Attach survey at the bottom right corner of the host Activity's view
      *
-     * @note Tablet only     */
+     * Tablet only     */
     QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH
 }
