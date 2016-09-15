@@ -1,4 +1,4 @@
-package qualaroo.com.androidqualaroosdk.src;
+package qualaroo.com.AndroidMobileSDK;
 
 import android.content.Context;
 import android.util.Log;

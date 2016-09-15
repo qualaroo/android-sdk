@@ -1,4 +1,4 @@
-package qualaroo.com.androidqualaroosdk.src;
+package qualaroo.com.AndroidMobileSDK;
 
 import android.app.Activity;
 import android.graphics.Color;

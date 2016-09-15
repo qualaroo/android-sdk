@@ -1,4 +1,4 @@
-package qualaroo.com.androidqualaroosdk.src;
+package qualaroo.com.AndroidMobileSDK;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("qualaroo.com.androidqualaroosdk.src.test", appContext.getPackageName());
+        assertEquals("qualaroo.com.src.test", appContext.getPackageName());
     }
 }

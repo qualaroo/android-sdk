@@ -1,4 +1,4 @@
-package qualaroo.com.androidqualaroosdk.src;
+package qualaroo.com.AndroidMobileSDK;
 
 /**
  * Created by Artem Orynko on 25.08.16.
