@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 24
@@ -27,4 +28,13 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.0'
     testCompile 'junit:junit:4.12'
+}
+
+publish {
+    userOrg = 'qualarooinc'
+    groupId = 'com.qualaroo'
+    repoName = 'AndroidMobileSDK'
+    artifactId = 'AndroidMobileSDK'
+    publishVersion = '1.0.0'
+    website = 'http://qualaroo.com'
 }
