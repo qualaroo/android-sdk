@@ -1,0 +1,55 @@
+/*
+ qualaroo-lightui-custom.css
+ QualarooMobileSDK
+
+ Created by Artem Orynko on 31/08/16.
+ Copyright © 2016 Qualaroo. All rights reserved.
+ */
+
+body,
+div#qual_scrnr.qual_scrnr,
+div#qual_ol.qual_ol {
+    background: hsl(0, 0%, 90%);
+}
+
+div#qual_scrnr.qual_scrnr,
+div#qual_ol.qual_ol {
+    border-top: 1px solid rgba(255, 255, 255, 0.75);
+}
+
+div#qual_ol .qual_ol_ans_item,
+div#qual_ol .qual_ol_ans_item:hover {
+    background: hsl(0, 0%, 52%);
+    color: white;
+}
+
+div#qual_ol .qual_x_select.qual_ol_ans_item {
+    background: hsl(0, 0%, 62%);
+    color: white;
+}
+
+div#qual_scrnr .qual_scrnr_txt_link,
+div#qual_scrnr .qual_scrnr_txt_link:hover,
+div#qual_ol_send.qual_ol_btn.qual_ol_send,
+div#qual_ol_send.qual_ol_btn.qual_ol_send:hover,
+div#qual_ol .qual_ol_btn,
+div#qual_ol .qual_ol_btn:hover {
+    background-color: hsl(196, 69%, 43%);
+    color: white;
+}
+
+div#qual_scrnr .qual_scrnr_txt_link:hover,
+div#qual_ol_send.qual_ol_btn.qual_ol_send:hover,
+div#qual_ol .qual_ol_btn:hover {
+    background-color: hsl(196, 69%, 53%);
+}
+
+div#qual_ol .qual_ol_logo,
+div#qual_scrnr .qual_scrnr_logo {
+    background-color: hsl(210, 3%, 74%);
+}
+
+div#qual_ol .qual_ol_check_svg_icon,
+div#qual_ol .qual_ol_check_svg_bg {
+    stroke: hsl(0, 0%, 20%);
+}

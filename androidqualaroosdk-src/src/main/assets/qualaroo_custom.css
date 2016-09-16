@@ -1,0 +1,333 @@
+/*
+  qualaroo-custom.css
+  QualarooMobileSDK
+
+  Created by Ruben Nine on 15/03/16.
+  Copyright © 2016 Qualaroo. All rights reserved.
+*/
+
+html {
+    -webkit-text-size-adjust: none; /* Never autoresize text */
+}
+
+:not(input):not(textarea) {
+    -webkit-user-select: none; /* disable selection/Copy of UIWebView */
+}
+
+/*
+    Font size overrides
+*/
+div#qual_scrnr.qual_scrnr,
+div#qual_ol.qual_ol,
+div#qual_mask.qual_mask {
+    font-size: 14.53px;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_title {
+    font-size: 1.0em;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_action {
+    font-size: 0.9em;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_link {
+    font-size: 1.2em;
+}
+
+div#qual_ol .qual_ol_ans_item {
+    font-size: 1.2em;
+}
+
+div#qual_ol .qual_ol_qtitle,
+div#qual_ol .qual_ol_qdescr,
+div#qual_ol .qual_ol_date_box,
+div#qual_ol .qual_ol_qlabel {
+    font-size: 0.88em;
+}
+
+div#qual_ol .qual_ol_btn,
+div#qual_ol_send.qual_ol_btn.qual_ol_send {
+    font-size: 1.2em;
+}
+
+div#qual_ol .qual_ol_nps_labels {
+    font-size: 0.8em;
+}
+
+/*
+    Other partial overrides
+*/
+div#qual_scrnr.qual_scrnr,
+div#qual_ol.qual_ol {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+div#qual_scrnr .qual_scrnr_logo {
+    top: 12px;
+    left: 12px;
+    height: 48px;
+    width: 48px;
+    border-radius: 8px;
+    border-width: 0;
+    position: absolute;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img {
+    left: 0;
+    right: 0;
+    padding: 0 12px;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_title,
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_action {
+    position: relative;
+    margin-left: 60px;
+    margin-right: 25px;
+    line-height: 1.33em;
+    padding-left: 0;
+    height: auto;
+}
+
+div#qual_scrnr .qual_scrnr_txt_w_img .qual_scrnr_txt_link {
+    font-weight: bold;
+    margin-top: 25px;
+    border: none;
+    border-radius: 0;
+    padding: 0.8em 0.5em 1em 0.5em;
+    height: auto;
+    line-height: 1em;
+}
+
+div#qual_ol .qual_ol_logo {
+    position: relative;
+    float: left;
+    left: 0;
+    top: 0;
+    height: 48px;
+    width: 48px;
+    margin-right: 12px;
+    border-radius: 8px;
+    border-width: 0;
+}
+
+div#qual_ol .qual_ol_send_box {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+div#qual_ol textarea.qual_ol_ans_text {
+    margin: 0;
+    width: 100%;
+    border: none;
+}
+
+div#qual_ol .qual_ol_btm {
+    width 100%;
+    padding: 0;
+}
+
+div#qual_ol .qual_ol_btn,
+div#qual_ol_send.qual_ol_btn.qual_ol_send {
+    width: 100%;
+    max-width: inherit;
+    border-radius: 0;
+    margin-top: 12px;
+    padding: 0.8em 0.5em 1em 0.5em;
+    height: auto;
+    line-height: 1em;
+}
+
+div#qual_ol .qual_ol_check {
+    height: 7.5em;
+}
+
+div#qual_ol .qual_ol_check_svg_icon,
+div#qual_ol .qual_ol_check_svg_bg {
+    fill: none;
+    stroke-width: 1.5px;
+}
+
+div#qual_ol .qual_ol_btn_dot {
+    display: none;
+}
+
+div#qual_scrnr .qual_x_close,
+div#qual_ol .qual_x_close {
+    z-index: 2;
+    top: 0.6em;
+    right: 0.6em;
+    min-width: 2em;
+    height: 2em;
+    border: none;
+    border-radius: 0;
+    stroke-width: 5px;
+}
+
+div#qual_scrnr .qual_x_close,
+div#qual_ol .qual_x_close,
+div#qual_scrnr .qual_x_close:hover,
+div#qual_ol .qual_x_close:hover {
+    background: none;
+}
+
+div#qual_mask.qual_mask {
+    display: none;
+}
+
+div#qual_scrnr.qual_scrnr {
+    left: 0;
+    right: 0;
+    height: 9.5em;
+    bottom: 0;
+}
+
+div#qual_tagline.qual_tagline {
+    display: none;
+}
+
+div#qual_ol .qual_ol_hr {
+    display: none;
+}
+
+div#qual_ol .qual_ol_qtitle {
+    padding-right: 1.85em;
+    margin-left: 0;
+    text-align: left;
+    font-weight: bold;
+}
+
+div#qual_ol .qual_ol_qdescr {
+    margin-bottom: 0;
+    padding: 0;
+}
+
+div#qual_ol.qual_ol {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/*
+    In some targets (i.e. iPad), the qual_ol node contains an inlined style="height: xxx"; that we want to override.
+
+    Please notice this min-height is based on the MinimizedSurveyHeight defined in QualarooSurveyController.m
+    with +1px added, so it is effective for sizes strictly greater than MinimizedSurveyHeight.
+*/
+@media screen and (min-height: 49px) {
+    div#qual_ol.qual_ol {
+        height: auto !important;
+    }
+}
+
+div#qual_ol .qual_ol_check {
+    margin-bottom: 0.5em;
+    height: 4.5em;
+}
+
+div#qual_ol .qual_ol_ans_item {
+    flex: 1;
+    font-weight: bold;
+    margin: 0;
+    min-height: inherit;
+    padding: 0.8em 1.182em 1em 1.182em;
+    line-height: 1em;
+    border: none;
+    border-radius: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: scroll;
+}
+
+div#qual_ol .qual_ol_ans_tick,
+div#qual_ol .qual_x_select .qual_ol_ans_tick {
+    display: none;
+}
+
+div#qual_ol .qual_ol_ans_item ~ .qual_ol_ans_item {
+    margin-left: 12px;
+}
+
+div#qual_tagline.qual_tagline {
+    padding-top: 0.545em;
+    text-align: center;
+}
+
+div#qual_ol div.qual_ol_box {
+    top: 12px;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    padding: 0;
+}
+
+div#qual_ol input.qual_ol_ans_text_single:last-child,
+div#qual_ol textarea.qual_ol_ans_text:last-child {
+    margin-bottom: 0;
+}
+
+div#qual_ol .qual_x_presense {
+    display: none;
+}
+
+div#qual_ol form.qual_ol_ans_box {
+    padding: 0.5em 0 0 0;
+    display: flex;
+    flex-direction: row;
+}
+
+div#qual_ol form.qual_ol_ans_box .qual_ol_ans_item:last-child {
+    margin-bottom: 0;
+}
+
+div#qual_ol form.qual_ol_ans_box.vertical-arrangement {
+    flex-direction: column;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+div#qual_ol form.qual_ol_ans_box.vertical-arrangement .qual_ol_ans_item {
+    text-align: left;
+    margin: 0 0 10px 0;
+}
+
+div#qual_ol form.qual_ol_ans_box.vertical-arrangement .qual_ol_ans_item:last-child {
+    margin-bottom: 0;
+}
+
+div#qual_ol .qual_ol_nps {
+    flex: 1;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+div#qual_ol .qual_ol_nps_ul {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+div#qual_ol .qual_ol_nps_labels {
+    margin-bottom: 0;
+    height: auto;
+}
+
+div#qual_ol .qual_ol_nps_ul li:first-child {
+    border-top-left-radius: 0.182em;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0.182em;
+}
+
+div#qual_ol .qual_ol_nps_ul li:last-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0.182em;
+    border-bottom-right-radius: 0.182em;
+    border-bottom-left-radius: 0;
+    border-right-width: 0.091em;
+}
