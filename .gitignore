@@ -39,9 +39,8 @@ captures/
 # Keystore files
 *.jks
 .idea/
-build.gradle
 gradle.properties
 gradle/
 gradlew
 gradlew.bat
-settings.gradle
+app/
