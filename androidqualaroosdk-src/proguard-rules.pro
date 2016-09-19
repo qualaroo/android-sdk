@@ -15,3 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class qualaroo.com.AndroidMobileSDK.QualarooSurvey {
+    public *;
+}
+-keep public enum * {
+    public *;
+}
