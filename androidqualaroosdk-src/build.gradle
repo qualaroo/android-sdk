@@ -13,7 +13,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,6 +37,6 @@ publish {
     dryRun = 'false'
     repoName = 'AndroidMobileSDK'
     artifactId = 'AndroidMobileSDK'
-    publishVersion = '1.0.1'
+    publishVersion = '1.0.2.5'
     website = 'http://qualaroo.com'
 }

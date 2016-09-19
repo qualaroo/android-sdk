@@ -29,7 +29,7 @@ import static android.view.Gravity.*;
  * Copyright © 2016 Qualaroo. All rights reserved.
  */
 
-public class QualarooController {
+class QualarooController {
 
     // Tag for debug
     private static final String TAG = QualarooController.class.getSimpleName();
