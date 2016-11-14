@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -142,7 +143,7 @@ class QualarooController {
 
             jsString = "triggerSurvey('" + surveyAlias + "', " + shouldForce + ")";
 
-            mWebView.evaluateJavascript(jsString, null);
+            evaluateJavaScript(jsString, null);
         }
     }
 
@@ -310,18 +311,26 @@ class QualarooController {
     private void loadQualarooScriptIfNeeded(){
 
         String jsString = "loadQualarooScriptIfNeeded('" + mScriptURL + "');";
-        mWebView.evaluateJavascript(jsString, null);
+        evaluateJavaScript(jsString, null);
 
     }
     //endregion
 
     //region Protected Methods
 
+    protected void evaluateJavaScript(String script, ValueCallback<String> resultCallback) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mWebView.evaluateJavascript(script, resultCallback);
+        } else {
+            mWebView.loadUrl("javascript:" + script);
+        }
+    }
+
     protected void setupIdentityCode() {
         final String deviceUUID = UUID.randomUUID().toString();
         String jsString = "_kiq.push(['identify', '" + deviceUUID + "'])";
 
-        mWebView.evaluateJavascript(jsString, null);
+        evaluateJavaScript(jsString, null);
     }
 
     protected void updateHeight(){

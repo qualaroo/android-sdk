@@ -76,8 +76,8 @@ QualarooHost.prototype = {
             var linksArray = Array.prototype.slice.call(links);
 
             // Check if stylesheet is already present
-            for (link of linksArray) {
-                if (link.href.split("/").pop() == relativeURL) {
+            for (var index in linksArray) {
+                if (linksArray[index].href.split("/").pop() == relativeURL) {
                     // Already there; return early and call callback
                     onLoadCallback();
                     return;
@@ -192,10 +192,10 @@ QualarooHost.prototype = {
             var ansItemsList = ansBox.getElementsByClassName("qual_ol_ans_item");
             var ansItems = Array.prototype.slice.call(ansItemsList);
 
-            for (item of ansItems) {
+            for (var index in ansItems) {
                // As soon as we find an item that does not fit inside its intended space,
                // we change the answers arrangement to vertical.
-               if (item.scrollWidth > item.offsetWidth) {
+               if (ansItems[index].scrollWidth > ansItems[index].offsetWidth) {
                     // arrange items vertically
                     ansBox.classList.add("vertical-arrangement");
 
@@ -288,9 +288,9 @@ QualarooHost.prototype = {
             var linksArray = Array.prototype.slice.call(links);
 
             // Check if stylesheet is already present
-            for (link of linksArray) {
-                if (link.href.split("/").pop() == relativeURL) {
-                    head.removeChild(link);
+            for (var index in linksArray) {
+                if (linksArray[index].href.split("/").pop() == relativeURL) {
+                    head.removeChild(linksArray[index]);
                 }
             }
         }
