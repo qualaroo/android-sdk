@@ -1,0 +1,299 @@
+package qualaroo.com.AndroidMobileSDKDemo;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.InflateException;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import qualaroo.com.AndroidMobileSDK.QualarooSurvey;
+import qualaroo.com.AndroidMobileSDK.QualarooSurveyPosition;
+
+public class Survey extends AppCompatActivity {
+
+    EditText apiKeyEditText;
+    EditText    surveyAliasEditText;
+    Button showSurveyButton;
+    Spinner positionSpinner;
+
+    String      mSurveyAlias;
+    String      mAPIKey;
+
+    boolean mIsTable;
+    SharedPreferences sharedPreferences;
+    QualarooSurveyPosition mAttachmentPosition;
+
+    public String getSurveyAlias() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSurveyAlias = sharedPreferences.getString("DemoSurvey", "");
+        return mSurveyAlias;
+    }
+
+    public void setSurveyAlias(String surveyAlias) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("DemoSurvey", surveyAlias).apply();
+
+        if (mQualarooSurvey != null && !surveyAlias.isEmpty()) {
+            showSurveyButton.setEnabled(true);
+        } else {
+            showSurveyButton.setEnabled(false);
+        }
+
+        mSurveyAlias = surveyAlias;
+    }
+
+    public String getAPIKey() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mAPIKey = sharedPreferences.getString("DemoAPIKey", "");
+        return mAPIKey;
+    }
+
+    public void setAPIKey(String APIKey) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("DemoAPIKey", APIKey).apply();
+
+        showSurveyButton.setEnabled(false);
+
+        mAPIKey = APIKey;
+
+        if (!APIKey.isEmpty()) {
+            instantiateQualarooWithAPIKey(APIKey);
+        }
+    }
+
+    public QualarooSurveyPosition getAttachmentPosition() {
+        String position;
+        QualarooSurveyPosition attachmentPosition;
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        position = sharedPreferences.getString("DemoAttachmentPosition", "");
+
+        if (position == null) {
+            if (this.getResources().getBoolean(qualaroo.com.AndroidMobileSDKDemo.R.bool.isTablet)) {
+                attachmentPosition = QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH;
+            } else {
+                attachmentPosition = QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM;
+            }
+            mAttachmentPosition = attachmentPosition;
+        } else {
+            mAttachmentPosition = QualarooSurveyPosition.valueOf(position);
+        }
+        return mAttachmentPosition;
+    }
+
+    public void setAttachmentPosition(QualarooSurveyPosition attachmentPosition) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("DemoAttachmentPosition", attachmentPosition.toString()).apply();
+
+        showSurveyButton.setEnabled(false);
+
+        if (!getAPIKey().isEmpty()) {
+            instantiateQualarooWithAPIKey(mAPIKey);
+        }
+    }
+
+    QualarooSurvey mQualarooSurvey = new QualarooSurvey(this);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_survey);
+
+        mIsTable = getResources().getBoolean(R.bool.isTablet);
+
+        apiKeyEditText      = (EditText)findViewById(R.id.apikey_edittext);
+        surveyAliasEditText = (EditText)findViewById(R.id.survey_edittext);
+        showSurveyButton    = (Button)findViewById(R.id.show_survey_button);
+
+        showSurveyButton.setEnabled(false);
+        apiKeyEditText.setText(getAPIKey());
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getStringPosition());
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+
+        positionSpinner = (Spinner) findViewById(R.id.spinner);
+        positionSpinner.setAdapter(adapter);
+        positionSpinner.setPrompt("Survey position");
+        positionSpinner.setSelection(0);
+
+        if (getSurveyAlias() != null) {
+            surveyAliasEditText.setText(getSurveyAlias());
+        } else {
+            surveyAliasEditText.setText("");
+        }
+
+        apiKeyEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) { return; }
+
+                String s = ((EditText) v).getText().toString();
+                if (!s.isEmpty()) {
+                    setAPIKey(s);
+                }
+            }
+        });
+
+        apiKeyEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (event != null &&
+                        (event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
+                                actionId == EditorInfo.IME_ACTION_DONE)) {
+                    surveyAliasEditText.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        surveyAliasEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) { return; }
+
+                String s = ((EditText) v).getText().toString();
+                setSurveyAlias(s);
+            }
+        });
+
+        surveyAliasEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (event != null &&
+                        (event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
+                                actionId == EditorInfo.IME_ACTION_DONE)) {
+                    InputMethodManager inputMethodManager;
+                    inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(surveyAliasEditText.getWindowToken(), 0);
+                    showSurveyButton.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        positionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mIsTable) {
+                    switch (position){
+                        case 0:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH);
+                            break;
+                        case 1:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM_LEFT);
+                            break;
+                        case 2:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_TOP_RIGHT);
+                            break;
+                        case 3:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM_LEFT);
+                            break;
+                    }
+                } else {
+                    switch (position) {
+                        case 0:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM);
+                            break;
+                        case 1:
+                            setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_TOP);
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        showSurveyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mQualarooSurvey == null) {
+                    presentErrorMessage("Qualaroo Survey is not properly configured. Please enter a valid API Key.");
+                } else {
+                    mQualarooSurvey.showSurvey(mSurveyAlias, true);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mQualarooSurvey.removeFromActivity();
+    }
+
+    //region Private Methods
+
+    private boolean instantiateQualarooWithAPIKey(String APIKey) {
+
+        mQualarooSurvey.removeFromActivity();
+        mQualarooSurvey = null;
+
+        try {
+            mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey);
+            mQualarooSurvey.attachToActivity(getAttachmentPosition());
+
+            if (!mSurveyAlias.isEmpty()) {
+                showSurveyButton.setEnabled(true);
+            }
+            return true;
+        } catch (InflateException e) {
+            presentErrorMessage(e.getMessage());
+        }
+        return true;
+    }
+
+    private String[] getStringPosition() {
+        if (this.getResources().getBoolean(R.bool.isTablet)) {
+            return new String[] {
+                    "Bottom Right",
+                    "Bottom Left",
+                    "Top Right",
+                    "Top Left"
+            };
+        } else {
+            return new String[] {
+                    "Bottom",
+                    "Top"
+            };
+        }
+    }
+
+    private void presentErrorMessage(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("QualarooAndroidSDK")
+                .setMessage(message)
+                .setCancelable(false)
+                .setNegativeButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    //endregion
+
+}
