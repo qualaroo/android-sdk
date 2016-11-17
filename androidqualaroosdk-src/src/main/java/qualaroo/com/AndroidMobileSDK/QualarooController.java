@@ -1,17 +1,25 @@
 package qualaroo.com.AndroidMobileSDK;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -41,7 +49,8 @@ class QualarooController {
     private boolean mIsTablet;
 
     private String  mScriptURL;
-    protected float   mSuggestedHeight;
+    private String mIdentity;
+    private float   mSuggestedHeight;
     protected boolean mMinimized;
     protected boolean mHtmlLoaded;
     protected boolean mQualarooScriptLoaded;
@@ -51,6 +60,40 @@ class QualarooController {
     WebView         mWebView;
 
     //region Protected Methods
+
+    protected int getSugesstedHeight() {
+        return (int) mSuggestedHeight;
+    }
+
+    protected void setSuggestedHeight(float suggestedHeight) {
+        WindowManager windowManager = (WindowManager) mHostActivity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int newSuggestedHeight = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                suggestedHeight,
+                mHostActivity.getResources().getDisplayMetrics()
+        );
+        int halfScreenHeight = size.y / 2;
+
+        if (halfScreenHeight < newSuggestedHeight) {
+            mSuggestedHeight = halfScreenHeight;
+        } else {
+            mSuggestedHeight = newSuggestedHeight;
+        }
+    }
+
+    protected String getIdentity() {
+        if (mIdentity == null) {
+            mIdentity = UUID.randomUUID().toString();
+        }
+        return mIdentity;
+    }
+
+    protected void setIdentity(String mIdentity) {
+        this.mIdentity = mIdentity;
+    }
 
     protected QualarooController(Activity hostActivity, QualarooSurvey delegate) {
         mDelegate = delegate;
@@ -62,16 +105,14 @@ class QualarooController {
 
         // Decode API key
         if (!decodeAPIKey(APIKey)) {
-            //TODO: print error
+            Log.d(TAG, "Unable to obtain data from APIKey");
             return null;
         }
 
         // Initialize properties
-        mSuggestedHeight = 0;
+        setSuggestedHeight(0);
         mMinimized = false;
         mHtmlLoaded = false;
-
-        //TODO: OBserve to keyboard show/hide
 
         initializeWebView();
 
@@ -102,8 +143,6 @@ class QualarooController {
         mWebView.loadUrl(mBaseURL);
 
         mHostActivity.addContentView(mLinearLayout, mLinearLayout.getLayoutParams());
-
-        //TODO: constaint
 
         return true;
     }
@@ -142,7 +181,7 @@ class QualarooController {
 
             jsString = "triggerSurvey('" + surveyAlias + "', " + shouldForce + ")";
 
-            mWebView.evaluateJavascript(jsString, null);
+            evaluateJavaScript(jsString, null);
         }
     }
 
@@ -200,7 +239,6 @@ class QualarooController {
 
         mLinearLayout = new LinearLayout(mHostActivity);
 
-        mLinearLayout.setId(R.id.my_linear_layout);
         mLinearLayout.setOrientation(LinearLayout.VERTICAL);
         mLinearLayout.setBackgroundColor(Color.TRANSPARENT);
         mLinearLayout.setVisibility(View.INVISIBLE);
@@ -234,7 +272,13 @@ class QualarooController {
         }
 
         mWebView = new WebView(mHostActivity);
-        mWebView.setId(R.id.my_webview);
+
+        WebSettings webSettings;
+        webSettings = mWebView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAppCacheEnabled(false);
+
         mWebView.setBackgroundColor(Color.TRANSPARENT);
         mWebView.setVisibility(View.INVISIBLE);
         mWebView.setWebChromeClient(new WebChromeClient());
@@ -254,21 +298,11 @@ class QualarooController {
                 "Qualaroo"
         );
 
-        WebSettings webSettings;
-        webSettings = mWebView.getSettings();
-
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setAppCacheEnabled(false);
-
         LinearLayout.LayoutParams layoutParams;
 
         layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        mSuggestedHeight,
-                        mHostActivity.getResources().getDisplayMetrics()
-                )
+                getSugesstedHeight()
         );
 
         mWebView.setLayoutParams(layoutParams);
@@ -310,26 +344,38 @@ class QualarooController {
     private void loadQualarooScriptIfNeeded(){
 
         String jsString = "loadQualarooScriptIfNeeded('" + mScriptURL + "');";
-        mWebView.evaluateJavascript(jsString, null);
+        evaluateJavaScript(jsString, null);
 
     }
     //endregion
 
     //region Protected Methods
 
-    protected void setupIdentityCode() {
-        final String deviceUUID = UUID.randomUUID().toString();
-        String jsString = "_kiq.push(['identify', '" + deviceUUID + "'])";
+    protected void evaluateJavaScript(final String script, final ValueCallback<String> resultCallback) {
 
-        mWebView.evaluateJavascript(jsString, null);
+        mHostActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    mWebView.evaluateJavascript(script, resultCallback);
+                } else {
+                    mWebView.loadUrl("javascript:" + script);
+                }
+            }
+        });
+    }
+
+    protected void setupIdentityCode() {
+
+        String jsString = "_kiq.push(['identify', '" + getIdentity() + "'])";
+
+        evaluateJavaScript(jsString, null);
+        Log.d(TAG, "Qualaroo Identity Code set to " + getIdentity());
     }
 
     protected void updateHeight(){
-        int newHeight = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                mSuggestedHeight,
-                mHostActivity.getResources().getDisplayMetrics()
-        );
+        int newHeight = getSugesstedHeight();
         final LinearLayout.LayoutParams layoutParams;
         layoutParams = (LinearLayout.LayoutParams) mWebView.getLayoutParams();
         layoutParams.height = newHeight;

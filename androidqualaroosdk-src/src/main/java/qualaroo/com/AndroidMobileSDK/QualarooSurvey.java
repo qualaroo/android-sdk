@@ -113,6 +113,14 @@ public class QualarooSurvey {
         mQualarooController.showSurvey(surveyAlias, shouldForce);
     }
 
+    /**
+     * Set custom Qualaroo Identity Code based on the string
+     * @param string Custom Identity Code
+     */
+    public void setIdentityCodeWithString(String string) {
+        mQualarooController.setIdentity(string);
+    }
+
     //endregion
 
     //region Protected Methods

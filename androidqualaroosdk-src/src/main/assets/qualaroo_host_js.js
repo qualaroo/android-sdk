@@ -7,6 +7,8 @@
 //
 
 var QualarooHost = function() {};
+var isVertical = false;
+var isScrolled = false;
 
 QualarooHost.prototype = {
 
@@ -76,8 +78,8 @@ QualarooHost.prototype = {
             var linksArray = Array.prototype.slice.call(links);
 
             // Check if stylesheet is already present
-            for (link of linksArray) {
-                if (link.href.split("/").pop() == relativeURL) {
+            for (var index in linksArray) {
+                if (linksArray[index].href.split("/").pop() == relativeURL) {
                     // Already there; return early and call callback
                     onLoadCallback();
                     return;
@@ -165,6 +167,65 @@ QualarooHost.prototype = {
             });
         }
     },
+    addOnClickItems: function() {
+    	var itemsList = document.getElementsByClassName("qual_ol_ans_item");
+	    var items = Array.prototype.slice.call(itemsList);
+
+        if (items.length != 0) {
+	        for (var index in items) {
+	            if (items[index].onclick) return;
+	            items[index].onclick = function(event) {
+	              event.target.scrollIntoView();
+	            }
+	        }
+        }
+    },
+
+    demoScroll: function () {
+      var box = document.getElementById("qual_ol_box");
+      if (box && isVertical && !isScrolled) {
+        Qualaroo.qualarooStartDemoScroll();
+        setTimeout(function() {
+            function scrollDown(element, to, difference) {
+
+              var oldDifference = difference;
+              var difference = to - element.scrollTop;
+              var perTick = 2;
+
+              if (oldDifference == difference) {
+                setTimeout(function () {
+                  scrollTo(box, 0, 1000);
+                }, 800);
+                return;
+              } else {
+                oldDifference = difference;
+              }
+
+              setTimeout(function() {
+                element.scrollTop = element.scrollTop + perTick;
+                scrollDown(element, to, oldDifference);
+              }, 10);
+            }
+            scrollDown(box, suggestedNewHeight, 0);
+            function scrollTo(element, to, duration) {
+
+                var difference = to - element.scrollTop;
+                var perTick = difference / duration * 10;
+
+                if (duration <= 0) return;
+                setTimeout(function() {
+                    element.scrollTop = element.scrollTop + perTick;
+                    if (element.scrollTop == to) {
+                        Qualaroo.qualarooStopDemoScroll();
+                        isScrolled = true;
+                        return;
+                    }
+                    scrollTo(element, to, duration - 10);
+                }, 10);
+            }
+        }, 800);
+      }
+    },
 
     calculateCurrentHeight: function() {
         var ol = document.getElementById("qual_ol");
@@ -192,15 +253,14 @@ QualarooHost.prototype = {
             var ansItemsList = ansBox.getElementsByClassName("qual_ol_ans_item");
             var ansItems = Array.prototype.slice.call(ansItemsList);
 
-            for (item of ansItems) {
+            for (var index in ansItems) {
                // As soon as we find an item that does not fit inside its intended space,
                // we change the answers arrangement to vertical.
-               if (item.scrollWidth > item.offsetWidth) {
+               if (isVertical) break;
+               if (ansItems[index].scrollWidth > ansItems[index].offsetWidth) {
                     // arrange items vertically
                     ansBox.classList.add("vertical-arrangement");
-
-                    this.forceScrollHintsRefresh();
-
+                    isVertical = true;
                     // break the loop early
                     break;
                 } else {
@@ -225,18 +285,6 @@ QualarooHost.prototype = {
             logo.style.display = "none";
         } else {
             logo.style.display = "block";
-        }
-    },
-
-    forceScrollHintsRefresh: function() {
-        // naive way to force scroll hints to appear
-        var box = document.getElementById("qual_ol_box");
-
-        if (box) {
-            box.scrollTop = 1;
-            setTimeout(function() {
-                box.scrollTop = 0;
-            }, 25);
         }
     },
 
@@ -274,6 +322,8 @@ QualarooHost.prototype = {
     },
 
     notifySurveyClosed: function() {
+      isVertical = false;
+      isScrolled = false;
       Qualaroo.surveyClosed();
     },
 
@@ -288,9 +338,9 @@ QualarooHost.prototype = {
             var linksArray = Array.prototype.slice.call(links);
 
             // Check if stylesheet is already present
-            for (link of linksArray) {
-                if (link.href.split("/").pop() == relativeURL) {
-                    head.removeChild(link);
+            for (var index in linksArray) {
+                if (linksArray[index].href.split("/").pop() == relativeURL) {
+                    head.removeChild(linksArray[index]);
                 }
             }
         }

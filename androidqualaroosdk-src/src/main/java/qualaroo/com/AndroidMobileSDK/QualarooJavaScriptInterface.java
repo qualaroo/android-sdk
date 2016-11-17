@@ -52,7 +52,7 @@ class QualarooJavaScriptInterface {
         Log.d(TAG, "Close/minimize/maximize tapped " + isMinimized);
 
         if (isMinimized) {
-            mQualarooController.mSuggestedHeight = 48;
+            mQualarooController.setSuggestedHeight(48);
             mQualarooController.updateHeight();
         } else {
             mQualarooController.updateHeight();
@@ -67,7 +67,7 @@ class QualarooJavaScriptInterface {
         if (!minimized) {
             Log.d(TAG, "Survey height changed. New height suggested: " + suggestedHeight);
 
-            mQualarooController.mSuggestedHeight = suggestedHeight;
+            mQualarooController.setSuggestedHeight(suggestedHeight);
             mQualarooController.updateHeight();
         }
     }
@@ -103,5 +103,15 @@ class QualarooJavaScriptInterface {
             mQualarooController.mDelegate.errorLoadingQualarooScript(message);
         }
 
+    }
+
+    @JavascriptInterface
+    public void qualarooStartDemoScroll() {
+        Log.d(TAG, "Srart scroll down");
+    }
+
+    @JavascriptInterface
+    public void qualarooStopDemoScroll() {
+        Log.d(TAG, "Stop scroll up");
     }
 }

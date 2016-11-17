@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_survey"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="qualaroo.com.AndroidMobileSDKDemo.Survey"
+    android:layout_weight="2">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/apikey_textview"
+            android:textSize="18sp"
+            android:textStyle="normal|bold"
+            android:textAlignment="center"/>
+
+        <EditText
+            android:id="@+id/apikey_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/apikey_hint"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/survey_alias"
+            android:textSize="18sp"
+            android:textStyle="normal|bold"
+            android:textAlignment="center"/>
+
+        <EditText
+            android:id="@+id/survey_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/survey_hint"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/>
+    </LinearLayout>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/show_survey_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/show_survey_button"
+        />
+</LinearLayout>
