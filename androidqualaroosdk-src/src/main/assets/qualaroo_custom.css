@@ -242,7 +242,6 @@ div#qual_ol .qual_ol_ans_item {
     border-radius: 0;
     text-align: center;
     white-space: nowrap;
-    overflow: scroll;
 }
 
 div#qual_ol .qual_ol_ans_tick,
@@ -295,6 +294,8 @@ div#qual_ol form.qual_ol_ans_box.vertical-arrangement {
 div#qual_ol form.qual_ol_ans_box.vertical-arrangement .qual_ol_ans_item {
     text-align: left;
     margin: 0 0 10px 0;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 div#qual_ol form.qual_ol_ans_box.vertical-arrangement .qual_ol_ans_item:last-child {
@@ -330,4 +331,8 @@ div#qual_ol .qual_ol_nps_ul li:last-child {
     border-bottom-right-radius: 0.182em;
     border-bottom-left-radius: 0;
     border-right-width: 0.091em;
+}
+
+div#qual_ol .qual_ol_more_above, div#qual_ol .qual_ol_more_below {
+    display: none;
 }

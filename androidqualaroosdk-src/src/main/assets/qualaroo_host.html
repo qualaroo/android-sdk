@@ -65,7 +65,7 @@
             window.addEventListener("resize", function() {
                 setTimeout(function() {
                     qualarooHost.reflowAnswers();
-                    qualarooHost.forceScrollHintsRefresh();
+                    qualarooHost.demoScroll();
                     qualarooHost.notifySurveyHeightChangedIfNeeded();
                 }, 250);
             });
@@ -107,6 +107,7 @@
                     qualarooHost.hideLogoIfCheckIsPresent();
                     qualarooHost.notifySurveyHeightChangedIfNeeded();
                 }, 0);
+                qualarooHost.addOnClickItems();
             }]);
 
             _kiq.push(['eventHandler', 'close', function() {
