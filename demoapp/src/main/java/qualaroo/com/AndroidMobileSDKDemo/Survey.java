@@ -16,21 +16,30 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.Objects;
+
+import qualaroo.com.AndroidMobileSDK.QualarooBackgroundStyle;
 import qualaroo.com.AndroidMobileSDK.QualarooSurvey;
 import qualaroo.com.AndroidMobileSDK.QualarooSurveyPosition;
 
 public class Survey extends AppCompatActivity {
 
     EditText apiKeyEditText;
-    EditText    surveyAliasEditText;
+    EditText apiSecretKeyEditText;
+    EditText surveyAliasEditText;
     Button showSurveyButton;
     Spinner positionSpinner;
+    Spinner backgroundStyleSpinner;
+    SeekBar seekBar;
 
-    String      mSurveyAlias;
-    String      mAPIKey;
+    String mSurveyAlias;
+    String mAPIKey;
+    String mAPISecretKey;
+    int alpha = 128;
 
     boolean mIsTable;
     SharedPreferences sharedPreferences;
@@ -69,9 +78,40 @@ public class Survey extends AppCompatActivity {
 
         mAPIKey = APIKey;
 
-        if (!APIKey.isEmpty()) {
-            instantiateQualarooWithAPIKey(APIKey);
-        }
+    }
+
+    public String getAPISecretKey() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mAPISecretKey = sharedPreferences.getString("DemoAPISecretKey", "");
+        return mAPISecretKey;
+    }
+
+    public void setAPISecretKey(String APISecretKey) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("DemoAPISecretKey", APISecretKey).apply();
+
+        mAPISecretKey = APISecretKey;
+
+    }
+
+    public QualarooBackgroundStyle getBackgroundStyle() {
+        String style;
+        QualarooBackgroundStyle backgroundStyle;
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        style = sharedPreferences.getString("BackgroundStyle", "");
+
+        if (Objects.equals(style, ""))
+            backgroundStyle = QualarooBackgroundStyle.DARK;
+        else
+            backgroundStyle = QualarooBackgroundStyle.valueOf(style);
+
+        return backgroundStyle;
+    }
+
+    public void setBackgroundStyle(QualarooBackgroundStyle style) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putString("BackgroundStyle", style.toString()).apply();
     }
 
     public QualarooSurveyPosition getAttachmentPosition() {
@@ -100,9 +140,6 @@ public class Survey extends AppCompatActivity {
 
         showSurveyButton.setEnabled(false);
 
-        if (!getAPIKey().isEmpty()) {
-            instantiateQualarooWithAPIKey(mAPIKey);
-        }
     }
 
     QualarooSurvey mQualarooSurvey = new QualarooSurvey(this);
@@ -114,12 +151,15 @@ public class Survey extends AppCompatActivity {
 
         mIsTable = getResources().getBoolean(R.bool.isTablet);
 
-        apiKeyEditText      = (EditText)findViewById(R.id.apikey_edittext);
-        surveyAliasEditText = (EditText)findViewById(R.id.survey_edittext);
-        showSurveyButton    = (Button)findViewById(R.id.show_survey_button);
+        apiKeyEditText = (EditText) findViewById(R.id.apikey_edittext);
+        surveyAliasEditText = (EditText) findViewById(R.id.survey_edittext);
+        showSurveyButton = (Button) findViewById(R.id.show_survey_button);
+        apiSecretKeyEditText = (EditText) findViewById(R.id.secretkey_edittext);
 
         showSurveyButton.setEnabled(false);
         apiKeyEditText.setText(getAPIKey());
+        apiSecretKeyEditText.setText(getAPISecretKey());
+        surveyAliasEditText.setText(getSurveyAlias());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getStringPosition());
         adapter.setDropDownViewResource(R.layout.spinner_item);
@@ -129,16 +169,20 @@ public class Survey extends AppCompatActivity {
         positionSpinner.setPrompt("Survey position");
         positionSpinner.setSelection(0);
 
-        if (getSurveyAlias() != null) {
-            surveyAliasEditText.setText(getSurveyAlias());
-        } else {
-            surveyAliasEditText.setText("");
-        }
+        //Spinner, set backgroundStyle
+        ArrayAdapter<String> background_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getStringBackground());
+        background_adapter.setDropDownViewResource(R.layout.spinner_item);
+        backgroundStyleSpinner = (Spinner) findViewById(R.id.spinner_background_style);
+        backgroundStyleSpinner.setAdapter(background_adapter);
+        backgroundStyleSpinner.setPrompt("Background style");
+        backgroundStyleSpinner.setSelection(getBackgroundStyle().ordinal());
 
         apiKeyEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) { return; }
+                if (hasFocus) {
+                    return;
+                }
 
                 String s = ((EditText) v).getText().toString();
                 if (!s.isEmpty()) {
@@ -148,6 +192,33 @@ public class Survey extends AppCompatActivity {
         });
 
         apiKeyEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (event != null &&
+                        (event.getKeyCode() == KeyEvent.KEYCODE_ENTER ||
+                                actionId == EditorInfo.IME_ACTION_DONE)) {
+                    apiSecretKeyEditText.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        apiSecretKeyEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    return;
+                }
+
+                String s = ((EditText) v).getText().toString();
+                if (!s.isEmpty()) {
+                    setAPISecretKey(s);
+                }
+            }
+        });
+
+        apiSecretKeyEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event != null &&
@@ -163,7 +234,9 @@ public class Survey extends AppCompatActivity {
         surveyAliasEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) { return; }
+                if (hasFocus) {
+                    return;
+                }
 
                 String s = ((EditText) v).getText().toString();
                 setSurveyAlias(s);
@@ -186,11 +259,32 @@ public class Survey extends AppCompatActivity {
             }
         });
 
+        backgroundStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                switch (position) {
+                    case 0:
+                        setBackgroundStyle(QualarooBackgroundStyle.DARK);
+                        break;
+                    case 1:
+                        setBackgroundStyle(QualarooBackgroundStyle.GREY);
+                        break;
+                    case 2:
+                        setBackgroundStyle(QualarooBackgroundStyle.LIGHT);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         positionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mIsTable) {
-                    switch (position){
+                    switch (position) {
                         case 0:
                             setAttachmentPosition(QualarooSurveyPosition.QUALAROO_SURVEY_POSITION_BOTTOM_RIGTH);
                             break;
@@ -222,13 +316,34 @@ public class Survey extends AppCompatActivity {
             }
         });
 
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        seekBar.setMax(255);
+        seekBar.setProgress(128);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int value, boolean b) {
+                alpha = value;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         showSurveyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                instantiateQualarooWithAPIKey();
                 if (mQualarooSurvey == null) {
                     presentErrorMessage("Qualaroo Survey is not properly configured. Please enter a valid API Key.");
                 } else {
+                    mQualarooSurvey.setBackgroundStyle(getBackgroundStyle(), alpha);
                     mQualarooSurvey.showSurvey(mSurveyAlias, true);
                 }
             }
@@ -243,14 +358,19 @@ public class Survey extends AppCompatActivity {
 
     //region Private Methods
 
-    private boolean instantiateQualarooWithAPIKey(String APIKey) {
+    private boolean instantiateQualarooWithAPIKey() {
 
         mQualarooSurvey.removeFromActivity();
         mQualarooSurvey = null;
 
         try {
-            mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey);
+            if (getAPISecretKey() == "") {
+                mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey);
+            } else {
+                mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey, mAPISecretKey);
+            }
             mQualarooSurvey.attachToActivity(getAttachmentPosition());
+            mQualarooSurvey.setIdentityCodeWithString("Android test #1");
 
             if (!mSurveyAlias.isEmpty()) {
                 showSurveyButton.setEnabled(true);
@@ -264,18 +384,26 @@ public class Survey extends AppCompatActivity {
 
     private String[] getStringPosition() {
         if (this.getResources().getBoolean(R.bool.isTablet)) {
-            return new String[] {
+            return new String[]{
                     "Bottom Right",
                     "Bottom Left",
                     "Top Right",
                     "Top Left"
             };
         } else {
-            return new String[] {
+            return new String[]{
                     "Bottom",
                     "Top"
             };
         }
+    }
+
+    private String[] getStringBackground() {
+        return new String[]{
+                "Dark",
+                "Grey",
+                "White"
+        };
     }
 
     private void presentErrorMessage(String message) {

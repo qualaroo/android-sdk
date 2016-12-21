@@ -16,6 +16,19 @@
             var deferredTriggerSurveyFn;
             var qualarooScriptLoaded = false;
             var qualarooScriptLoading = false;
+            var alias;
+
+            if (false) {
+              // Disable screener hiding for debugging purposes
+              window.oldSetTimeout = window.setTimeout;
+              window.setTimeout = function (func, delay) {
+                if (delay == 0) {
+                  return window.oldSetTimeout(func, delay);
+                } else {
+                  console.log('Ignore timer for ' + delay.toString() + 'ms');
+                }
+              };
+            }
 
             function loadQualarooScriptIfNeeded(url) {
                 if (!qualarooScriptLoaded && !qualarooScriptLoading) {
@@ -26,6 +39,8 @@
                         qualarooScriptLoading = false;
 
                         Qualaroo.qualarooScriptLoadSuccess(url);
+
+                        getSurveyInfo();
 
                         if (deferredTriggerSurveyFn) {
                             setTimeout(function() {
@@ -46,16 +61,25 @@
             }
 
             function triggerSurvey(surveyAlias, shouldForce) {
-              var surveyID = String(KI._info.surveyAliases[surveyAlias]);
+              alias = surveyAlias;
               if (qualarooScriptLoaded) {
+                var surveyID = String(KI._info.surveyAliases[surveyAlias]);
                 _kiq.push(['stopSurvey']);
                 _kiq.push(['showSurvey', surveyID, shouldForce]);
               } else {
                 // Let's trigger later
                 deferredTriggerSurveyFn = function() {
-                  triggerSurvey(surveyID, shouldForce);
+                  triggerSurvey(surveyAlias, shouldForce);
                 };
               }
+            }
+
+            function getSurveyInfo() {
+              var surveysInfo = {
+                surveyRequireMaps: KI._info.surveyRequireMaps,
+                surveyAliases: KI._info.surveyAliases
+              };
+              qualarooHost.notifyGetSurveysInfo(JSON.stringify(surveysInfo));
             }
 
             window.addEventListener("error", function(e) {
@@ -65,7 +89,7 @@
             window.addEventListener("resize", function() {
                 setTimeout(function() {
                     qualarooHost.reflowAnswers();
-                    qualarooHost.demoScroll();
+                    qualarooHost.demoScroll(alias);
                     qualarooHost.notifySurveyHeightChangedIfNeeded();
                 }, 250);
             });
