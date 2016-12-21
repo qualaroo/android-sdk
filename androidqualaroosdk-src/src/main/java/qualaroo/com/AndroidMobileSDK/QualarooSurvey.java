@@ -9,7 +9,7 @@ import android.util.Log;
  */
 
 /**
- * `QualarooMobile` provides an easy intarface to attach, remove and display Qualaroo Mobile surveys
+ * `QualarooMobile` provides an easy intarface to attach, remove and display Qualaroo Mobile mSurveys
  * inside a Activity.
  */
 public class QualarooSurvey {
@@ -27,7 +27,7 @@ public class QualarooSurvey {
     /**
      * Instantiates a new QualarooSurvey with Activity.
      *
-     * @param hostActivity the Activity that will be used to host surveys.
+     * @param hostActivity the Activity that will be used to host mSurveys.
      */
     public QualarooSurvey(Activity hostActivity) {
         mHostActivity = hostActivity;
@@ -40,17 +40,25 @@ public class QualarooSurvey {
      * @return the QualarooSurvey.
      */
     public QualarooSurvey initWithAPIKey(String APIKey) {
+      return initWithAPIKey(APIKey, "");
+    }
 
-        mQualarooController = new QualarooController(mHostActivity, this).initWithAPIKey(APIKey);
+    /**
+     * Designated initializer with APIKey.
+     *
+     * @param APIKey the API key from Qualaroo.
+     * @param APISecretKey the API secret key from Qualaroo accaunt
+     * @return the QualarooSurvey.
+     */
+    public QualarooSurvey initWithAPIKey(String APIKey, String APISecretKey) {
+
+        mQualarooController = new QualarooController(mHostActivity, this).initWithAPIKey(APIKey, APISecretKey);
 
         if (mQualarooController == null) {
             return null;
         }
 
         mAPIKey = APIKey;
-
-        //TODO: get Network connection
-
         return this;
     }
 
@@ -74,6 +82,10 @@ public class QualarooSurvey {
      */
     public boolean attachToActivity(QualarooSurveyPosition position) {
         return mQualarooController.attachToActivity(position);
+    }
+
+    public boolean setBackgroundStyle(QualarooBackgroundStyle style, int opacity){
+        return mQualarooController.setBackgroundStyle(style, opacity);
     }
 
     /**

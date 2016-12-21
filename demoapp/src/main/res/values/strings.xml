@@ -5,4 +5,9 @@
     <string name="apikey_hint">Enter API Key</string>
     <string name="survey_hint">Enter Survey Alias</string>
     <string name="show_survey_button">Show Survey</string>
+    <string name="choose_background_color">Choose background color</string>
+    <string name="choose_alpha">Choose background alpha</string>
+    <string name="choose_position">Choose survey position</string>
+    <string name="secretkey_textview">API Secret</string>
+    <string name="secretkey_hint">Enter API Secret key</string>
 </resources>

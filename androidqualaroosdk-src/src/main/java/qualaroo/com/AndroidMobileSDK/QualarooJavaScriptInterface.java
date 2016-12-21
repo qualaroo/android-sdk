@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 
+import qualaroo.com.AndroidMobileSDK.Api.QMRequest;
+
 /**
  * Created by Artem Orynko on 31.09.16.
  * Copyright © 2016 Qualaroo. All rights reserved.
@@ -12,7 +14,7 @@ import android.webkit.JavascriptInterface;
 
 class QualarooJavaScriptInterface {
 
-    private QualarooController  mQualarooController;
+    private QualarooController mQualarooController;
     Context mContext;
 
     // Tag for debug
@@ -76,6 +78,7 @@ class QualarooJavaScriptInterface {
     public void globalUnhandledJSError(String error) {
         Log.d(TAG, "Unhandled global JS Error: " + error);
     }
+
     @JavascriptInterface
 
     public void surveyUndeliveredAnswerRequest(String request) {
@@ -106,12 +109,37 @@ class QualarooJavaScriptInterface {
     }
 
     @JavascriptInterface
-    public void qualarooStartDemoScroll() {
+    public void qualarooStartScroll() {
         Log.d(TAG, "Srart scroll down");
+        //disable touch in LinearLayout and WebView while demoScroll
+        mQualarooController.setInteraction(mQualarooController.mLinearLayout, true);
+        mQualarooController.setInteraction(mQualarooController.mWebView, true);
     }
 
     @JavascriptInterface
-    public void qualarooStopDemoScroll() {
+    public void qualarooStopScroll(String alias) {
         Log.d(TAG, "Stop scroll up");
+        //enable touch in LinearLayout and WebView after demoScroll
+        mQualarooController.setInteraction(mQualarooController.mLinearLayout, false);
+        mQualarooController.setInteraction(mQualarooController.mWebView, false);
+        if (mQualarooController.mSecretKey != null) {
+            mQualarooController.addInfoAboutSurveyAlias(alias);
+        }
+    }
+
+    @JavascriptInterface
+    public void getSurveysInfo(final String survey) {
+        if (mQualarooController.mSecretKey != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    QMRequest request = QMRequest.getInstance();
+                    mQualarooController.mSurveys = request.getSurveyInfo(survey);
+                    mQualarooController.mSurveysLoaded = true;
+                }
+            }).start();
+        } else {
+            mQualarooController.mSurveysLoaded = true;
+        }
     }
 }

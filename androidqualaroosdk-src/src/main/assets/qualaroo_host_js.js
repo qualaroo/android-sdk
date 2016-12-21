@@ -10,6 +10,22 @@ var QualarooHost = function() {};
 var isVertical = false;
 var isScrolled = false;
 
+if (typeof(window.Qualaroo) === 'undefined') {
+  window.webkit = {}
+}
+
+if (typeof(window.Qualaroo) === 'undefined') {
+  window.Qualaroo = new Proxy ({}, {
+    get: function(target, name, reciever) {
+      return {
+        postMessage: function(msg) {
+          console.log(name + ': ' + msg.toString());
+        }
+      };
+    }
+  });
+}
+
 QualarooHost.prototype = {
 
     handleGlobalErrorEvent: function(e) {
@@ -32,7 +48,14 @@ QualarooHost.prototype = {
                 }
             }
         } else {
-          Qualaroo.globalUnhandledJSError("Unhandled error in element " + e.target);
+          Qualaroo.globalUnhandledJSError(
+            "Unhandled error in element " + e.target
+            + "\nmessage: " + e.message
+            + "\nfilename " + e.filename
+            + "\nlineno: " + e.lineno
+            + "\ncolno: " + e.colno
+            + "\nerror: " + e.error
+          );
         }
     },
 
@@ -167,6 +190,7 @@ QualarooHost.prototype = {
             });
         }
     },
+
     addOnClickItems: function() {
     	var itemsList = document.getElementsByClassName("qual_ol_ans_item");
 	    var items = Array.prototype.slice.call(itemsList);
@@ -181,10 +205,10 @@ QualarooHost.prototype = {
         }
     },
 
-    demoScroll: function () {
+    demoScroll: function (surveyAlias) {
       var box = document.getElementById("qual_ol_box");
       if (box && isVertical && !isScrolled) {
-        Qualaroo.qualarooStartDemoScroll();
+        Qualaroo.qualarooStartScroll();
         setTimeout(function() {
             function scrollDown(element, to, difference) {
 
@@ -216,7 +240,7 @@ QualarooHost.prototype = {
                 setTimeout(function() {
                     element.scrollTop = element.scrollTop + perTick;
                     if (element.scrollTop == to) {
-                        Qualaroo.qualarooStopDemoScroll();
+                        Qualaroo.qualarooStopScroll(surveyAlias);
                         isScrolled = true;
                         return;
                     }
@@ -257,7 +281,7 @@ QualarooHost.prototype = {
                // As soon as we find an item that does not fit inside its intended space,
                // we change the answers arrangement to vertical.
                if (isVertical) break;
-               if (ansItems[index].scrollWidth > ansItems[index].offsetWidth) {
+               if (ansItems[index].scrollWidth >= ansItems[index].offsetWidth) {
                     // arrange items vertically
                     ansBox.classList.add("vertical-arrangement");
                     isVertical = true;
@@ -325,6 +349,10 @@ QualarooHost.prototype = {
       isVertical = false;
       isScrolled = false;
       Qualaroo.surveyClosed();
+    },
+
+    notifyGetSurveysInfo: function(surveysInfo) {
+      Qualaroo.getSurveysInfo(surveysInfo);
     },
 
     // Internal Functions
