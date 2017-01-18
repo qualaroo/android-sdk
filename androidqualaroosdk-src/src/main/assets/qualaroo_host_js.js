@@ -11,7 +11,7 @@ var isVertical = false;
 var isScrolled = false;
 
 if (typeof(window.Qualaroo) === 'undefined') {
-  window.webkit = {}
+  window.Qualaroo = {}
 }
 
 if (typeof(window.Qualaroo) === 'undefined') {
@@ -207,6 +207,15 @@ QualarooHost.prototype = {
 
     demoScroll: function (surveyAlias) {
       var box = document.getElementById("qual_ol_box");
+      if (box && !isScrolled && isOldVersion) {
+        var stuff = document.getElementById("qual_ol_stuff");
+        if (stuff) {
+            Qualaroo.qualarooStopScroll(surveyAlias);
+            stuff.style.height = '100%';
+            isScrolled = true;
+            return;
+        }
+      }
       if (box && isVertical && !isScrolled) {
         Qualaroo.qualarooStartScroll();
         setTimeout(function() {
@@ -248,6 +257,10 @@ QualarooHost.prototype = {
                 }, 10);
             }
         }, 800);
+      } else if (box && !isVertical && !isScrolled) {
+        Qualaroo.qualarooStopScroll(surveyAlias);
+        isScrolled = true;
+        return;
       }
     },
 
@@ -281,7 +294,7 @@ QualarooHost.prototype = {
                // As soon as we find an item that does not fit inside its intended space,
                // we change the answers arrangement to vertical.
                if (isVertical) break;
-               if (ansItems[index].scrollWidth >= ansItems[index].offsetWidth) {
+               if (ansItems[index].scrollWidth > ansItems[index].offsetWidth) {
                     // arrange items vertically
                     ansBox.classList.add("vertical-arrangement");
                     isVertical = true;

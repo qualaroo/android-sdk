@@ -1,6 +1,7 @@
 package qualaroo.com.AndroidMobileSDK;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -94,6 +95,10 @@ class QualarooJavaScriptInterface {
         Log.d(TAG, "Load script: " + message);
         mQualarooController.mQualarooScriptLoaded = true;
         mQualarooController.setupIdentityCode();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            String jsString = "isOldVersion = true;";
+            mQualarooController.evaluateJavaScript(jsString, null);
+        }
     }
 
     @JavascriptInterface
@@ -122,14 +127,14 @@ class QualarooJavaScriptInterface {
         //enable touch in LinearLayout and WebView after demoScroll
         mQualarooController.setInteraction(mQualarooController.mLinearLayout, false);
         mQualarooController.setInteraction(mQualarooController.mWebView, false);
-        if (mQualarooController.mSecretKey != null) {
+        if (!mQualarooController.mSecretKey.equals("")) {
             mQualarooController.addInfoAboutSurveyAlias(alias);
         }
     }
 
     @JavascriptInterface
     public void getSurveysInfo(final String survey) {
-        if (mQualarooController.mSecretKey != null) {
+        if (!mQualarooController.mSecretKey.equals("")) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {

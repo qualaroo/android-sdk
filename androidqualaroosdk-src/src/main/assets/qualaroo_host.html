@@ -16,6 +16,7 @@
             var deferredTriggerSurveyFn;
             var qualarooScriptLoaded = false;
             var qualarooScriptLoading = false;
+            var isOldVersion = false;
             var alias;
 
             if (false) {
@@ -98,12 +99,25 @@
                 qualarooHost.removeBaseURL();
 
                 setTimeout(function() {
-                    qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {
-                        qualarooHost.loadThemeStylesheetBasedOnBackgroundInElement("qual_ol", function() {
-                            qualarooHost.setBaseURLToHTTPS();
-                            qualarooHost.notifySurveyShow();
+                    if (isOldVersion) {
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {});
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom_4_0_3.css", function() {});
+                        setTimeout(function() {
+                            qualarooHost.loadThemeStylesheetBasedOnBackgroundInElement("qual_ol", function() {});
+                            setTimeout(function() {
+                                qualarooHost.setBaseURLToHTTPS();
+                                qualarooHost.notifySurveyHeightChangedIfNeeded();
+                                qualarooHost.notifySurveyShow();
+                            }, 100);
+                        }, 100);
+                    } else {
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {
+                            qualarooHost.loadThemeStylesheetBasedOnBackgroundInElement("qual_ol", function() {
+                                qualarooHost.setBaseURLToHTTPS();
+                                qualarooHost.notifySurveyShow();
+                            });
                         });
-                    });
+                    }
                 }, 0);
             }]);
 
@@ -113,13 +127,26 @@
                 setTimeout(function() {
                     qualarooHost.forceHTTPSinBackgroundURL("qual_scrnr_logo");
 
-                    qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {
+                    if (isOldVersion) {
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {});
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom_4_0_3.css", function() {});
+                        setTimeout(function() {
+                            qualarooHost.loadThemeStylesheetBasedOnBackgroundInElement("qual_scrnr", function() {});
+                            setTimeout(function() {
+                                qualarooHost.setBaseURLToHTTPS();
+                                qualarooHost.notifySurveyHeightChangedForScreenerIfNeeded();
+                                qualarooHost.notifySurveyScreenerReady();
+                            }, 100);
+                        }, 100);
+                    } else {
+                        qualarooHost.loadStylesheetIfNotAlreadyLoaded("qualaroo_custom.css", function() {
                         qualarooHost.loadThemeStylesheetBasedOnBackgroundInElement("qual_scrnr", function() {
                             qualarooHost.setBaseURLToHTTPS();
                             qualarooHost.notifySurveyHeightChangedForScreenerIfNeeded();
                             qualarooHost.notifySurveyScreenerReady();
                         });
                     });
+                    }
                 }, 0);
             }]);
 
@@ -136,6 +163,16 @@
 
             _kiq.push(['eventHandler', 'close', function() {
                 qualarooHost.notifySurveyClosed();
+            }]);
+
+            _kiq.push(['eventHandler', 'submit', function() {
+                if (isOldVersion) {
+                    var stuff = document.getElementById("qual_ol_stuff");
+                    if (stuff) {
+                        stuff.style.height = '';
+                    }
+                    qualarooHost.notifySurveyHeightChangedIfNeeded();
+                }
             }]);
         </script>
     </body>
