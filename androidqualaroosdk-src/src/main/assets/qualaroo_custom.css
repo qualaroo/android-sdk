@@ -242,6 +242,7 @@ div#qual_ol .qual_ol_ans_item {
     border-radius: 0;
     text-align: center;
     white-space: nowrap;
+    overflow: scroll;
 }
 
 div#qual_ol .qual_ol_ans_tick,

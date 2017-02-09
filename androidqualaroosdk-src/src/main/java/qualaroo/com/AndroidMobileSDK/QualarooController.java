@@ -182,7 +182,7 @@ class QualarooController {
 
         mHostActivity.addContentView(mLinearLayout, mLinearLayout.getLayoutParams());
 
-        if (mSecretKey != null) {
+        if (!mSecretKey.equals("")) {
             QMRequest request = QMRequest.getInstance();
             request.mSecretKey = mSecretKey;
             request.mAppKey = mScriptURL.split("/")[4];
@@ -240,7 +240,7 @@ class QualarooController {
                     }
                 }
 
-                if (mSecretKey != null) {
+                if (!mSecretKey.equals("")) {
                     while (!mSurveysLoaded) {
                         try {
                             Thread.sleep(timeout);
@@ -469,7 +469,8 @@ class QualarooController {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                performHideSurveyAnimation(500);
+                String jsString = "_kiq.push(['stopSurvey']);";
+                evaluateJavaScript(jsString, null);
             }
         };
     }

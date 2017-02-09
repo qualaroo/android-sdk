@@ -9,6 +9,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 
+import qualaroo.com.AndroidMobileSDK.BuildConfig;
+
 /**
  * Created by Artem Orynko on 09.12.16.
  * Copyright © 2016 Qualaroo. All rights reserved.
@@ -28,6 +30,9 @@ public class QMWebView extends WebView {
 
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(false);
+
+        String versionSDK = BuildConfig.VERSION_NAME;
+        webSettings.setUserAgentString("AndroidMobileSDK v" + versionSDK);
 
         this.setBackgroundColor(Color.TRANSPARENT);
         this.setVisibility(View.INVISIBLE);

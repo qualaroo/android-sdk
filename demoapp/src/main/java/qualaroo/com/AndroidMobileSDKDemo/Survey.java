@@ -101,7 +101,7 @@ public class Survey extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         style = sharedPreferences.getString("BackgroundStyle", "");
 
-        if (Objects.equals(style, ""))
+        if (style.equals(""))
             backgroundStyle = QualarooBackgroundStyle.DARK;
         else
             backgroundStyle = QualarooBackgroundStyle.valueOf(style);
@@ -364,13 +364,13 @@ public class Survey extends AppCompatActivity {
         mQualarooSurvey = null;
 
         try {
-            if (getAPISecretKey() == "") {
+            if (getAPISecretKey().equals("")) {
                 mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey);
             } else {
                 mQualarooSurvey = new QualarooSurvey(this).initWithAPIKey(mAPIKey, mAPISecretKey);
             }
             mQualarooSurvey.attachToActivity(getAttachmentPosition());
-            mQualarooSurvey.setIdentityCodeWithString("Android test #1");
+            mQualarooSurvey.setIdentityCodeWithString("Android test string");
 
             if (!mSurveyAlias.isEmpty()) {
                 showSurveyButton.setEnabled(true);
