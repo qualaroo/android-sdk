@@ -10,4 +10,7 @@
     <string name="choose_position">Choose survey position</string>
     <string name="secretkey_textview">API Secret</string>
     <string name="secretkey_hint">Enter API Secret key</string>
+    <string name="attach_survey_button">Attach Survey</string>
+    <string name="remove_QM_button">X</string>
+    <string name="get_state_button">Get</string>
 </resources>
