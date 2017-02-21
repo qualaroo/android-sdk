@@ -73,7 +73,7 @@ public enum QMPosition {
                 result = "Top";
                 break;
             case BOTTOM:
-                result = " Bottom";
+                result = "Bottom";
                 break;
             case LEFT:
                 result = "Left center";

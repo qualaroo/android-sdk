@@ -9,7 +9,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "1.5.0"
+        versionName "1.5.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -45,7 +45,7 @@ publish {
     groupId = 'com.qualaroo'
     repoName = 'AndroidMobileSDK'
     artifactId = 'AndroidMobileSDK'
-    publishVersion = '1.5.0'
+    publishVersion = '1.5.1'
     website = 'http://qualaroo.com'
     dryRun = false
 }
