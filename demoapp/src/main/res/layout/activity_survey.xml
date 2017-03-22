@@ -10,7 +10,6 @@
     tools:context="qualaroo.com.QualarooMobileDemo.Survey">
 
     <LinearLayout
-        android:id="@+id/apikey_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -26,7 +25,7 @@
             android:textStyle="normal|bold" />
 
         <EditText
-            android:id="@+id/apikey_edittext"
+            android:id="@+id/api_key_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/apikey_hint"
@@ -36,8 +35,8 @@
             android:textSize="16sp" />
 
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/secretkey_linearlayout"
         android:layout_width="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -53,7 +52,7 @@
             android:textStyle="normal|bold" />
 
         <EditText
-            android:id="@+id/secretkey_edittext"
+            android:id="@+id/secret_key_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/secretkey_hint"
@@ -63,8 +62,8 @@
             android:textSize="16sp" />
 
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/alias_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -81,7 +80,7 @@
             android:textStyle="normal|bold" />
 
         <EditText
-            android:id="@+id/survey_edittext"
+            android:id="@+id/survey_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/survey_hint"
@@ -92,7 +91,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/position_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -140,7 +138,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/backgroun_alpha_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -194,7 +191,7 @@
         android:gravity="center">
 
         <Button
-            android:id="@+id/remove_gm_button"
+            android:id="@+id/remove_qm_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/remove_QM_button"/>

@@ -37,22 +37,13 @@ import static com.qualaroo.MobileSDK.QMPosition.TOP_RIGHT;
 
 public class Survey extends AppCompatActivity {
 
-    LinearLayout apiKeyLinearLayout;
     EditText apiKeyEditText;
-
-    LinearLayout apiSecretKeyLinearLayout;
     EditText apiSecretKeyEditText;
-
-    LinearLayout surveyAliasLinearLayout;
     EditText surveyAliasEditText;
 
-    LinearLayout surveyPositionLinearLayout;
     Spinner positionSpinner;
-
-    LinearLayout backgroudColorLiearLayout;
     Spinner backgroundColorSpinner;
 
-    LinearLayout backgroudAlphaLinearLayout;
     SeekBar backgroundAlphaSeekBar;
 
     Button showSurveyButton;
@@ -115,7 +106,7 @@ public class Survey extends AppCompatActivity {
         surveyAlias = newValue;
     }
 
-    QMBackgroundColor getBackGroundColor() {
+    QMBackgroundColor getBackgroundColor() {
 
         QMBackgroundColor backgroundColor;
         String color;
@@ -176,28 +167,19 @@ public class Survey extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
 
-        apiKeyLinearLayout = (LinearLayout) findViewById(R.id.apikey_linearlayout);
-        apiKeyEditText = (EditText) findViewById(R.id.apikey_edittext);
+        apiKeyEditText = (EditText) findViewById(R.id.api_key_edit_text);
+        apiSecretKeyEditText = (EditText) findViewById(R.id.secret_key_edit_text);
+        surveyAliasEditText = (EditText) findViewById(R.id.survey_edit_text);
 
-        apiSecretKeyLinearLayout = (LinearLayout) findViewById(R.id.secretkey_linearlayout);
-        apiSecretKeyEditText = (EditText) findViewById(R.id.secretkey_edittext);
-
-        surveyAliasLinearLayout = (LinearLayout) findViewById(R.id.alias_linearlayout);
-        surveyAliasEditText = (EditText) findViewById(R.id.survey_edittext);
-
-        surveyPositionLinearLayout = (LinearLayout) findViewById(R.id.position_linearlayout);
         positionSpinner = (Spinner) findViewById(R.id.position_spinner);
-
-        backgroudColorLiearLayout = (LinearLayout) findViewById(R.id.backgroun_color_linearlayout);
         backgroundColorSpinner = (Spinner) findViewById(R.id.background_color_spinner);
 
-        backgroudAlphaLinearLayout = (LinearLayout) findViewById(R.id.backgroun_alpha_linearlayout);
         backgroundAlphaSeekBar = (SeekBar) findViewById(R.id.background_alpha_seek_bar);
 
         showSurveyButton = (Button) findViewById(R.id.show_survey_button);
         attachSurveyButton = (Button) findViewById(R.id.attach_survey_button);
 
-        removeQualarooMobileButton = (Button) findViewById(R.id.remove_gm_button);
+        removeQualarooMobileButton = (Button) findViewById(R.id.remove_qm_button);
         getStateButton = (Button) findViewById(R.id.get_state_button);
 
 
@@ -408,7 +390,7 @@ public class Survey extends AppCompatActivity {
 
         if (qualaroo != null) {
             qualaroo.removeFromActivity();
-            qualaroo.setBackgroundStyle(getBackGroundColor(), alpha);
+            qualaroo.setBackgroundStyle(getBackgroundColor(), alpha);
             qualaroo.attachToActivity(this, getPosition(), new QMCallback() {
                 @Override
                 public void callback(QMState state, QMReport report) {
@@ -420,7 +402,7 @@ public class Survey extends AppCompatActivity {
         } else {
             try {
                 qualaroo = new QualarooMobile(this.getBaseContext()).init(getApiKey(), getApiSecretKey());
-                qualaroo.setBackgroundStyle(getBackGroundColor(), alpha);
+                qualaroo.setBackgroundStyle(getBackgroundColor(), alpha);
                 qualaroo.setIdentityCode("Test new logic #1");
                 qualaroo.attachToActivity(this, getPosition(), new QMCallback() {
                     @Override
