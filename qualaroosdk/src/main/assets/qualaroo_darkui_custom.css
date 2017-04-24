@@ -1,0 +1,28 @@
+/*
+ qualaroo-darkui-custom.css
+ QualarooMobileSDK
+
+ Created by Artem Orynko on 07/04/16.
+ Copyright © 2016 Qualaroo. All rights reserved.
+ */
+
+div#qual_scrnr.qual_scrnr,
+div#qual_ol.qual_ol {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+div#qual_scrnr .qual_scrnr_txt_link:hover,
+div#qual_ol_send.qual_ol_btn.qual_ol_send:hover,
+div#qual_ol .qual_ol_btn:hover {
+    background-color: hsl(196, 69%, 37%);
+}
+
+div#qual_ol .qual_ol_logo,
+div#qual_scrnr .qual_scrnr_logo {
+    background-color: hsl(210, 3%, 16%);
+}
+
+div#qual_ol .qual_ol_check_svg_icon,
+div#qual_ol .qual_ol_check_svg_bg {
+    stroke: white;
+}
