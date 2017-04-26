@@ -9,8 +9,6 @@ package com.qualaroo.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 public final class SurveyManager {
 
@@ -52,11 +49,15 @@ public final class SurveyManager {
         Iterator<String> keys = aliases.keys();
 
         while (keys.hasNext()) {
-            HashMap<String, Object> survey = new HashMap<>();
-
             String alias = keys.next();
             String id = null;
             JSONObject howOftenShowSurvey = null;
+
+            HashMap<String, Object> survey = surveys.get(alias);
+
+            if (survey == null) {
+                survey = new HashMap<>();
+            }
 
             try {
                 id = aliases.getString(alias);
@@ -133,19 +134,19 @@ public final class SurveyManager {
 
         if (!howOftenShowSurvey.equals(HowOftenShowSurvey.PERSISTENT.toString())) {
             boolean isOneShot = howOftenShowSurvey.equals(HowOftenShowSurvey.ONCE.toString());
-            String action = isOneShot ? SURVEY_SHOWN : SURVEY_ANSWERED;
+            String action = isOneShot ? SURVEY_ANSWERED : SURVEY_SHOWN;
 
             HashSet<String> identifiers = getIdentifiers(action, survey);
 
             if (identifiers.size() == 0) return true;
 
             if (identifiers.contains(identifier)) {
+                if (action.equals(SURVEY_SHOWN)) {
+                    logger.info("Survey have already is shown for this customer.");
+                } else {
+                    logger.info("Customer already answered for this survey.");
+                }
                 return false;
-            }
-            if (action.equals(SURVEY_SHOWN)) {
-                logger.info("Survey have already is shown for this customer.");
-            } else {
-                logger.info("Customer already answered for this survey.");
             }
         }
         return true;
@@ -178,14 +179,14 @@ public final class SurveyManager {
     }
 
     private static void setSurveys(Context context, String surveys) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUALAROO, Context.MODE_PRIVATE);
         sharedPreferences.edit().putString(QUALAROO, surveys).apply();
     }
 
     private static HashMap<String, HashMap<String, Object>> getSurveys(Context context) {
         HashMap<String, HashMap<String, Object>> surveys = new HashMap<>();
         String surveysString = null;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUALAROO, Context.MODE_PRIVATE);
 
         surveysString = sharedPreferences.getString(QUALAROO, null);
 
@@ -211,7 +212,13 @@ public final class SurveyManager {
             try {
                 surveyObject = jsonObject.getJSONObject(alias);
                 howOftenShowSurveyObject = surveyObject.getString(SURVEY_HOW_OFTEN_SHOW);
+            } catch (JSONException ignored) {}
+
+            assert surveyObject != null;
+            try {
                 shownArray = surveyObject.getJSONArray(SURVEY_SHOWN);
+            } catch (JSONException ignored) {}
+            try {
                 answeredArray = surveyObject.getJSONArray(SURVEY_ANSWERED);
             } catch (JSONException ignored) {}
 
