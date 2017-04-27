@@ -210,7 +210,8 @@ public final class SurveyManager {
             JSONArray shownArray = null;
             JSONArray answeredArray = null;
             try {
-                surveyObject = jsonObject.getJSONObject(alias);
+                String surveyString = String.valueOf(jsonObject.get(alias));
+                surveyObject = new JSONObject(surveyString);
                 howOftenShowSurveyObject = surveyObject.getString(SURVEY_HOW_OFTEN_SHOW);
             } catch (JSONException ignored) {}
 

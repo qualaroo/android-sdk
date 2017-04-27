@@ -13,7 +13,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "2.0.2"
+        versionName "2.0.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -49,7 +49,7 @@ publish {
     groupId = 'com.qualaroo'
     repoName = 'QualarooSDK'
     artifactId = 'QualarooSDK'
-    publishVersion = '2.0.2'
+    publishVersion = '2.0.3'
     website = 'http://qualaroo.com'
     dryRun = false
 }
