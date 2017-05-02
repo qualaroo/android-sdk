@@ -312,7 +312,7 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
                 try {
                     isSurveyInformationSavedSemaphore.acquire();
                 } catch (InterruptedException e) {
-                    logger.error(e, "");
+                    logger.error(e, e.getLocalizedMessage());
                 } finally {
                     isSurveyInformationSavedSemaphore.release();
                     aliasToShow = isAliasExists(context, alias);
@@ -327,7 +327,7 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
                     try {
                         surveyIsShowingSemaphore.acquire();
                     } catch (InterruptedException e) {
-                        logger.error(e, "");
+                        logger.error(e, e.getLocalizedMessage());
                     } finally {
                         surveyIsShowingSemaphore.release();
                         triggerSurvey(aliasToShow, shouldForce);
@@ -745,24 +745,24 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
         }
         @JavascriptInterface
         public void surveyScreenerReady() {
-            logger.info("Screen is showing.");
-            performShow();
-
             try {
                 surveyIsShowingSemaphore.acquire();
             } catch (InterruptedException e) {
-                logger.error(e, "");
+                logger.error(e, e.getLocalizedMessage());
+            } finally {
+                logger.info("Screen is showing.");
+                performShow();
             }
         }
         @JavascriptInterface
         public void surveyShow() {
-            logger.info("Survey is showing.");
-            performShow();
-
             try {
                 surveyIsShowingSemaphore.acquire();
             } catch (InterruptedException e) {
-                logger.error(e, "");
+                logger.error(e, e.getLocalizedMessage());
+            } finally {
+                logger.info("Survey is showing.");
+                performShow();
             }
         }
         @JavascriptInterface
@@ -809,9 +809,35 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
             errorSendingReportRequest(message);
         }
         @JavascriptInterface
-        public void reload() {
-            logger.info("Reloading data from a server");
-            webView.reload();
+        public void reloadQualarooData() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        logger.info("Waiting for the closing of the survey.");
+                        surveyIsShowingSemaphore.acquire();
+                    } catch (InterruptedException e) {
+                        logger.error(e, e.getLocalizedMessage());
+                    } finally {
+                        logger.info("Reloading data from a server.");
+                        surveyIsShowingSemaphore.release();
+                        try {
+                            isSurveyInformationSavedSemaphore.acquire();
+                        } catch (InterruptedException e) {
+                            logger.error(e, e.getLocalizedMessage());
+                        } finally {
+                            isSurveyInformationSavedSemaphore.release();
+                            hostingActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    webView.loadUrl(BASE_URL);
+                                }
+                            });
+                            logger.info("Tha data was reloaded.");
+                        }
+                    }
+                }
+            }).start();
         }
         @JavascriptInterface
         public void globalUnhandledJSError(String message) {
