@@ -311,11 +311,11 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
                 String aliasToShow = null;
                 try {
                     isSurveyInformationSavedSemaphore.acquire();
-                    aliasToShow = isAliasExists(context, alias);
                 } catch (InterruptedException e) {
-                    logger.debug(e.toString());
+                    logger.error(e, "");
                 } finally {
                     isSurveyInformationSavedSemaphore.release();
+                    aliasToShow = isAliasExists(context, alias);
                 }
 
                 if (isNullOrEmpty(aliasToShow)) {
@@ -326,11 +326,11 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
                 if (showSurvey) {
                     try {
                         surveyIsShowingSemaphore.acquire();
-                        triggerSurvey(aliasToShow, shouldForce);
                     } catch (InterruptedException e) {
-                        logger.debug(e.toString());
+                        logger.error(e, "");
                     } finally {
                         surveyIsShowingSemaphore.release();
+                        triggerSurvey(aliasToShow, shouldForce);
                     }
                 }
             }
@@ -751,7 +751,7 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
             try {
                 surveyIsShowingSemaphore.acquire();
             } catch (InterruptedException e) {
-                logger.debug(e.toString());
+                logger.error(e, "");
             }
         }
         @JavascriptInterface
@@ -762,7 +762,7 @@ public class Qualaroo extends WebViewClient implements QualarooBackgroundViewDel
             try {
                 surveyIsShowingSemaphore.acquire();
             } catch (InterruptedException e) {
-                logger.debug(e.toString());
+                logger.error(e, "");
             }
         }
         @JavascriptInterface
