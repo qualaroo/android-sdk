@@ -24,10 +24,15 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep public enum * {
+    public *;
+}
+
 -keep public class com.qualaroo.Qualaroo {
     public *;
 }
 
--keep public enum * {
+-keep public class com.qualaroo.internal.model.* {
     public *;
 }
+-dontwarn org.apache.commons.**

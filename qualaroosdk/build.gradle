@@ -2,58 +2,65 @@
  * Copyright © 2017 Qualaroo. All rights reserved.
  */
 
+apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'kotlin-android'
+
+int major = 1
+int minor = 0
+int patch = 0
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "25.0.2"
+    resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 1
-        versionName "2.0.5"
-
+        targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
+            lintOptions {
+                abortOnError false
+            }
         }
-        debug {
-            shrinkResources false
+        debug {        
             minifyEnabled false
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.volley:volley:1.0.0'
-    testCompile 'junit:junit:4.12'
+    implementation "com.android.support:appcompat-v7:26.1.0"
+    implementation "com.android.support:design:26.1.0"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    testImplementation 'org.mockito:mockito-core:2.9.0'
+    testImplementation 'com.nhaarman:mockito-kotlin-kt1.1:1.5.0'
+    testImplementation 'junit:junit:4.12'
+    implementation files('libs/commons-jexl3-3.1.jar')
+    implementation files('libs/commons-logging-1.2.jar')
 }
 
-// Bintray
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-publish {
-    bintrayUser = properties.getProperty("bintray.user")
-    bintrayKey = properties.getProperty("bintray.apikey")
-
-    userOrg = 'qualarooinc'
-    groupId = 'com.qualaroo'
-    repoName = 'QualarooSDK'
-    artifactId = 'QualarooSDK'
-    publishVersion = '2.0.5'
-    website = 'http://qualaroo.com'
-    dryRun = false
+repositories {
+    mavenCentral()
 }
+
+task generateJavadoc(type: Javadoc) {
+    description "Generates Javadoc"
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath = files() + files(ext.androidJar)
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("http://d.android.com/reference/")
+}
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="qualaroo__question_title_size">22dp</dimen>
+    <dimen name="qualaroo__question_logo_size">48dp</dimen>
+
+    <dimen name="qualaroo__radio_text_size">18dp</dimen>
+    <dimen name="qualaroo__radio_drawable_padding">8dp</dimen>
+    <dimen name="qualaroo__radio_button_top_margin">8dp</dimen>
+
+    <dimen name="qualaroo__checkbox_text_size">18dp</dimen>
+
+    <dimen name="qualaroo__nps_label_text_size">18dp</dimen>
+
+    <dimen name="qualaroo__message_text_size">22dp</dimen>
+
+</resources>
