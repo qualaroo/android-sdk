@@ -10,7 +10,7 @@ import org.apache.commons.jexl3.internal.Script;
 import java.util.List;
 import java.util.Set;
 
-public class UserPropertiesMatcher {
+final class UserPropertiesMatcher {
 
     private final UserInfo userInfo;
     private final JexlEngine jexlEngine;

@@ -19,7 +19,7 @@ public final class SurveyStatus {
     private boolean hasBeenFinished;
     private long seenAtInMillis;
 
-    SurveyStatus(int surveyId, boolean hasBeenSeen, boolean hasBeenFinished, long seenAtInMillis) {
+    private SurveyStatus(int surveyId, boolean hasBeenSeen, boolean hasBeenFinished, long seenAtInMillis) {
         this.surveyId = surveyId;
         this.hasBeenSeen = hasBeenSeen;
         this.hasBeenFinished = hasBeenFinished;

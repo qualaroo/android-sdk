@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 class TimeMatcherTest {
 
     val timeProvider = TestTimeProvider()
-    val timeMatcher = TimeMatcher(timeProvider)
+    private val timeMatcher = TimeMatcher(timeProvider)
 
     @Test
     fun enoughTimePassed() {

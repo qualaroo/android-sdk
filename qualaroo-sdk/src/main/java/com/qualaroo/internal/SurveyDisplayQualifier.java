@@ -4,7 +4,7 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
 import com.qualaroo.internal.storage.LocalStorage;
 
-public class SurveyDisplayQualifier {
+final class SurveyDisplayQualifier {
 
     private final LocalStorage localStorage;
     private final UserPropertiesMatcher propertiesMatcher;

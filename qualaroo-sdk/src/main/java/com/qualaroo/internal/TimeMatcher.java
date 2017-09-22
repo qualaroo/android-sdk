@@ -2,7 +2,7 @@ package com.qualaroo.internal;
 
 import java.util.concurrent.TimeUnit;
 
-public class TimeMatcher {
+final class TimeMatcher {
 
     private static final long PAUSE_BETWEEN_SAME_SURVEYS = TimeUnit.DAYS.toMillis(3);
 

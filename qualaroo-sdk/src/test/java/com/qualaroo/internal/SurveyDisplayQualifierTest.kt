@@ -1,5 +1,8 @@
 package com.qualaroo.internal
 
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.requireMap
 import com.qualaroo.internal.model.TestModels.spec
@@ -8,16 +11,22 @@ import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.InMemorySettings
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class SurveyDisplayQualifierTest {
 
     val localStorage = InMemoryLocalStorage(TimeProvider())
-    val userPropertiesMatcher = AlwaysTrueUserPropertiesMatcher()
-    val timeMatcher = AlwaysTrueTimeMatcher()
+    private val userPropertiesMatcher = UserPropertiesMatcher(UserInfo(InMemorySettings()))
+    private val timeMatcher = mock<TimeMatcher>()
 
-    val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher)
+    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher)
+
+    @Before
+    fun setup() {
+        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(true)
+    }
 
     @Test
     fun `should always show on "persistent" flag`() {
@@ -81,17 +90,17 @@ class SurveyDisplayQualifierTest {
                 )
         )
 
-        var qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, AlwaysFalseTimeMatcher())
+        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(false)
         assertFalse(qualifier.shouldShowSurvey(survey))
 
-        qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, AlwaysTrueTimeMatcher())
+        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(true)
         assertTrue(qualifier.shouldShowSurvey(survey))
     }
 
     @Test
     fun `should show only if custom matching is satisfied`() {
         val userInfo = UserInfo(InMemorySettings())
-        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), AlwaysTrueTimeMatcher())
+        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher)
         var survey = survey(
                 id = 1,
                 spec = spec(
@@ -125,21 +134,4 @@ class SurveyDisplayQualifierTest {
         localStorage.markSurveyFinished(survey)
     }
 
-    class AlwaysTrueTimeMatcher : TimeMatcher(null) {
-        override fun enoughTimePassed(fromInMillis: Long): Boolean {
-            return true
-        }
-    }
-
-    class AlwaysFalseTimeMatcher : TimeMatcher(null) {
-        override fun enoughTimePassed(fromInMillis: Long): Boolean {
-            return false
-        }
-    }
-
-    class AlwaysTrueUserPropertiesMatcher : UserPropertiesMatcher(null) {
-        override fun match(customMap: String?): Boolean {
-            return true
-        }
-    }
 }

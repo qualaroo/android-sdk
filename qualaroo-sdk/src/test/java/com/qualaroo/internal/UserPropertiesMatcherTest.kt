@@ -9,7 +9,7 @@ import org.junit.Test
 class UserPropertiesMatcherTest {
 
     val userInfo = UserInfo(InMemorySettings())
-    val matcher = UserPropertiesMatcher(userInfo)
+    private val matcher = UserPropertiesMatcher(userInfo)
 
     @Test
     fun `matches basic cases`() {
