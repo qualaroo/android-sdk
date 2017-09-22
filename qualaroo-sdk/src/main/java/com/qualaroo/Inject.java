@@ -58,7 +58,7 @@ public class Inject {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
         SessionInfo sessionInfo = new SessionInfo(context);
-        Settings settings = new Settings(context);
+        Settings settings = new Settings(context.getSharedPreferences("qualaroo_pref", Context.MODE_PRIVATE));
         UserInfo userInfo = new UserInfo(settings);
         return new SurveyClient(new RestClient(okHttpClient, gson), new ApiConfig(), sessionInfo, userInfo, Executors.newSingleThreadExecutor());
     }
