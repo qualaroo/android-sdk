@@ -5,6 +5,7 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.qualaroo.internal.ReportManager
+import com.qualaroo.internal.TimeProvider
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.language
@@ -52,7 +53,7 @@ class SurveyInteractorTest {
                     surveyVariations = listOf(language("en"), language("pl"))
             )
     )
-    val localStorage = InMemoryLocalStorage()
+    val localStorage = InMemoryLocalStorage(TimeProvider())
     val reportManager = mock<ReportManager>()
 
     val backgroundExecutor = TestExecutors.currentThread()
@@ -233,11 +234,6 @@ class SurveyInteractorTest {
     }
 
     @Test
-    fun `can find messages based on nodeType field`() {
-
-    }
-
-    @Test
     fun `closes survey on last question`() {
         val survey = survey(
                 id = 123,
@@ -276,21 +272,26 @@ class SurveyInteractorTest {
                         startMap = mapOf(
                                 language("en") to node(
                                         id = 100,
-                                        nodeType = "question"
+                                        nodeType = "message"
                                 )
                         ),
-                        questionList = mapOf(
+                        msgScreenList = mapOf(
                                 language("en") to listOf(
-                                        question(
+                                        message(
                                                 id = 100,
-                                                type = QuestionType.RADIO,
-                                                answerList = listOf(answer(id = 10))
+                                                description = "hello"
                                         )
                                 )
                         )
                 )
         )
-    }
 
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.startSurvey()
+        interactor.messageConfirmed(message(id = 100))
+
+        verify(observer).closeSurvey()
+    }
 
 }
