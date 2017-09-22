@@ -112,6 +112,7 @@ public final class Survey implements Serializable {
     public static final class RequireMap implements Serializable {
         private List<String> deviceTypeList;
         private boolean isPersistent;
+        private boolean isOneShot;
         private String customMap;
 
         public List<String> deviceTypeList() {
@@ -122,13 +123,18 @@ public final class Survey implements Serializable {
             return isPersistent;
         }
 
+        public boolean isOneShot() {
+            return isOneShot;
+        }
+
         public String customMap() {
             return customMap;
         }
 
-        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, String customMap) {
+        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap) {
             this.deviceTypeList = deviceTypeList;
             this.isPersistent = isPersistent;
+            this.isOneShot = isOneShot;
             this.customMap = customMap;
         }
 
