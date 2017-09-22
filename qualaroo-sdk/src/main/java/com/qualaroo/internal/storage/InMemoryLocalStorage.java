@@ -1,13 +1,23 @@
 package com.qualaroo.internal.storage;
 
+import com.qualaroo.internal.TimeProvider;
 import com.qualaroo.internal.model.Survey;
+import com.qualaroo.internal.model.SurveyStatus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryLocalStorage implements LocalStorage {
 
+    private final TimeProvider timeProvider;
     private final List<String> failedRequests = new ArrayList<>();
+    private final Map<Integer, SurveyStatus> surveyStatusMap = new HashMap<>();
+
+    public InMemoryLocalStorage(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
+    }
 
     @Override public synchronized void storeFailedReportRequest(String reportRequestUrl) {
         failedRequests.add(reportRequestUrl);
@@ -27,11 +37,40 @@ public class InMemoryLocalStorage implements LocalStorage {
         return result;
     }
 
-    @Override public void markSurveyFinished(Survey survey) {
-
+    @Override public synchronized void markSurveyAsSeen(Survey survey) {
+        SurveyStatus.Builder builder = SurveyStatus.builder();
+        builder.setSurveyId(survey.id());
+        builder.setHasBeenSeen(true);
+        builder.setSeenAtInMillis(timeProvider.nowInMillis());
+        if (surveyStatusMap.containsKey(survey.id())) {
+            SurveyStatus current = surveyStatusMap.get(survey.id());
+            builder.setHasBeenFinished(current.hasBeenFinished());
+        } else {
+            builder.setHasBeenFinished(false);
+        }
+        surveyStatusMap.put(survey.id(), builder.build());
     }
 
-    @Override public boolean isSurveyFinished(Survey survey) {
-        return false;
+    @Override public synchronized void markSurveyFinished(Survey survey) {
+        SurveyStatus.Builder builder = SurveyStatus.builder();
+        builder.setSurveyId(survey.id());
+        builder.setHasBeenFinished(true);
+        builder.setSeenAtInMillis(timeProvider.nowInMillis());
+        if (surveyStatusMap.containsKey(survey.id())) {
+            SurveyStatus current = surveyStatusMap.get(survey.id());
+            builder.setHasBeenSeen(current.hasBeenSeen());
+        } else {
+            builder.setHasBeenSeen(false);
+        }
+        surveyStatusMap.put(survey.id(), builder.build());
     }
+
+    @Override public synchronized SurveyStatus getSurveyStatus(Survey survey) {
+        SurveyStatus result = surveyStatusMap.get(survey.id());
+        if (result == null) {
+            result = SurveyStatus.emptyStatus(survey);
+        }
+        return result;
+    }
+
 }
