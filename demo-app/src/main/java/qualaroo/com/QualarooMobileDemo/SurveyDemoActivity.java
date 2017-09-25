@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SurveyActivity extends AppCompatActivity {
+public class SurveyDemoActivity extends AppCompatActivity {
 
     private static final String KEY_RECENT_SURVEY = "recentSurvey";
 
@@ -41,7 +41,7 @@ public class SurveyActivity extends AppCompatActivity {
             @Override public void doClick(View v) {
                 Survey survey = (Survey) availableSurveysSpinner.getSelectedItem();
                 sharedPreferences.edit().putString(KEY_RECENT_SURVEY, survey.canonicalName()).apply();
-                qualaroo.showSurvey(SurveyActivity.this, survey);
+                qualaroo.showSurvey(survey.canonicalName());
             }
         });
         qualaroo.setSurveysListener(new Qualaroo.SurveysListener() {
