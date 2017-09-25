@@ -19,6 +19,8 @@ import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.ui.render.QuestionView;
+import com.qualaroo.ui.render.QuestionViewState;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.ui.render.Theme;
 import com.qualaroo.util.DebouncingOnClickListener;
@@ -26,6 +28,9 @@ import com.qualaroo.util.DebouncingOnClickListener;
 import java.util.List;
 
 public class SurveyFragment extends Fragment implements SurveyView {
+
+    private static final String KEY_PRESENTER_STATE = "pstate";
+    private static final String QUESTION_VIEW_STATE = "qviewstate";
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
@@ -39,6 +44,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private View emptySpace;
 
     private boolean mandatory;
+    private QuestionView questionView;
+    private QuestionViewState viewState;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qualaroo__fragment_survey, container, false);
@@ -69,31 +76,20 @@ public class SurveyFragment extends Fragment implements SurveyView {
         super.onActivityCreated(savedInstanceState);
         SurveyComponentHelper.get(getContext()).inject(this);
         surveyPresenter.setView(this);
-        runOpenAnimation();
+        SurveyPresenter.State presentersState = null;
+        if (savedInstanceState != null) {
+            presentersState = (SurveyPresenter.State) savedInstanceState.getSerializable(KEY_PRESENTER_STATE);
+            viewState = savedInstanceState.getParcelable(QUESTION_VIEW_STATE);
+        }
+        surveyPresenter.init(presentersState);
     }
 
-    private void runOpenAnimation() {
-        ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        animator.setDuration(250);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override public void onAnimationUpdate(ValueAnimator animation) {
-                float value = (float) animation.getAnimatedValue();
-                getView().setAlpha(value);
-            }
-        });
-        animator.start();
-        surveyContainer.post(new Runnable() {
-            @Override public void run() {
-                surveyContainer.setTranslationY(surveyContainer.getHeight());
-                surveyContainer.setVisibility(View.VISIBLE);
-                surveyContainer.animate()
-                        .setStartDelay(250)
-                        .setDuration(300)
-                        .translationY(0)
-                        .setInterpolator(new FastOutSlowInInterpolator())
-                        .start();
-            }
-        });
+    @Override public void onSaveInstanceState(Bundle outState) {
+        if (questionView != null) {
+            outState.putParcelable(QUESTION_VIEW_STATE, questionView.getCurrentState());
+        }
+        outState.putSerializable(KEY_PRESENTER_STATE, surveyPresenter.getSavedState());
+        super.onSaveInstanceState(outState);
     }
 
     private void runCloseAnimation() {
@@ -128,25 +124,57 @@ public class SurveyFragment extends Fragment implements SurveyView {
         mandatory = viewModel.cannotBeClosed();
     }
 
+    @Override public void showWithAnimation() {
+        ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
+        animator.setDuration(250);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                getView().setAlpha(value);
+            }
+        });
+        animator.start();
+        surveyContainer.post(new Runnable() {
+            @Override public void run() {
+                surveyContainer.setTranslationY(surveyContainer.getHeight());
+                surveyContainer.setVisibility(View.VISIBLE);
+                surveyContainer.animate()
+                        .setStartDelay(250)
+                        .setDuration(300)
+                        .translationY(0)
+                        .setInterpolator(new FastOutSlowInInterpolator())
+                        .start();
+            }
+        });
+    }
+
+    @Override public void showImmediately() {
+        surveyContainer.setVisibility(View.VISIBLE);
+        surveyContainer.setTranslationY(0);
+    }
+
     @Override public void showQuestion(Question question) {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(question.title());
         Context context = getContext();
-        View view = renderer.renderQuestion(context, question, new OnAnsweredListener() {
-            @Override public void onAnswered(Question question, Answer answer) {
-                surveyPresenter.onAnswered(answer);
-            }
+        questionView = renderer.renderQuestion(context, question, new OnAnsweredListener() {
+                @Override public void onAnswered(Question question1, Answer answer) {
+                    surveyPresenter.onAnswered(answer);
+                }
 
-            @Override public void onAnswered(Question question, List<Answer> answers) {
-                surveyPresenter.onAnswered(answers);
-            }
+                @Override public void onAnswered(Question question1, List<Answer> answers) {
+                    surveyPresenter.onAnswered(answers);
+                }
 
-            @Override public void onAnsweredWithText(Question question, String answer) {
-                surveyPresenter.onAnsweredWithText(answer);
-            }
-        });
-        questionsContent.addView(view);
+                @Override public void onAnsweredWithText(Question question1, String answer) {
+                    surveyPresenter.onAnsweredWithText(answer);
+                }
+            });
+        questionsContent.addView(questionView.view());
+        if (viewState != null) {
+            questionView.restoreState(viewState);
+        }
     }
 
     @Override public void showMessage(Message message) {

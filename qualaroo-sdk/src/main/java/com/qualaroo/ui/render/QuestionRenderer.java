@@ -1,7 +1,6 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
-import android.view.View;
 
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
@@ -18,6 +17,6 @@ abstract class QuestionRenderer {
         return theme;
     }
 
-    abstract View render(Context context, Question question, OnAnsweredListener onAnsweredListener);
+    abstract QuestionView render(Context context, Question question, OnAnsweredListener onAnsweredListener);
 
 }

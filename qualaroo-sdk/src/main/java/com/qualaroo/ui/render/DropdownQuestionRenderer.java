@@ -14,8 +14,6 @@ import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class DropdownQuestionRenderer extends QuestionRenderer {
@@ -24,27 +22,14 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public View render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_question_dropdown, null);
         Button confirmButton = view.findViewById(R.id.qualaroo__view_question_dropdown_confirm);
         final Spinner spinner = view.findViewById(R.id.qualaroo__view_question_dropdown_spinner);
         confirmButton.setText(question.sendText());
         ArrayAdapter<AnswerItem> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
         List<AnswerItem> spinnerItems = new ArrayList<>();
-        //TODO move this to business logic part so it can be tested nicely
-        LinkedList<Answer> answerList = new LinkedList<>(question.answerList());
-        Answer anchoredLastAnswer = null;
-        if (question.anchorLast()) {
-            anchoredLastAnswer = answerList.removeLast();
-        }
-        if (question.enableRandom()) {
-            Collections.shuffle(answerList);
-        }
-        if (anchoredLastAnswer != null) {
-            answerList.addLast(anchoredLastAnswer);
-        }
-        //TODO ^ move this to business logic part
-        for (Answer answer : answerList) {
+        for (Answer answer : question.answerList()) {
             spinnerItems.add(new AnswerItem(answer));
         }
         adapter.addAll(spinnerItems);
@@ -56,7 +41,9 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
                 onAnsweredListener.onAnswered(question, answerItem.answer);
             }
         });
-        return view;
+        return QuestionView.forQuestionId(question.id())
+                .setView(view)
+                .build();
     }
 
     private static class AnswerItem {
