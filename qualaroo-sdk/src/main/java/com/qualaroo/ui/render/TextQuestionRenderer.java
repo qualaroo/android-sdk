@@ -37,9 +37,12 @@ final class TextQuestionRenderer extends QuestionRenderer {
             }
         });
         ThemeUtils.applyTheme(editText, getTheme());
+        button.setEnabled(!question.isRequired());
         editText.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                button.setEnabled(count > 0);
+                if (question.isRequired()) {
+                    button.setEnabled(count > 0);
+                }
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {

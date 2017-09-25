@@ -19,8 +19,9 @@ public final class Question implements Serializable {
     private boolean disableRandom;
     private boolean anchorLast;
     private boolean alwaysShowSend;
+    private boolean isRequired;
 
-    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend) {
+    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -33,6 +34,7 @@ public final class Question implements Serializable {
         this.disableRandom = disableRandom;
         this.anchorLast = anchorLast;
         this.alwaysShowSend = alwaysShowSend;
+        this.isRequired = isRequired;
     }
 
     Question() {
@@ -88,6 +90,10 @@ public final class Question implements Serializable {
         return alwaysShowSend;
     }
 
+    public boolean isRequired() {
+        return isRequired;
+    }
+
     public Question mutateWith(List<Answer> answerList) {
         Question mutated = new Question();
         mutated.id = id;
@@ -102,6 +108,7 @@ public final class Question implements Serializable {
         mutated.disableRandom = disableRandom;
         mutated.anchorLast = anchorLast;
         mutated.alwaysShowSend = alwaysShowSend;
+        mutated.isRequired = isRequired;
         return mutated;
     }
 
