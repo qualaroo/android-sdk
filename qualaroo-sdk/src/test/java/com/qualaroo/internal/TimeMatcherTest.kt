@@ -13,10 +13,10 @@ class TimeMatcherTest {
 
     @Test
     fun enoughTimePassed() {
-        assertFalse(timeMatcher.enoughTimePassed(0))
+        assertFalse(timeMatcher.enoughTimePassedFrom(0))
 
         timeProvider.setCurrentTime(TimeUnit.DAYS.toMillis(3))
-        assertTrue(timeMatcher.enoughTimePassed(0))
+        assertTrue(timeMatcher.enoughTimePassedFrom(0))
     }
 
 }

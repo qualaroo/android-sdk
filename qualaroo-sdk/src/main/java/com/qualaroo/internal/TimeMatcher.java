@@ -12,7 +12,7 @@ final class TimeMatcher {
         this.timeProvider = timeProvider;
     }
 
-    public boolean enoughTimePassed(long fromInMillis) {
+    public boolean enoughTimePassedFrom(long fromInMillis) {
         return timeProvider.nowInMillis() - fromInMillis >= PAUSE_BETWEEN_SAME_SURVEYS;
     }
 }

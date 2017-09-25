@@ -27,7 +27,7 @@ final class SurveyDisplayQualifier {
             return false;
         }
 
-        if (!timeMatcher.enoughTimePassed(status.seenAtInMillis())) {
+        if (!timeMatcher.enoughTimePassedFrom(status.seenAtInMillis())) {
             return false;
         }
 

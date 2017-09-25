@@ -25,7 +25,7 @@ class SurveyDisplayQualifierTest {
 
     @Before
     fun setup() {
-        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(true)
+        whenever(timeMatcher.enoughTimePassedFrom(any())).thenReturn(true)
     }
 
     @Test
@@ -90,10 +90,10 @@ class SurveyDisplayQualifierTest {
                 )
         )
 
-        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(false)
+        whenever(timeMatcher.enoughTimePassedFrom(any())).thenReturn(false)
         assertFalse(qualifier.shouldShowSurvey(survey))
 
-        whenever(timeMatcher.enoughTimePassed(any())).thenReturn(true)
+        whenever(timeMatcher.enoughTimePassedFrom(any())).thenReturn(true)
         assertTrue(qualifier.shouldShowSurvey(survey))
     }
 
