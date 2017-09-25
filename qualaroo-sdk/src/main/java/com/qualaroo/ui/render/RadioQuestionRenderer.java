@@ -77,7 +77,10 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 })
                 .onRestoreState(new QuestionView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
-                        radioGroup.check(from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED));
+                        int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
+                        if (checkedId != NOTHING_SELECTED) {
+                            radioGroup.check(checkedId);
+                        }
                     }
                 }).build();
 
