@@ -10,8 +10,8 @@ object TestModels {
         return Survey.Spec(requireMap, optionMap, questionList, msgScreenList, startMap, surveyVariations)
     }
 
-    fun requireMap(deviceTypeList: List<String> = emptyList(), isPersistent: Boolean = false, customMap: String = ""): Survey.RequireMap {
-        return Survey.RequireMap(deviceTypeList, isPersistent, customMap)
+    fun requireMap(deviceTypeList: List<String> = emptyList(), isPersistent: Boolean = false, isOneShot: Boolean = false, customMap: String = ""): Survey.RequireMap {
+        return Survey.RequireMap(deviceTypeList, isPersistent, isOneShot, customMap)
     }
 
     fun optionMap(colorThemeMap: ColorThemeMap = colorThemeMap(), mandatory: Boolean = false, showFullScreen: Boolean = false): Survey.OptionMap {
