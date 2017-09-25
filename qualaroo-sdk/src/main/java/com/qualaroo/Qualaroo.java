@@ -1,20 +1,21 @@
 package com.qualaroo;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.qualaroo.internal.model.Survey;
-import com.qualaroo.internal.network.SurveyClient;
 import com.qualaroo.internal.network.Callback;
+import com.qualaroo.internal.network.SurveyClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Qualaroo {
+public class Qualaroo implements QualarooBase {
 
     private final SurveyClient surveyClient;
+    private final Context context;
     private List<Survey> surveys = new ArrayList<>();
     private SurveysListener surveysListener;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -27,12 +28,13 @@ public class Qualaroo {
         void onSurveysReady(List<Survey> surveys);
     }
 
-    public Qualaroo(SurveyClient surveyClient) {
+    public Qualaroo(Context context,  SurveyClient surveyClient) {
+        this.context = context;
         this.surveyClient = surveyClient;
     }
 
     public void init() {
-        this.surveyClient.fetchSurveys(new Callback<List<Survey>>() {
+        surveyClient.fetchSurveys(new Callback<List<Survey>>() {
             @Override public void onSuccess(List<Survey> result) {
                 surveys.clear();
                 surveys.addAll(result);
@@ -49,8 +51,8 @@ public class Qualaroo {
         });
     }
 
-    public void showSurvey(Activity activity, @NonNull String alias) {
-        if (alias == null || alias.length() == 0) {
+    @Override public void showSurvey(@NonNull String alias) {
+        if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
         Survey surveyToDisplay = null;
@@ -62,11 +64,18 @@ public class Qualaroo {
         if (surveyToDisplay == null) {
             throw new IllegalArgumentException("Survey not found");
         }
-        QualarooActivity.showSurvey(activity, surveyToDisplay);
+        QualarooActivity.showSurvey(context, surveyToDisplay);
     }
 
-    public void showSurvey(Activity activity, Survey survey) {
-        QualarooActivity.showSurvey(activity, survey);
+    @Override public void setUserId(@NonNull String userId) {
+
     }
 
+    @Override public void setUserProperty(@NonNull String key, String value) {
+
+    }
+
+    @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+
+    }
 }

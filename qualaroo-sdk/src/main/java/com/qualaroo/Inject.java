@@ -1,6 +1,7 @@
 package com.qualaroo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
@@ -30,10 +31,17 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class Inject {
 
     public static Qualaroo qualaroo(Context context) {
-        return new Qualaroo(surveyClient(context));
+        SharedPreferences qualaroo_pref = context.getSharedPreferences("qualaroo_pref", Context.MODE_PRIVATE);
+        Settings settings = new Settings(qualaroo_pref);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
+                .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+        return new Qualaroo(context, surveyClient(new SessionInfo(context), new UserInfo(settings), gson));
     }
 
-    private static SurveyClient surveyClient(Context context) {
+    private static SurveyClient surveyClient(SessionInfo sessionInfo, UserInfo userInfo, Gson gson) {
         final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override public void log(String message) {
                 Log.d("OkHttp", message);
@@ -52,14 +60,6 @@ public class Inject {
                     }
                 })
                 .build();
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
-                .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-        SessionInfo sessionInfo = new SessionInfo(context);
-        Settings settings = new Settings(context.getSharedPreferences("qualaroo_pref", Context.MODE_PRIVATE));
-        UserInfo userInfo = new UserInfo(settings);
         return new SurveyClient(new RestClient(okHttpClient, gson), new ApiConfig(), sessionInfo, userInfo, Executors.newSingleThreadExecutor());
     }
 
