@@ -34,4 +34,16 @@ public class ReportManager {
         Result<String> result = reportClient.recordTextAnswer(survey, question, answer);
 
     }
+
+    public static class DummyReportManager extends ReportManager {
+        public DummyReportManager() {
+            super(null, null, null);
+        }
+
+        @Override public void recordImpression(Survey survey) {}
+
+        @Override public void recordAnswer(Survey survey, Question question, List<Answer> answers) {}
+
+        @Override public void recordTextAnswer(Survey survey, Question question, String answer) {}
+    }
 }
