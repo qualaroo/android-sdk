@@ -35,4 +35,15 @@ class QuestionTest {
         assertFalse(question == questionWithSameTypeButDifferentId)
         assertFalse(question == totallyDifferentQuestion)
     }
+
+    @Test
+    fun `makes disable random flag more readable`() {
+        val question = question(
+                id = 5,
+                type = QuestionType.RADIO,
+                disableRandom = false
+        )
+
+        assertTrue(question.enableRandom())
+    }
 }
