@@ -18,7 +18,7 @@ object TestModels {
         return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen)
     }
 
-    fun question(id: Int, type: QuestionType, title: String = "Title", description: String = "some description", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, alwaysShowSend: Boolean = true): Question {
+    fun question(id: Int, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, alwaysShowSend: Boolean = true): Question {
         return Question(id, type, title, description, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, disableRandom, anchorLast, alwaysShowSend)
     }
 

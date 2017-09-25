@@ -1,6 +1,7 @@
 package com.qualaroo.ui;
 
 import android.support.annotation.Nullable;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Answer;
@@ -12,6 +13,7 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.storage.LocalStorage;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -30,10 +32,10 @@ public class SurveyInteractor {
     private final Language preferredLanguage;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
+    private final SparseArrayCompat<Question> questions;
+    private final SparseArrayCompat<Message> messages;
 
-    private final List<Question> questions;
-    private final List<Message> messages;
-
+    private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
 
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
@@ -43,32 +45,43 @@ public class SurveyInteractor {
         this.preferredLanguage = preferredLanguage;
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
-        this.questions = preferredLanguageOrDefault(survey.spec().questionList());
-        this.messages = preferredLanguageOrDefault(survey.spec().msgScreenList());
+        this.questions = prepareQuestions();
+        List<Message> messages = preferredLanguageOrDefault(survey.spec().msgScreenList());
+        this.messages = convertMessagesToSparseArray(messages);
     }
 
-    public void startSurvey() {
-        Node startNode = selectStartNode(survey.spec().startMap());
-        followNode(startNode);
+    public void displaySurvey() {
+        if (currentNode == null) {
+            Node startNode = selectStartNode(survey.spec().startMap());
+            followNode(startNode);
+        } else {
+            followNode(currentNode);
+        }
     }
 
     public void questionAnsweredWithText(Question question, String answer) {
         reportManager.recordTextAnswer(survey, question, answer);
-        Node nextNode = findNextNode(question, Collections.<Answer>emptyList());
+        Node nextNode = findNextNode(question.id(), Collections.<Answer>emptyList());
         followNode(nextNode);
     }
 
     public void questionAnswered(Question question, List<Answer> selectedAnswers) {
         reportManager.recordAnswer(survey, question, selectedAnswers);
-        Node nextNode = findNextNode(question, selectedAnswers);
+        Node nextNode = findNextNode(question.id(), selectedAnswers);
         followNode(nextNode);
     }
 
-    private Node findNextNode(Question question, List<Answer> selectedAnswers) {
+    private Node findNextNode(int questionId, List<Answer> selectedAnswers) {
         Node nextNode = null;
+        //TODO: Question and Answer objects provided by a presenter are not trusted and local copies are used instead.
+        //This was done to avoid having to pass fully built objects in tests. Could be fixed by either passing simple int ids
+        //or by changing the way we acquired objects in tests (directly from Survey model instead of creating new ones via TestModel.kt helper class)
+        Question question = questions.get(questionId);
         for (Answer answer : selectedAnswers) {
-            if (answer.nextMap() != null) {
-                nextNode = answer.nextMap();
+            int index = question.answerList().indexOf(answer);
+            Answer storedAnswer = question.answerList().get(index);
+            if (storedAnswer.nextMap() != null) {
+                nextNode = storedAnswer.nextMap();
                 break;
             }
         }
@@ -79,35 +92,18 @@ public class SurveyInteractor {
     }
 
     private void followNode(@Nullable Node node) {
+        this.currentNode = node;
         if (node == null) {
             eventsObserver.closeSurvey();
         } else if (node.nodeType().equals("message")) {
-            eventsObserver.showMessage(findMessageById(node.id(), messages));
+            eventsObserver.showMessage(messages.get(node.id()));
         } else if (node.nodeType().equals("question")) {
-            eventsObserver.showQuestion(findQuestionById(node.id(), questions));
+            eventsObserver.showQuestion(questions.get(node.id()));
         }
     }
 
     public void messageConfirmed(Message message) {
         eventsObserver.closeSurvey();
-    }
-
-    private static Question findQuestionById(int id, List<Question> questions) {
-        for (Question question : questions) {
-            if (question.id() == id) {
-                return  question;
-            }
-        }
-        return null;
-    }
-
-    private static Message findMessageById(int id, List<Message> messages) {
-        for (Message message : messages) {
-            if (message.id() == id) {
-                return message;
-            }
-        }
-        return null;
     }
 
     void registerObserver(EventsObserver eventsObserver) {
@@ -165,6 +161,44 @@ public class SurveyInteractor {
         @Override public void showQuestion(Question question) {}
         @Override public void showMessage(Message message) {}
         @Override public void closeSurvey() {}
+    }
+
+    private SparseArrayCompat<Question> prepareQuestions() {
+        List<Question> originalQuestions = preferredLanguageOrDefault(survey.spec().questionList());
+        SparseArrayCompat<Question> result = new SparseArrayCompat<>();
+        for (Question originalQuestion : originalQuestions) {
+            if (originalQuestion.enableRandom()) {
+                final LinkedList<Answer> answerList = new LinkedList<>(originalQuestion.answerList());
+                Answer anchoredLastAnswer = null;
+                if (originalQuestion.anchorLast()) {
+                    anchoredLastAnswer = answerList.removeLast();
+                }
+                Collections.shuffle(answerList);
+                if (anchoredLastAnswer != null) {
+                    answerList.addLast(anchoredLastAnswer);
+                }
+                result.append(originalQuestion.id(), originalQuestion.mutateWith(answerList));
+            } else {
+                result.append(originalQuestion.id(), originalQuestion);
+            }
+        }
+        return result;
+    }
+
+    private SparseArrayCompat<Message> convertMessagesToSparseArray(List<Message> messages) {
+        final SparseArrayCompat<Message> result = new SparseArrayCompat<>(messages.size());
+        for (Message message : messages) {
+            result.append(message.id(), message);
+        }
+        return result;
+    }
+
+    private SparseArrayCompat<Question> prepareQuestions(List<Question> questions) {
+        final SparseArrayCompat<Question> result = new SparseArrayCompat<>(questions.size());
+        for (Question question : questions) {
+            result.append(question.id(), question);
+        }
+        return result;
     }
 
     private <T> List<T> preferredLanguageOrDefault(Map<Language, List<T>> map) {

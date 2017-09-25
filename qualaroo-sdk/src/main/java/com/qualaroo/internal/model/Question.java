@@ -88,6 +88,23 @@ public final class Question implements Serializable {
         return alwaysShowSend;
     }
 
+    public Question mutateWith(List<Answer> answerList) {
+        Question mutated = new Question();
+        mutated.id = id;
+        mutated.type = type;
+        mutated.title = title;
+        mutated.description = description;
+        mutated.answerList = answerList;
+        mutated.sendText = sendText;
+        mutated.nextMap = nextMap;
+        mutated.npsMinLabel = npsMinLabel;
+        mutated.npsMaxLabel = npsMaxLabel;
+        mutated.disableRandom = disableRandom;
+        mutated.anchorLast = anchorLast;
+        mutated.alwaysShowSend = alwaysShowSend;
+        return mutated;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -99,5 +116,11 @@ public final class Question implements Serializable {
 
     @Override public int hashCode() {
         return id;
+    }
+
+    @Override public String toString() {
+        return "Question{" +
+                "id=" + id +
+                '}';
     }
 }
