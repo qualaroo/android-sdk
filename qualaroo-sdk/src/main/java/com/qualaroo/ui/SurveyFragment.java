@@ -122,6 +122,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
         emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
         mandatory = viewModel.cannotBeClosed();
+        getView().setBackgroundColor(theme.dimColor());
     }
 
     @Override public void showWithAnimation() {

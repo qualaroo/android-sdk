@@ -3,7 +3,6 @@
     android:id="@+id/qualaroo__fragment_survey_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D4323433"
     android:clipChildren="false"
     android:orientation="vertical">
 

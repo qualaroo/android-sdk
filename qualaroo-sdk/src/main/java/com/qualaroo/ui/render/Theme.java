@@ -7,9 +7,12 @@ import com.qualaroo.internal.model.ColorThemeMap;
 
 public final class Theme {
 
+    private static final @ColorInt int DIM_TYPE_LIGHT = Color.parseColor("#D4CACED6");
+    private static final @ColorInt int DIM_TYPE_VERY_LIGHT = Color.parseColor("#D4FAFAFA");
+    private static final @ColorInt int DIM_TYPE_DARK = Color.parseColor("#D4323433");
+
     public static Theme from(ColorThemeMap colorThemeMap) {
         Theme theme = new Theme();
-        theme.dimType = parseColorSafely(colorThemeMap.dimType());
         theme.backgroundColor = parseColorSafely(colorThemeMap.backgroundColor());
         theme.borderColor = parseColorSafely(colorThemeMap.borderColor());
         theme.textColor = parseColorSafely(colorThemeMap.textColor());
@@ -17,6 +20,7 @@ public final class Theme {
         theme.buttonEnabledColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
         theme.buttonDisabledColor = parseColorSafely(colorThemeMap.buttonDisabledColor());
         theme.accentColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
+        theme.dimColor = parseDimType(colorThemeMap.dimType());
         return theme;
     }
 
@@ -28,7 +32,20 @@ public final class Theme {
         }
     }
 
-    @ColorInt private int dimType;
+    private static @ColorInt int parseDimType(String dimType) {
+        if (dimType == null) {
+            return DIM_TYPE_DARK;
+        }
+        switch(dimType) {
+            case "light":
+                return DIM_TYPE_LIGHT;
+            case "very_light":
+                return DIM_TYPE_VERY_LIGHT;
+        }
+        return DIM_TYPE_DARK;
+    }
+
+    @ColorInt private int dimColor;
     @ColorInt private int backgroundColor;
     @ColorInt private int borderColor;
     @ColorInt private int textColor;
@@ -37,8 +54,8 @@ public final class Theme {
     @ColorInt private int buttonDisabledColor;
     @ColorInt private int accentColor;
 
-    public int dimType() {
-        return dimType;
+    public int dimColor() {
+        return dimColor;
     }
 
     public int backgroundColor() {
