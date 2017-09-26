@@ -82,6 +82,10 @@ public class InMemoryLocalStorage implements LocalStorage {
     }
 
     @Override public void updateUserProperty(@NonNull String key, @Nullable String value) {
-        userProperties.put(key, value);
+        if (value == null) {
+            userProperties.remove(key);
+        } else {
+            userProperties.put(key, value);
+        }
     }
 }

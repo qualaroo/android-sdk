@@ -5,13 +5,12 @@ import com.qualaroo.internal.model.TestModels.survey
 import org.junit.Assert.*
 import org.junit.Test
 
-@Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class InMemoryLocalStorageTest {
 
     val localStorage = InMemoryLocalStorage(TimeProvider())
 
     @Test
-    fun `store failed report requests`() {
+    fun storeFailedReportRequests() {
         localStorage.storeFailedReportRequest("http://url.com/1")
         localStorage.storeFailedReportRequest("http://url.com/2")
         localStorage.storeFailedReportRequest("http://url.com/3")
@@ -21,7 +20,13 @@ class InMemoryLocalStorageTest {
         assertTrue(storedRequests.contains("http://url.com/1"))
         assertTrue(storedRequests.contains("http://url.com/2"))
         assertTrue(storedRequests.contains("http://url.com/3"))
+    }
 
+    @Test
+    fun removeFailedReportRequests() {
+        localStorage.storeFailedReportRequest("http://url.com/1")
+        localStorage.storeFailedReportRequest("http://url.com/2")
+        localStorage.storeFailedReportRequest("http://url.com/3")
         localStorage.removeReportRequest("http://url.com/2")
         val requests = localStorage.getFailedReportRequests(3)
 
@@ -30,7 +35,7 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
-    fun `fetch specified number of reports or all available`() {
+    fun fetchSpecifiedNumberOfReportsOrAllAvailable() {
         localStorage.storeFailedReportRequest("http://url.com/1")
         localStorage.storeFailedReportRequest("http://url.com/2")
         localStorage.storeFailedReportRequest("http://url.com/3")
@@ -45,7 +50,7 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
-    fun `mark survey as seen`() {
+    fun markSurveyAsSeen() {
         val survey = survey(id = 24)
 
         localStorage.markSurveyAsSeen(survey)
@@ -55,7 +60,7 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
-    fun `mark survey as finished`() {
+    fun markSurveyAsFinished() {
         val survey = survey(id = 24)
 
         localStorage.markSurveyFinished(survey)
@@ -65,7 +70,7 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
-    fun `keep previous status data`() {
+    fun keepPreviousStatusData() {
         val survey = survey(id = 24)
 
         localStorage.markSurveyAsSeen(survey)
@@ -80,13 +85,33 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
-    fun `store users properties`() {
-        val properties = localStorage.userProperties
+    fun storeUserProperties() {
+        var properties = localStorage.userProperties
         assertFalse(properties.containsKey("someKey"))
+        assertEquals(0, properties.size)
 
         localStorage.updateUserProperty("someKey", "someValue")
-        assertFalse(properties.containsKey("someKey"))
-
-        assertEquals("someValue", localStorage.userProperties["someKey"])
+        properties = localStorage.userProperties
+        assertEquals(1, properties.size)
+        assertEquals("someValue", properties["someKey"])
     }
+
+    @Test
+    fun replacesValuesForKeys() {
+        localStorage.updateUserProperty("someKey", "someValue")
+        assertEquals("someValue", localStorage.userProperties["someKey"])
+
+        localStorage.updateUserProperty("someKey", "otherValue")
+        assertEquals("otherValue", localStorage.userProperties["someKey"])
+    }
+
+    @Test
+    fun removesUserPropertyWhenValueIsNull() {
+        localStorage.updateUserProperty("someKey", "someValue")
+        assertTrue(localStorage.userProperties.containsKey("someKey"))
+
+        localStorage.updateUserProperty("someKey", null)
+        assertFalse(localStorage.userProperties.containsKey("someKey"))
+    }
+
 }
