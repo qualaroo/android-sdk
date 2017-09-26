@@ -3,7 +3,8 @@ package com.qualaroo.internal.storage
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import org.junit.Assert
+import com.qualaroo.internal.model.UiTestModels.survey
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,10 +28,10 @@ class DatabaseLocalStorageTest {
         localStorage.storeFailedReportRequest("http://url.com/3")
         val storedRequests = localStorage.getFailedReportRequests(3)
 
-        Assert.assertEquals(3, storedRequests.size)
-        Assert.assertTrue(storedRequests.contains("http://url.com/1"))
-        Assert.assertTrue(storedRequests.contains("http://url.com/2"))
-        Assert.assertTrue(storedRequests.contains("http://url.com/3"))
+        assertEquals(3, storedRequests.size)
+        assertTrue(storedRequests.contains("http://url.com/1"))
+        assertTrue(storedRequests.contains("http://url.com/2"))
+        assertTrue(storedRequests.contains("http://url.com/3"))
     }
 
     @Test
@@ -41,8 +42,8 @@ class DatabaseLocalStorageTest {
         localStorage.removeReportRequest("http://url.com/2")
         val requests = localStorage.getFailedReportRequests(3)
 
-        Assert.assertEquals(2, requests.size)
-        Assert.assertFalse(requests.contains("http://url.com/2"))
+        assertEquals(2, requests.size)
+        assertFalse(requests.contains("http://url.com/2"))
     }
 
     @Test
@@ -54,10 +55,75 @@ class DatabaseLocalStorageTest {
         localStorage.storeFailedReportRequest("http://url.com/5")
 
         var requests = localStorage.getFailedReportRequests(3)
-        Assert.assertEquals(3, requests.size)
+        assertEquals(3, requests.size)
 
         requests = localStorage.getFailedReportRequests(7)
-        Assert.assertEquals(5, requests.size)
+        assertEquals(5, requests.size)
     }
-    
+
+    @Test
+    fun markSurveyAsSeen() {
+        val survey = survey(id = 24)
+
+        localStorage.markSurveyAsSeen(survey)
+        val status = localStorage.getSurveyStatus(survey)
+
+        assertTrue(status.hasBeenSeen())
+    }
+
+    @Test
+    fun markSurveyAsFinished() {
+        val survey = survey(id = 24)
+
+        localStorage.markSurveyFinished(survey)
+        val status = localStorage.getSurveyStatus(survey)
+
+        assertTrue(status.hasBeenFinished())
+    }
+
+    @Test
+    fun keepPreviousStatusData() {
+        val survey = survey(id = 24)
+
+        localStorage.markSurveyAsSeen(survey)
+        var status = localStorage.getSurveyStatus(survey)
+        assertTrue(status.hasBeenSeen())
+        assertFalse(status.hasBeenFinished())
+
+        localStorage.markSurveyFinished(survey)
+        status = localStorage.getSurveyStatus(survey)
+        assertTrue(status.hasBeenSeen())
+        assertTrue(status.hasBeenFinished())
+    }
+
+    @Test
+    fun storeUserProperties() {
+        var properties = localStorage.userProperties
+        assertFalse(properties.containsKey("someKey"))
+        assertEquals(0, properties.size)
+
+        localStorage.updateUserProperty("someKey", "someValue")
+        properties = localStorage.userProperties
+        assertEquals(1, properties.size)
+        assertEquals("someValue", properties["someKey"])
+    }
+
+    @Test
+    fun replacesValuesForKeys() {
+        localStorage.updateUserProperty("someKey", "someValue")
+        assertEquals("someValue", localStorage.userProperties["someKey"])
+
+        localStorage.updateUserProperty("someKey", "otherValue")
+        assertEquals("otherValue", localStorage.userProperties["someKey"])
+    }
+
+    @Test
+    fun removesUserPropertyWhenValueIsNull() {
+        localStorage.updateUserProperty("someKey", "someValue")
+        assertTrue(localStorage.userProperties.containsKey("someKey"))
+
+        localStorage.updateUserProperty("someKey", null)
+        assertFalse(localStorage.userProperties.containsKey("someKey"))
+    }
+
 }
