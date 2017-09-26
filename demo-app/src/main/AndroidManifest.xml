@@ -9,7 +9,8 @@
         android:label="Qualaroo Demo"
         android:allowBackup="true" android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true" android:theme="@style/AppTheme">
-        <activity android:name=".SurveyDemoActivity">
+        <activity android:name=".SurveyDemoActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

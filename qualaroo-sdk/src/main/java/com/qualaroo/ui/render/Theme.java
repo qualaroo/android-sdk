@@ -16,7 +16,7 @@ public final class Theme {
         theme.buttonTextColor = parseColorSafely(colorThemeMap.buttonTextColor());
         theme.buttonEnabledColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
         theme.buttonDisabledColor = parseColorSafely(colorThemeMap.buttonDisabledColor());
-        theme.accentColor = parseColorSafely("#1d93d1");
+        theme.accentColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
         return theme;
     }
 

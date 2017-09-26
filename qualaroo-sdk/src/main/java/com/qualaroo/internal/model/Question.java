@@ -19,8 +19,9 @@ public final class Question implements Serializable {
     private boolean disableRandom;
     private boolean anchorLast;
     private boolean alwaysShowSend;
+    private boolean isRequired;
 
-    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend) {
+    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -33,6 +34,7 @@ public final class Question implements Serializable {
         this.disableRandom = disableRandom;
         this.anchorLast = anchorLast;
         this.alwaysShowSend = alwaysShowSend;
+        this.isRequired = isRequired;
     }
 
     Question() {
@@ -88,6 +90,28 @@ public final class Question implements Serializable {
         return alwaysShowSend;
     }
 
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    public Question mutateWith(List<Answer> answerList) {
+        Question mutated = new Question();
+        mutated.id = id;
+        mutated.type = type;
+        mutated.title = title;
+        mutated.description = description;
+        mutated.answerList = answerList;
+        mutated.sendText = sendText;
+        mutated.nextMap = nextMap;
+        mutated.npsMinLabel = npsMinLabel;
+        mutated.npsMaxLabel = npsMaxLabel;
+        mutated.disableRandom = disableRandom;
+        mutated.anchorLast = anchorLast;
+        mutated.alwaysShowSend = alwaysShowSend;
+        mutated.isRequired = isRequired;
+        return mutated;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -99,5 +123,11 @@ public final class Question implements Serializable {
 
     @Override public int hashCode() {
         return id;
+    }
+
+    @Override public String toString() {
+        return "Question{" +
+                "id=" + id +
+                '}';
     }
 }

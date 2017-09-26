@@ -29,23 +29,22 @@ import java.util.List;
 public class NpsView extends FrameLayout {
 
     private final LinearLayout scoresContainer;
-
     public interface OnScoreChangedListener {
         void onScoreChanged(int score);
     }
-
     private static final int NUM_OF_SCORES = 11;
+
     private static final int MIN_SCORE = 0;
     private static final int MAX_SCORE = 10;
     private static final int SPACE_WIDTH_IN_DP = 4;
-
     private final List<AppCompatTextView> scores = new ArrayList<>();
+
     private final Drawable activeDrawable;
     private final Drawable inactiveDrawable;
     private final @Px int spaceWidth;
     private TextView hintView;
-
     private final int[] scorePositions = new int[NUM_OF_SCORES];
+
     private int currentlySelectedScore = -1;
     private OnScoreChangedListener onScoreChangedListener;
 
@@ -129,6 +128,11 @@ public class NpsView extends FrameLayout {
 
     public void setOnScoreChangedListener(OnScoreChangedListener onScoreChangedListener) {
         this.onScoreChangedListener = onScoreChangedListener;
+    }
+
+    public void setScore(int score) {
+        selectScore(score);
+        invalidate();
     }
 
     public int getCurrentlySelectedScore() {

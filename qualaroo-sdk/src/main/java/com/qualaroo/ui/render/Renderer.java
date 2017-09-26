@@ -31,7 +31,8 @@ public class Renderer {
         return new MessageRenderer(theme).render(context, message, onMessageConfirmedListener);
     }
 
-    public View renderQuestion(Context context, Question question, OnAnsweredListener onAnsweredListener) {
+    public QuestionView renderQuestion(Context context, Question question, OnAnsweredListener onAnsweredListener) {
         return questionRenderers.get(question.type()).render(context, question, onAnsweredListener);
     }
+
 }

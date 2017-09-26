@@ -3,7 +3,6 @@ package com.qualaroo.ui.render;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatTextView;
-import android.view.View;
 import android.widget.TextView;
 
 import com.qualaroo.internal.model.Question;
@@ -17,10 +16,12 @@ final class UnknownQuestionTypeRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public View render(Context context, Question question, OnAnsweredListener onAnsweredListener) {
+    @Override public QuestionView render(Context context, Question question, OnAnsweredListener onAnsweredListener) {
         TextView view = new AppCompatTextView(context);
         view.setText(String.format(Locale.ROOT,"We're sorry! Question with id %d is not supported yet", question.id()));
         view.setTextColor(Color.RED);
-        return view;
+        return QuestionView.forQuestionId(question.id())
+                .setView(view)
+                .build();
     }
 }

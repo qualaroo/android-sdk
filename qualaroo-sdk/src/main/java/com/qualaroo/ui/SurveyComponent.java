@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.ui.render.Renderer;
@@ -46,7 +47,8 @@ public class SurveyComponent {
 
     private SurveyInteractor provideSurveyInteractor() {
         if (surveyInteractor == null) {
-            surveyInteractor = new SurveyInteractor(survey, null, null, new Language("en"), Executors.newSingleThreadExecutor(), new AndroidMainThreadExecutor());
+            ReportManager reportManager = new ReportManager.DummyReportManager();
+            surveyInteractor = new SurveyInteractor(survey, null, reportManager, new Language("en"), Executors.newSingleThreadExecutor(), new AndroidMainThreadExecutor());
         }
         return surveyInteractor;
     }

@@ -1,6 +1,7 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.util.TypedValue;
 import android.view.View;
@@ -16,20 +17,19 @@ import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class CheckboxQuestionRenderer extends QuestionRenderer {
 
+    private static final String KEY_CHECKED_ELEMENTS = "question.checkedElements";
 
     CheckboxQuestionRenderer(Theme theme) {
         super(theme);
     }
 
-    @Override public View render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         ViewGroup view = (ViewGroup) View.inflate(context, R.layout.qualaroo__view_question_checkbox, null);
-        ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
+        final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
         button.setText(question.sendText());
         button.setEnabled(false);
@@ -48,22 +48,10 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 button.setEnabled(anyChecked);
             }
         };
-        //TODO move this to business logic part so it can be tested nicely
-        LinkedList<Answer> answerList = new LinkedList<>(question.answerList());
-        Answer anchoredLastAnswer = null;
-        if (question.anchorLast()) {
-            anchoredLastAnswer = answerList.removeLast();
-        }
-        if (question.enableRandom()) {
-            Collections.shuffle(answerList);
-        }
-        if (anchoredLastAnswer != null) {
-            answerList.addLast(anchoredLastAnswer);
-        }
-        //TODO ^ move this to business logic part
-        for (Answer answer : answerList) {
+        for (Answer answer : question.answerList()) {
             AppCompatCheckBox checkBox = new AppCompatCheckBox(context);
             ThemeUtils.applyTheme(checkBox, getTheme());
+            checkBox.setId(answer.id());
             checkBox.setText(answer.title());
             checkBox.setTextColor(getTheme().textColor());
             checkBox.setOnCheckedChangeListener(listener);
@@ -84,7 +72,34 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 onAnsweredListener.onAnswered(question, selectedAnswers);
             }
         });
-        return view;
+        return QuestionView.forQuestionId(question.id())
+                .setView(view)
+                .onSaveState(new QuestionView.OnSaveState() {
+                    @Override public void onSaveState(Bundle into) {
+                        ArrayList<Integer> checkedElements = new ArrayList<>();
+                        for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
+                            CheckBox checkBox = (CheckBox) checkboxesContainer.getChildAt(i);
+                            if (checkBox.isChecked()) {
+                                checkedElements.add(checkBox.getId());
+                            }
+                        }
+                        into.putIntegerArrayList(KEY_CHECKED_ELEMENTS, checkedElements);
+                    }
+                })
+                .onRestoreState(new QuestionView.OnRestoreState() {
+                    @Override public void onRestoreState(Bundle from) {
+                        ArrayList<Integer> checkedElements = from.getIntegerArrayList(KEY_CHECKED_ELEMENTS);
+                        if (checkedElements != null) {
+                            for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
+                                CheckBox checkBox = (CheckBox) checkboxesContainer.getChildAt(i);
+                                if (checkedElements.contains(checkBox.getId())) {
+                                    checkBox.setChecked(true);
+                                }
+                            }
+                        }
+                    }
+                })
+                .build();
     }
 
 }

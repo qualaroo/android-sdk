@@ -1,11 +1,14 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.Nullable;
+
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.ui.render.Theme;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +31,20 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
         surveyView = view;
         surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
         interactor.registerObserver(this);
-        interactor.startSurvey();
+    }
+
+    public void init(@Nullable State state) {
+        if (state == null) {
+            surveyView.showWithAnimation();
+        } else {
+            currentlyDisplayedQuestion = state.question();
+            surveyView.showImmediately();
+        }
+        interactor.displaySurvey();
+    }
+
+    public State getSavedState() {
+        return new State(currentlyDisplayedQuestion);
     }
 
     public void dropView() {
@@ -63,5 +79,18 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
 
     void onAnsweredWithText(String payload) {
         interactor.questionAnsweredWithText(currentlyDisplayedQuestion, payload);
+    }
+
+    static class State implements Serializable {
+
+        private final Question question;
+
+        private State(Question question) {
+            this.question = question;
+        }
+
+        public Question question() {
+            return question;
+        }
     }
 }
