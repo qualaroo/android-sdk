@@ -49,12 +49,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/surveys_spinner" />
 
-        <Button
-            android:id="@+id/open_sandbox"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:text="Open sandbox" />
-
-
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
