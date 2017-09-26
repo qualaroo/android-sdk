@@ -1,13 +1,25 @@
 package com.qualaroo.internal.storage
 
-import com.qualaroo.internal.TimeProvider
-import com.qualaroo.internal.model.TestModels.survey
+import android.support.test.InstrumentationRegistry
+import android.support.test.filters.LargeTest
+import android.support.test.runner.AndroidJUnit4
+import com.qualaroo.internal.model.UiTestModels.survey
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class InMemoryLocalStorageTest {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class DatabaseLocalStorageTest {
 
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    lateinit var localStorage: LocalStorage
+
+    @Before
+    fun setup() {
+        InstrumentationRegistry.getContext().deleteDatabase(DatabaseLocalStorage.DB_NAME)
+        localStorage = DatabaseLocalStorage(InstrumentationRegistry.getTargetContext())
+    }
 
     @Test
     fun storeFailedReportRequests() {
