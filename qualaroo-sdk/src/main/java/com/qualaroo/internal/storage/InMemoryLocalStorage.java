@@ -1,5 +1,8 @@
 package com.qualaroo.internal.storage;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.qualaroo.internal.TimeProvider;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
@@ -14,6 +17,7 @@ public class InMemoryLocalStorage implements LocalStorage {
     private final TimeProvider timeProvider;
     private final List<String> failedRequests = new ArrayList<>();
     private final Map<Integer, SurveyStatus> surveyStatusMap = new HashMap<>();
+    private final Map<String, String> userProperties = new HashMap<>();
 
     public InMemoryLocalStorage(TimeProvider timeProvider) {
         this.timeProvider = timeProvider;
@@ -73,4 +77,11 @@ public class InMemoryLocalStorage implements LocalStorage {
         return result;
     }
 
+    @Override public Map<String, String> getUserProperties() {
+        return new HashMap<>(userProperties);
+    }
+
+    @Override public void updateUserProperty(@NonNull String key, @Nullable String value) {
+        userProperties.put(key, value);
+    }
 }

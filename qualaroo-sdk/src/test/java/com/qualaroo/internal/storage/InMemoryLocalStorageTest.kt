@@ -78,4 +78,15 @@ class InMemoryLocalStorageTest {
         assertTrue(status.hasBeenSeen())
         assertTrue(status.hasBeenFinished())
     }
+
+    @Test
+    fun `store users properties`() {
+        val properties = localStorage.userProperties
+        assertFalse(properties.containsKey("someKey"))
+
+        localStorage.updateUserProperty("someKey", "someValue")
+        assertFalse(properties.containsKey("someKey"))
+
+        assertEquals("someValue", localStorage.userProperties["someKey"])
+    }
 }

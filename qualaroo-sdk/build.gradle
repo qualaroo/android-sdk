@@ -36,6 +36,11 @@ android {
     }
 }
 
+repositories {
+    jcenter()
+    google()
+}
+
 dependencies {
     implementation "com.android.support:appcompat-v7:26.1.0"
     implementation "com.android.support:design:26.1.0"
@@ -43,17 +48,19 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.google.code.gson:gson:2.8.0'
+    implementation files('libs/commons-jexl3-3.1.jar')
+    implementation files('libs/commons-logging-1.2.jar')
+
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     testImplementation 'org.mockito:mockito-core:2.9.0'
     testImplementation 'com.nhaarman:mockito-kotlin-kt1.1:1.5.0'
     testImplementation 'junit:junit:4.12'
-    implementation files('libs/commons-jexl3-3.1.jar')
-    implementation files('libs/commons-logging-1.2.jar')
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
-repositories {
-    mavenCentral()
-}
+
 
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
