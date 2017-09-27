@@ -1,6 +1,5 @@
 package com.qualaroo.ui;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -36,6 +35,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     Renderer renderer;
     Theme theme;
 
+    private View backgroundView;
     private View surveyContainer;
     private TextView questionsTitle;
     private FrameLayout questionsContent;
@@ -53,6 +53,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        backgroundView = view.findViewById(R.id.qualaroo__fragment_survey_container);
         questionsTitle = view.findViewById(R.id.qualaroo__question_title);
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
@@ -93,16 +94,11 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     private void runCloseAnimation() {
-        ValueAnimator animator = ValueAnimator.ofFloat(1.0f, 0.0f);
-        animator.setDuration(300);
-        animator.setStartDelay(300);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override public void onAnimationUpdate(ValueAnimator animation) {
-                float value = (float) animation.getAnimatedValue();
-                getView().setAlpha(value);
-            }
-        });
-        animator.start();
+        backgroundView.animate()
+                .alpha(0.0f)
+                .setStartDelay(300)
+                .setDuration(300)
+                .start();
         surveyContainer.animate()
                 .setDuration(300)
                 .translationY(surveyContainer.getHeight())
@@ -122,19 +118,16 @@ public class SurveyFragment extends Fragment implements SurveyView {
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
         emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
         mandatory = viewModel.cannotBeClosed();
-        getView().setBackgroundColor(theme.dimColor());
+        backgroundView.setAlpha(0.0f);
+        backgroundView.setBackgroundColor(theme.dimColor());
     }
 
     @Override public void showWithAnimation() {
-        ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        animator.setDuration(250);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override public void onAnimationUpdate(ValueAnimator animation) {
-                float value = (float) animation.getAnimatedValue();
-                getView().setAlpha(value);
-            }
-        });
-        animator.start();
+        backgroundView.setAlpha(0.0f);
+        backgroundView.animate()
+                .alpha(1.0f)
+                .setDuration(300)
+                .start();
         surveyContainer.post(new Runnable() {
             @Override public void run() {
                 surveyContainer.setTranslationY(surveyContainer.getHeight());
@@ -150,6 +143,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void showImmediately() {
+        backgroundView.setAlpha(1.0f);
         surveyContainer.setVisibility(View.VISIBLE);
         surveyContainer.setTranslationY(0);
     }
@@ -204,7 +198,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     @Override public void closeSurvey() {
         runCloseAnimation();
-        getView().postDelayed(new Runnable() {
+        surveyContainer.postDelayed(new Runnable() {
             @Override public void run() {
                 getActivity().finish();
                 getActivity().overridePendingTransition(0, 0);
