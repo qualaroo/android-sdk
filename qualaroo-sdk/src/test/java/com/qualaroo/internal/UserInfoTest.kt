@@ -1,5 +1,6 @@
 package com.qualaroo.internal
 
+import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.InMemorySettings
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -7,7 +8,8 @@ import org.junit.Test
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class UserInfoTest {
 
-    val userInfo = UserInfo(InMemorySettings())
+    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val userInfo = UserInfo(InMemorySettings(), localStorage)
 
     @Test
     fun `generates device id once`() {

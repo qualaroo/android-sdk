@@ -1,5 +1,6 @@
 package com.qualaroo.internal
 
+import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.InMemorySettings
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -8,7 +9,8 @@ import org.junit.Test
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 class UserPropertiesMatcherTest {
 
-    val userInfo = UserInfo(InMemorySettings())
+    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val userInfo = UserInfo(InMemorySettings(), localStorage)
     private val matcher = UserPropertiesMatcher(userInfo)
 
     @Test
