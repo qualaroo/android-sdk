@@ -41,11 +41,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
-public class Qualaroo implements QualarooBase {
+public class Qualaroo implements QualarooSdk {
 
-    private static QualarooBase INSTANCE;
+    private static QualarooSdk INSTANCE;
 
-    public static QualarooBase getInstance() {
+    public static QualarooSdk getInstance() {
         return INSTANCE;
     }
 

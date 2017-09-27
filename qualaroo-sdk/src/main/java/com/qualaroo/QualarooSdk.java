@@ -2,7 +2,7 @@ package com.qualaroo;
 
 import android.support.annotation.NonNull;
 
-public interface QualarooBase {
+public interface QualarooSdk {
     /**
      * Shows a survey with specified alias if all targeting conditions are met.
      * @param alias - alias of a survey that should be shown
