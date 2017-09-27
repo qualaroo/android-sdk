@@ -6,33 +6,36 @@ import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.internal.storage.LocalStorage
 import okhttp3.HttpUrl
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.IOException
 
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class ReportClientTest {
 
     val survey: Survey = survey(id = 123)
 
-    val restClient = mock<RestClient> {
-        on { get(any()) } doReturn Result.of("")
-    }
+    val restClient = MockRestClient()
 
     val apiConfig = mock<ApiConfig> {
         on { reportApi() } doReturn HttpUrl.parse("https://turbo.qualaroo.com")
     }
 
-    val client = ReportClient(restClient, apiConfig)
+    val localStorage = mock<LocalStorage>()
+
+    val client = ReportClient(restClient, apiConfig, localStorage)
 
     @Test
     fun `builds proper url for impressions`() {
         client.recordImpression(survey)
 
-        val captor = argumentCaptor<HttpUrl>()
-        verify(restClient).get(captor.capture())
+        val url = restClient.recentHttpUrl!!
 
-        val url = captor.lastValue
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/c.js", url.encodedPath())
@@ -46,9 +49,7 @@ class ReportClientTest {
 
         client.recordAnswer(survey, question, listOf(answer))
 
-        val captor = argumentCaptor<HttpUrl>()
-        verify(restClient).get(captor.capture())
-        val url = captor.lastValue
+        val url = restClient.recentHttpUrl!!
 
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
@@ -64,9 +65,7 @@ class ReportClientTest {
 
         client.recordAnswer(survey, question, listOf(answer))
 
-        val captor = argumentCaptor<HttpUrl>()
-        verify(restClient).get(captor.capture())
-        val url = captor.lastValue
+        val url = restClient.recentHttpUrl!!
 
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
@@ -90,9 +89,7 @@ class ReportClientTest {
 
         client.recordAnswer(survey, question, answers)
 
-        val captor = argumentCaptor<HttpUrl>()
-        verify(restClient).get(captor.capture())
-        val url = captor.lastValue
+        val url = restClient.recentHttpUrl!!
 
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
@@ -114,15 +111,77 @@ class ReportClientTest {
 
         client.recordTextAnswer(survey, question, "long answer with spaces")
 
-        val captor = argumentCaptor<HttpUrl>()
-        verify(restClient).get(captor.capture())
-        val url = captor.lastValue
+        val url = restClient.recentHttpUrl!!
 
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
         assertEquals("long answer with spaces", url.queryParameter("r[123456][text]"))
+    }
+
+    @Test
+    fun `stores requests on network errors`() {
+        restClient.throwsIoException = true
+
+        client.recordImpression(survey(id = 10))
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+
+        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+
+        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+    }
+
+    @Test
+    fun `stores failed requests`() {
+        restClient.returnedResponseCode = 200
+
+        client.recordImpression(survey(id = 10))
+        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+
+        verify(localStorage, times(0)).storeFailedReportRequest(any())
+
+
+        restClient.returnedResponseCode = 400
+
+        client.recordImpression(survey(id = 10))
+        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+
+        verify(localStorage, times(0)).storeFailedReportRequest(any())
+
+
+        restClient.returnedResponseCode = 500
+
+        client.recordImpression(survey(id = 10))
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
+    }
+
+    class MockRestClient : RestClient(null, null) {
+
+        var returnedResponseCode = 200
+        var throwsIoException = false
+        var recentHttpUrl: HttpUrl? = null
+
+        public override fun get(httpUrl: HttpUrl): Response {
+            recentHttpUrl = httpUrl
+            if (throwsIoException) {
+                throw IOException()
+            }
+            return Response.Builder()
+                    .protocol(Protocol.HTTP_2)
+                    .message("")
+                    .request(Request.Builder().url(httpUrl).build())
+                    .code(returnedResponseCode)
+                    .build()
+        }
     }
 
 }

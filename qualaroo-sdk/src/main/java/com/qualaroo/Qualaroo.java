@@ -23,6 +23,7 @@ import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
+import com.qualaroo.internal.network.ReportClient;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
 import com.qualaroo.internal.storage.DatabaseLocalStorage;
@@ -45,31 +46,27 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class Qualaroo implements QualarooSdk {
 
-    private static QualarooSdk INSTANCE;
-    private final UserInfo userInfo;
-
+    public static Builder with(Context context) {
+        return new Builder(context);
+    }
     public static QualarooSdk getInstance() {
         return INSTANCE;
     }
 
-    private SurveyDisplayQualifier surveyDisplayQualifier;
+    private static QualarooSdk INSTANCE;
 
-    public static Builder with(Context context) {
-        return new Builder(context);
-    }
-
+    private final UserInfo userInfo;
+    private final SurveyDisplayQualifier surveyDisplayQualifier;
     private final Context context;
     private final SurveysRepository surveysRepository;
-
-
     private final Executor dataExecutor;
     private final ReportManager reportManager;
     private final LocalStorage localStorage;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
-    private Language preferredLanguage = new Language("en");
-
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
+
+    private Language preferredLanguage = new Language("en");
 
     private Qualaroo(Context context, Credentials credentials, boolean debugMode) {
         this.context = context.getApplicationContext();
@@ -90,7 +87,7 @@ public class Qualaroo implements QualarooSdk {
         this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         SessionInfo sessionInfo = new SessionInfo(this.context);
 
-        surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
     }
 
 
@@ -143,7 +140,7 @@ public class Qualaroo implements QualarooSdk {
         this.preferredLanguage = new Language(iso2Language);
     }
 
-    public SurveyComponent buildSurveyComponent(Survey survey) {
+    SurveyComponent buildSurveyComponent(Survey survey) {
         return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
     }
 

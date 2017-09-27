@@ -38,22 +38,10 @@ public class RestClient {
         }
     }
 
-    Result<String> get(HttpUrl httpUrl) {
-        try {
-            Request request = new Request.Builder()
-                    .url(httpUrl)
-                    .build();
-            Response response = okHttpClient.newCall(request).execute();
-            if(!response.isSuccessful()) {
-                return Result.error(new HttpException(response.code()));
-            }
-            if (response.body() != null) {
-                return Result.of(response.body().string());
-            } else {
-                return Result.of("");
-            }
-        } catch (IOException e) {
-            return Result.error(e);
-        }
+    Response get(HttpUrl httpUrl) throws IOException {
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        return okHttpClient.newCall(request).execute();
     }
 }
