@@ -60,6 +60,7 @@ public class Qualaroo implements QualarooBase {
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
 
+    private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
 
     private Qualaroo(Context context, Credentials credentials, boolean debugMode) {
         this.context = context.getApplicationContext();
@@ -78,20 +79,34 @@ public class Qualaroo implements QualarooBase {
         surveysRepository = new SurveysRepository(credentials.siteId(), restClient, new ApiConfig(), sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
     }
 
-    @Override public void showSurvey(@NonNull String alias) {
+
+    @Override public void showSurvey(@NonNull final String alias) {
         if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
-        Survey surveyToDisplay = null;
-        for (Survey survey : surveys) {
-            if (alias.equals(survey.canonicalName())) {
-                surveyToDisplay = survey;
+        if (requestingForSurvey.get()) {
+            return;
+        }
+        requestingForSurvey.set(true);
+        backgroundExecutor.execute(new Runnable() {
+            @Override public void run() {
+                List<Survey> surveys = surveysRepository.getSurveys();
+                for (final Survey survey : surveys) {
+                    if (alias.equals(survey.canonicalName())) {
+                        boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(survey);
+                        if (shouldShowSurvey) {
+                            uiExecutor.execute(new Runnable() {
+                                @Override public void run() {
+                                    QualarooActivity.showSurvey(context, survey);
+                                }
+                            });
+                            break;
+                        }
+                    }
+                }
+                requestingForSurvey.set(false);
             }
-        }
-        if (surveyToDisplay == null) {
-            throw new IllegalArgumentException("Survey not found");
-        }
-        QualarooActivity.showSurvey(context, surveyToDisplay);
+        });
     }
 
     @Override public void setUserId(@NonNull String userId) {
