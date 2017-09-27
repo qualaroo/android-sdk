@@ -21,7 +21,6 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.render.QuestionView;
 import com.qualaroo.ui.render.QuestionViewState;
 import com.qualaroo.ui.render.Renderer;
-import com.qualaroo.ui.render.Theme;
 import com.qualaroo.util.DebouncingOnClickListener;
 
 import java.util.List;
@@ -33,7 +32,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
-    Theme theme;
 
     private View backgroundView;
     private View surveyContainer;
@@ -119,7 +117,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
         mandatory = viewModel.cannotBeClosed();
         backgroundView.setAlpha(0.0f);
-        backgroundView.setBackgroundColor(theme.dimColor());
+        backgroundView.setBackgroundColor(viewModel.dimColor());
     }
 
     @Override public void showWithAnimation() {

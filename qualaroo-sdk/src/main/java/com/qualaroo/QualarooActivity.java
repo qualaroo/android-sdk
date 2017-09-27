@@ -29,7 +29,14 @@ public class QualarooActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         surveyComponent = (SurveyComponent) getLastCustomNonConfigurationInstance();
         if (surveyComponent == null) {
-            surveyComponent = SurveyComponent.from((Survey) getIntent().getExtras().getSerializable(KEY_SURVEY));
+            Survey survey = (Survey) getIntent().getExtras().getSerializable(KEY_SURVEY);
+            Qualaroo qualaroo = (Qualaroo) Qualaroo.getInstance();
+            if (qualaroo == null) {
+                finish();
+                //TODO call Logger here to notify about this exception
+                return;
+            }
+            this.surveyComponent = qualaroo.buildSurveyComponent(survey);
         }
         if (savedInstanceState == null) {
             getSupportFragmentManager()
