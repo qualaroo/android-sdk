@@ -52,6 +52,7 @@ public class SurveyInteractor {
 
     public void displaySurvey() {
         if (currentNode == null) {
+            reportManager.recordImpression(survey);
             Node startNode = selectStartNode(survey.spec().startMap());
             followNode(startNode);
         } else {
