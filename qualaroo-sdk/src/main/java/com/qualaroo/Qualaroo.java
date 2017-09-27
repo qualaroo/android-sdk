@@ -123,15 +123,25 @@ public class Qualaroo implements QualarooSdk {
         });
     }
 
-    @Override public void setUserId(@NonNull String userId) {
-
+    @Override public void setUserId(@NonNull final String userId) {
+        dataExecutor.execute(new Runnable() {
+            @Override public void run() {
+                userInfo.setUserId(userId);
+            }
+        });
     }
 
-    @Override public void setUserProperty(@NonNull String key, String value) {
-
+    @Override public void setUserProperty(@NonNull final String key, final String value) {
+        dataExecutor.execute(new Runnable() {
+            @Override public void run() {
+                userInfo.setUserProperty(key, value);
+            }
+        });
     }
 
-    @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+    @Override public synchronized void setPreferredLanguage(@NonNull String iso2Language) {
+        this.preferredLanguage = new Language(iso2Language);
+    }
 
     public SurveyComponent buildSurveyComponent(Survey survey) {
         return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);

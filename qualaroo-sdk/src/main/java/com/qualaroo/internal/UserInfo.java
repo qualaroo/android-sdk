@@ -19,11 +19,11 @@ public class UserInfo {
         this.localStorage = localStorage;
     }
 
-    synchronized void setUserId(String userId) {
+    public synchronized void setUserId(String userId) {
         settings.store(KEY_USER_ID, userId);
     }
 
-    synchronized String getUserId() {
+    public synchronized String getUserId() {
         return settings.get(KEY_USER_ID);
     }
 
@@ -36,11 +36,11 @@ public class UserInfo {
         return deviceId;
     }
 
-    public void setUserProperty(String key, String value) {
+    public synchronized void setUserProperty(String key, String value) {
         localStorage.updateUserProperty(key, value);
     }
 
-    public Map<String, String> getUserProperties() {
+    public synchronized Map<String, String> getUserProperties() {
         return localStorage.getUserProperties();
     }
 
