@@ -14,11 +14,11 @@ public class Result<T> {
         return data;
     }
 
-    Exception getException() {
+    public Exception getException() {
         return exception;
     }
 
-    boolean isSuccessful() {
+    public boolean isSuccessful() {
         return exception == null;
     }
 
