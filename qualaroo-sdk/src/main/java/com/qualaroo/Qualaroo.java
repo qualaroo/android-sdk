@@ -14,23 +14,20 @@ import java.util.List;
 
 public class Qualaroo implements QualarooBase {
 
+    private static QualarooBase INSTANCE;
     private final SurveyClient surveyClient;
     private final Context context;
     private List<Survey> surveys = new ArrayList<>();
     private SurveysListener surveysListener;
     private Handler handler = new Handler(Looper.getMainLooper());
 
-    public void setSurveysListener(SurveysListener surveysListener) {
-        this.surveysListener = surveysListener;
+    public static QualarooBase getInstance() {
+        return INSTANCE;
     }
 
-    public interface SurveysListener {
-        void onSurveysReady(List<Survey> surveys);
-    }
 
-    public Qualaroo(Context context,  SurveyClient surveyClient) {
-        this.context = context;
-        this.surveyClient = surveyClient;
+    public static Builder with(Context context) {
+        return new Builder(context);
     }
 
     public void init() {
@@ -78,4 +75,30 @@ public class Qualaroo implements QualarooBase {
     @Override public void setPreferredLanguage(@NonNull String iso2Language) {
 
     }
+    public static class Builder {
+        private final Context context;
+        private Credentials credentials;
+        private boolean debugMode = false;
+
+        Builder(Context context) {
+            this.context = context;
+        }
+
+        public Builder setApiKey(String apiKey) {
+            this.credentials = new Credentials(apiKey);
+            return this;
+        }
+
+        public Builder setDebugMode(boolean debugMode) {
+            this.debugMode = debugMode;
+            return this;
+        }
+
+        public void init() {
+            if (INSTANCE == null) {
+                INSTANCE = new Qualaroo(context, credentials, debugMode);
+            }
+        }
+    }
+
 }
