@@ -7,13 +7,10 @@ import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.storage.LocalStorage
+import com.qualaroo.util.MockRestClient
 import okhttp3.HttpUrl
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.io.IOException
 
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class ReportClientTest {
@@ -164,24 +161,6 @@ class ReportClientTest {
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
     }
 
-    class MockRestClient : RestClient(null, null) {
 
-        var returnedResponseCode = 200
-        var throwsIoException = false
-        var recentHttpUrl: HttpUrl? = null
-
-        public override fun get(httpUrl: HttpUrl): Response {
-            recentHttpUrl = httpUrl
-            if (throwsIoException) {
-                throw IOException()
-            }
-            return Response.Builder()
-                    .protocol(Protocol.HTTP_2)
-                    .message("")
-                    .request(Request.Builder().url(httpUrl).build())
-                    .code(returnedResponseCode)
-                    .build()
-        }
-    }
 
 }

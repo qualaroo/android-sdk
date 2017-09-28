@@ -39,6 +39,10 @@ public final class QualarooLogger {
         logger.i(message);
     }
 
+    public static void info(String message, Object... args) {
+        logger.i(String.format(message, args));
+    }
+
     private static class Logger {
         void i(String message){}
         void d(String message){}

@@ -38,7 +38,7 @@ public class RestClient {
         }
     }
 
-    Response get(HttpUrl httpUrl) throws IOException {
+    public Response get(HttpUrl httpUrl) throws IOException {
         Request request = new Request.Builder()
                 .url(httpUrl)
                 .build();
