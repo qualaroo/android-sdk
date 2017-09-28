@@ -13,7 +13,6 @@ import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.TimeMatcher;
-import com.qualaroo.internal.TimeProvider;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
 import com.qualaroo.internal.executor.UiThreadExecutor;
@@ -109,7 +108,7 @@ public class Qualaroo implements QualarooSdk {
         Settings settings = new Settings(sharedPreferences);
         userInfo = new UserInfo(settings, localStorage);
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
-        TimeMatcher timeMatcher = new TimeMatcher(new TimeProvider());
+        TimeMatcher timeMatcher = new TimeMatcher(TimeUnit.DAYS.toMillis(3));
         this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));

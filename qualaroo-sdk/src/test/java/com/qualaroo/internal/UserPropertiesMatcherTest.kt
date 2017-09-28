@@ -9,7 +9,7 @@ import org.junit.Test
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 class UserPropertiesMatcherTest {
 
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val localStorage = InMemoryLocalStorage()
     val userInfo = UserInfo(InMemorySettings(), localStorage)
     private val matcher = UserPropertiesMatcher(userInfo)
 

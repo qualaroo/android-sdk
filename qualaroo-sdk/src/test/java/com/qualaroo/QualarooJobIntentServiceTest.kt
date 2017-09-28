@@ -2,7 +2,6 @@ package com.qualaroo
 
 import android.content.Intent
 import com.nhaarman.mockito_kotlin.*
-import com.qualaroo.internal.TimeProvider
 import com.qualaroo.internal.network.RestClient
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.internal.storage.LocalStorage
@@ -13,7 +12,7 @@ import org.junit.Test
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 class QualarooJobIntentServiceTest {
 
-    val localStorage = spy(InMemoryLocalStorage(TimeProvider()))
+    val localStorage = spy(InMemoryLocalStorage())
     val restClient = spy(MockRestClient())
 
     val uploadIntent = mock<Intent> {
