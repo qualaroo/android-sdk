@@ -136,20 +136,26 @@ public class Qualaroo implements QualarooSdk {
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
                 List<Survey> surveys = surveysRepository.getSurveys();
+                Survey surveyToDisplay = null;
                 for (final Survey survey : surveys) {
                     if (alias.equals(survey.canonicalName())) {
-                        boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(survey);
-                        if (shouldShowSurvey) {
-                            QualarooLogger.debug("Displaying survey " + alias);
-                            uiExecutor.execute(new Runnable() {
-                                @Override public void run() {
-                                    QualarooActivity.showSurvey(context, survey);
-                                }
-                            });
-                            break;
-                        }
+                        surveyToDisplay = survey;
+                        break;
                     }
-                    QualarooLogger.debug("Survey %1$s not found", alias);
+                }
+                if (surveyToDisplay != null) {
+                    boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
+                    if (shouldShowSurvey) {
+                        QualarooLogger.debug("Displaying survey " + alias);
+                        final Survey finalSurveyToDisplay = surveyToDisplay;
+                        uiExecutor.execute(new Runnable() {
+                            @Override public void run() {
+                                QualarooActivity.showSurvey(context, finalSurveyToDisplay);
+                            }
+                        });
+                    }
+                } else {
+                    QualarooLogger.info("Survey %s not found", alias);
                 }
                 requestingForSurvey.set(false);
             }
