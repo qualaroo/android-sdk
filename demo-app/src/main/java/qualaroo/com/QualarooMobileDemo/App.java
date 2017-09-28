@@ -8,7 +8,7 @@ public class App extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-        Qualaroo.with(this)
+        Qualaroo.initializeWith(this)
                 .setApiKey("API_KEY_HERE")
                 .setDebugMode(false)
                 .init();
