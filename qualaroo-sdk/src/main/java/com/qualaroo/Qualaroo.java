@@ -86,7 +86,8 @@ public class Qualaroo implements QualarooSdk {
     private final SurveysRepository surveysRepository;
     private final Executor dataExecutor;
     private final ReportManager reportManager;
-    private final LocalStorage localStorage;
+    final LocalStorage localStorage;
+    final RestClient restClient;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
@@ -100,17 +101,16 @@ public class Qualaroo implements QualarooSdk {
         this.dataExecutor = Executors.newSingleThreadExecutor();
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
         this.localStorage = new DatabaseLocalStorage(this.context);
+        this.restClient = buildRestClient(credentials);
+        ApiConfig apiConfig = new ApiConfig();
+        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
+        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
         userInfo = new UserInfo(settings, localStorage);
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
         TimeMatcher timeMatcher = new TimeMatcher(new TimeProvider());
         this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
-
-        ApiConfig apiConfig = new ApiConfig();
-        RestClient restClient = buildRestClient(credentials);
-        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
-        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
 
@@ -136,20 +136,26 @@ public class Qualaroo implements QualarooSdk {
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
                 List<Survey> surveys = surveysRepository.getSurveys();
+                Survey surveyToDisplay = null;
                 for (final Survey survey : surveys) {
                     if (alias.equals(survey.canonicalName())) {
-                        boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(survey);
-                        if (shouldShowSurvey) {
-                            QualarooLogger.debug("Displaying survey " + alias);
-                            uiExecutor.execute(new Runnable() {
-                                @Override public void run() {
-                                    QualarooActivity.showSurvey(context, survey);
-                                }
-                            });
-                            break;
-                        }
+                        surveyToDisplay = survey;
+                        break;
                     }
-                    QualarooLogger.debug("Survey %1$s not found", alias);
+                }
+                if (surveyToDisplay != null) {
+                    boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
+                    if (shouldShowSurvey) {
+                        QualarooLogger.debug("Displaying survey " + alias);
+                        final Survey finalSurveyToDisplay = surveyToDisplay;
+                        uiExecutor.execute(new Runnable() {
+                            @Override public void run() {
+                                QualarooActivity.showSurvey(context, finalSurveyToDisplay);
+                            }
+                        });
+                    }
+                } else {
+                    QualarooLogger.info("Survey %s not found", alias);
                 }
                 requestingForSurvey.set(false);
             }

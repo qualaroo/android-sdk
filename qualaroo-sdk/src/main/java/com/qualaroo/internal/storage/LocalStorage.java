@@ -13,6 +13,7 @@ public interface LocalStorage {
     void storeFailedReportRequest(String reportRequestUrl);
     void removeReportRequest(String reportRequestUrl);
     List<String> getFailedReportRequests(int numOfRequests);
+    int getFailedRequestsCount();
     void markSurveyAsSeen(Survey survey);
     void markSurveyFinished(Survey survey);
     SurveyStatus getSurveyStatus(Survey survey);

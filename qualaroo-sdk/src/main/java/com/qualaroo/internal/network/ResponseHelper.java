@@ -2,9 +2,9 @@ package com.qualaroo.internal.network;
 
 import okhttp3.Response;
 
-final class ResponseHelper {
+public final class ResponseHelper {
 
-    static boolean shouldRetry(Response response) {
+    public static boolean shouldRetry(Response response) {
         if (response.isSuccessful()) {
             return false;
         }

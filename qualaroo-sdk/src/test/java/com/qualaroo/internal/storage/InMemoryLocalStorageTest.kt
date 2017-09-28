@@ -50,6 +50,19 @@ class InMemoryLocalStorageTest {
     }
 
     @Test
+    fun failedRequestsCount() {
+        localStorage.storeFailedReportRequest("http://url.com/1")
+        localStorage.storeFailedReportRequest("http://url.com/2")
+
+        assertEquals(2, localStorage.failedRequestsCount)
+
+        localStorage.storeFailedReportRequest("http://url.com/3")
+        localStorage.storeFailedReportRequest("http://url.com/4")
+
+        assertEquals(4, localStorage.failedRequestsCount)
+    }
+
+    @Test
     fun markSurveyAsSeen() {
         val survey = survey(id = 24)
 

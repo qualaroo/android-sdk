@@ -41,6 +41,10 @@ public class InMemoryLocalStorage implements LocalStorage {
         return result;
     }
 
+    @Override public int getFailedRequestsCount() {
+        return failedRequests.size();
+    }
+
     @Override public synchronized void markSurveyAsSeen(Survey survey) {
         SurveyStatus.Builder builder = SurveyStatus.builder();
         builder.setSurveyId(survey.id());
