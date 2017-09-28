@@ -29,11 +29,11 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
 
     public void setView(SurveyView view) {
         surveyView = view;
-        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
+        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
         interactor.registerObserver(this);
     }
 
-    public void init(@Nullable State state) {
+    void init(@Nullable State state) {
         if (state == null) {
             surveyView.showWithAnimation();
         } else {
@@ -43,11 +43,11 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
         interactor.displaySurvey();
     }
 
-    public State getSavedState() {
+    State getSavedState() {
         return new State(currentlyDisplayedQuestion);
     }
 
-    public void dropView() {
+    void dropView() {
         interactor.unregisterObserver();
         surveyView = null;
     }

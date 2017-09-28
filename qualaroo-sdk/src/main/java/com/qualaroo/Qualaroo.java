@@ -9,6 +9,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
+import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.TimeMatcher;
@@ -22,11 +23,13 @@ import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
+import com.qualaroo.internal.network.ReportClient;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
 import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
+import com.qualaroo.ui.SurveyComponent;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,42 +44,50 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
-public class Qualaroo implements QualarooBase {
-
-    private static QualarooBase INSTANCE;
-
-    public static QualarooBase getInstance() {
-        return INSTANCE;
-    }
-
-    private SurveyDisplayQualifier surveyDisplayQualifier;
+public class Qualaroo implements QualarooSdk {
 
     public static Builder with(Context context) {
         return new Builder(context);
     }
+    public static QualarooSdk getInstance() {
+        return INSTANCE;
+    }
 
+    private static QualarooSdk INSTANCE;
+
+    private final UserInfo userInfo;
+    private final SurveyDisplayQualifier surveyDisplayQualifier;
     private final Context context;
     private final SurveysRepository surveysRepository;
+    private final Executor dataExecutor;
+    private final ReportManager reportManager;
+    private final LocalStorage localStorage;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
-
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
+
+    private Language preferredLanguage = new Language("en");
 
     private Qualaroo(Context context, Credentials credentials, boolean debugMode) {
         this.context = context.getApplicationContext();
         this.uiExecutor = new UiThreadExecutor();
+        this.dataExecutor = Executors.newSingleThreadExecutor();
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
-        LocalStorage localStorage = new DatabaseLocalStorage(this.context);
+        this.localStorage = new DatabaseLocalStorage(this.context);
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
-        UserInfo userInfo = new UserInfo(settings, localStorage);
+        userInfo = new UserInfo(settings, localStorage);
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
         TimeMatcher timeMatcher = new TimeMatcher(new TimeProvider());
         this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
 
+        ApiConfig apiConfig = new ApiConfig();
         RestClient restClient = buildRestClient(credentials);
+        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
+        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         SessionInfo sessionInfo = new SessionInfo(this.context);
-        surveysRepository = new SurveysRepository(credentials.siteId(), restClient, new ApiConfig(), sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
+
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
     }
 
 
@@ -109,16 +120,28 @@ public class Qualaroo implements QualarooBase {
         });
     }
 
-    @Override public void setUserId(@NonNull String userId) {
-
+    @Override public void setUserId(@NonNull final String userId) {
+        dataExecutor.execute(new Runnable() {
+            @Override public void run() {
+                userInfo.setUserId(userId);
+            }
+        });
     }
 
-    @Override public void setUserProperty(@NonNull String key, String value) {
-
+    @Override public void setUserProperty(@NonNull final String key, final String value) {
+        dataExecutor.execute(new Runnable() {
+            @Override public void run() {
+                userInfo.setUserProperty(key, value);
+            }
+        });
     }
 
-    @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+    @Override public synchronized void setPreferredLanguage(@NonNull String iso2Language) {
+        this.preferredLanguage = new Language(iso2Language);
+    }
 
+    SurveyComponent buildSurveyComponent(Survey survey) {
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
     }
 
     private RestClient buildRestClient(Credentials credentials) {

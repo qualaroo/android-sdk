@@ -7,42 +7,40 @@ public class SurveyViewModel {
     private final @ColorInt int textColor;
     private final @ColorInt int backgroundColor;
     private final @ColorInt int buttonDisabledColor;
+    private final @ColorInt int dimColor;
     private final boolean cannotBeClosed;
     private final boolean isFullscreen;
 
-    public SurveyViewModel(int textColor, int backgroundColor, int buttonDisabledColor, boolean cannotBeClosed, boolean isFullscreen) {
+    SurveyViewModel(int textColor, int backgroundColor, int buttonDisabledColor, int dimColor, boolean cannotBeClosed, boolean isFullscreen) {
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.buttonDisabledColor = buttonDisabledColor;
+        this.dimColor = dimColor;
         this.cannotBeClosed = cannotBeClosed;
         this.isFullscreen = isFullscreen;
     }
 
-    public boolean cannotBeClosed() {
+    boolean cannotBeClosed() {
         return cannotBeClosed;
     }
 
-    public boolean isFullscreen() {
+    boolean isFullscreen() {
         return isFullscreen;
     }
 
-    public int textColor() {
+    int textColor() {
         return textColor;
     }
 
-    public int backgroundColor() {
+    int backgroundColor() {
         return backgroundColor;
     }
 
-    public boolean iscannotBeClosed() {
-        return cannotBeClosed;
-    }
-
-    public boolean isfullscreen() {
-        return isFullscreen;
-    }
-
-    public int buttonDisabledColor() {
+    int buttonDisabledColor() {
         return buttonDisabledColor;
+    }
+
+    public int dimColor() {
+        return dimColor;
     }
 }
