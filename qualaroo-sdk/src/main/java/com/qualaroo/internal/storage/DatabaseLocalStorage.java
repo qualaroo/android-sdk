@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
 
@@ -62,7 +63,7 @@ public class DatabaseLocalStorage implements LocalStorage {
                 cursor.moveToNext();
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            //ignore
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -104,7 +105,7 @@ public class DatabaseLocalStorage implements LocalStorage {
                 builder.setSeenAtInMillis(cursor.getInt(2));
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            QualarooLogger.debug("Could not acquire survey status for survey: " + survey.canonicalName());
         } finally {
             if (cursor != null) {
                 cursor.close();

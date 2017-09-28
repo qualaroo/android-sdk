@@ -61,7 +61,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
             Drawable applicationIcon = getContext().getPackageManager().getApplicationIcon(getContext().getPackageName());
             surveyLogo.setImageDrawable(applicationIcon);
         } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException(e);
+            //ignore exception
         }
         closeButton = view.findViewById(R.id.qualaroo__survey_close);
         closeButton.setOnClickListener(new DebouncingOnClickListener() {

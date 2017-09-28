@@ -94,6 +94,7 @@ public class Qualaroo implements QualarooSdk {
     private Language preferredLanguage = new Language("en");
 
     private Qualaroo(Context context, Credentials credentials, boolean debugMode) {
+        initLogging(debugMode);
         this.context = context.getApplicationContext();
         this.uiExecutor = new UiThreadExecutor();
         this.dataExecutor = Executors.newSingleThreadExecutor();
@@ -111,10 +112,17 @@ public class Qualaroo implements QualarooSdk {
         ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
         this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         SessionInfo sessionInfo = new SessionInfo(this.context);
-
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
+
+        QualarooLogger.info("Initialized QualarooSdk");
     }
 
+    private void initLogging(boolean debugMode) {
+        QualarooLogger.enableLogging();
+        if (debugMode) {
+            QualarooLogger.setDebugMode();
+        }
+    }
 
     @Override public void showSurvey(@NonNull final String alias) {
         if (alias.length() == 0) {
@@ -123,6 +131,7 @@ public class Qualaroo implements QualarooSdk {
         if (requestingForSurvey.get()) {
             return;
         }
+        QualarooLogger.debug("Trying to show survey: " + alias);
         requestingForSurvey.set(true);
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
@@ -131,6 +140,7 @@ public class Qualaroo implements QualarooSdk {
                     if (alias.equals(survey.canonicalName())) {
                         boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(survey);
                         if (shouldShowSurvey) {
+                            QualarooLogger.debug("Displaying survey " + alias);
                             uiExecutor.execute(new Runnable() {
                                 @Override public void run() {
                                     QualarooActivity.showSurvey(context, survey);
@@ -139,6 +149,7 @@ public class Qualaroo implements QualarooSdk {
                             break;
                         }
                     }
+                    QualarooLogger.debug("Survey %1$s not found", alias);
                 }
                 requestingForSurvey.set(false);
             }
