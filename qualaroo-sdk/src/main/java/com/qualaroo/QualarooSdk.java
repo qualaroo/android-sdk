@@ -51,7 +51,7 @@ public interface QualarooSdk {
         /**
          * Turns on the debug mode.
          * Debug mode will cause Qualaroo SDK to log survey related events in a console.
-         * @param isDebugMode - defaults to false
+         * @param isDebugMode - false by default
          * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
          */
         Builder setDebugMode(boolean isDebugMode);
