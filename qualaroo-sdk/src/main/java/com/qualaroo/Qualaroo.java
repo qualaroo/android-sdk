@@ -46,10 +46,35 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class Qualaroo implements QualarooSdk {
 
-    public static Builder with(Context context) {
+    /**
+     * Starts initialization phase of the SDK.
+     * Make sure to call {@link QualarooSdk.Builder#init()} to finish initialization properly.
+     * @param context - application {@link Context}
+     * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
+     */
+    public static Builder initializeWith(Context context) {
         return new Builder(context);
     }
+
+    /**
+     * Returns an instance of QualarooSdk that you can use.
+     * Make sure to initialize it first with:
+     * {@link #initializeWith(Context) initializeWith} method calls.
+     *
+     * Example of initialization:
+     * Qualaroo.initializeWith(getApplicationContext())
+     *      .setApiKey("my_own_api_key")
+     *      .setDebugMode(false)
+     *      .init()
+     *
+     * @throws IllegalStateException when SDK was not initialized before
+     * @return current instance of {@link QualarooSdk}
+     */
     public static QualarooSdk getInstance() {
+        if (INSTANCE == null) {
+            throw new IllegalStateException(
+                    "Qualaroo SDK has not been properly initialized. Make sure you finish initalizeWith");
+        }
         return INSTANCE;
     }
 
@@ -179,7 +204,7 @@ public class Qualaroo implements QualarooSdk {
                 .create();
     }
 
-    public static class Builder {
+    public static class Builder implements QualarooSdk.Builder {
         private final Context context;
         private Credentials credentials;
         private boolean debugMode = false;
@@ -188,16 +213,19 @@ public class Qualaroo implements QualarooSdk {
             this.context = context;
         }
 
+        @Override
         public Builder setApiKey(String apiKey) {
             this.credentials = new Credentials(apiKey);
             return this;
         }
 
+        @Override
         public Builder setDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
             return this;
         }
 
+        @Override
         public void init() {
             if (INSTANCE == null) {
                 INSTANCE = new Qualaroo(context, credentials, debugMode);
