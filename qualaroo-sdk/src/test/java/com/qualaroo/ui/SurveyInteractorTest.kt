@@ -13,6 +13,8 @@ import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.TestExecutors
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -444,7 +446,7 @@ class SurveyInteractorTest {
     }
 
     @Test
-    fun `records only impression when starting survey`() {
+    fun `records impressions when starting survey`() {
         interactor.displaySurvey()
 
         //user rotated a device maybe?
@@ -453,6 +455,110 @@ class SurveyInteractorTest {
         verify(reportManager, times(1)).recordImpression(survey)
     }
 
+    @Test
+    fun `marks survey as seen once`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100,
+                                                nextMap = node(
+                                                        id = 200,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 1))
+                                        ),
+                                        question(
+                                                id = 200,
+                                                nextMap = node(
+                                                        id = 300,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 1))
+                                        ),
+                                        question(
+                                                id = 300
+                                        )
+                                )
+                        )
+                )
+        )
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
 
+        assertFalse(localStorage.getSurveyStatus(survey).hasBeenSeen())
+
+        interactor.displaySurvey()
+        assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
+
+        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
+        interactor.questionAnswered(question(id = 200), listOf(answer(id = 1)))
+
+        interactor.stopSurvey()
+        interactor.displaySurvey()
+        interactor.questionAnswered(question(id = 300), emptyList())
+
+        assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
+    }
+
+    @Test
+    fun `marks survey as finished`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100,
+                                                nextMap = node(
+                                                        id = 200,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 1))
+                                        ),
+                                        question(
+                                                id = 200,
+                                                nextMap = node(
+                                                        id = 300,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 1))
+                                        ),
+                                        question(
+                                                id = 300
+                                        )
+                                )
+                        )
+                )
+        )
+
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+
+        interactor.displaySurvey()
+        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
+        interactor.questionAnswered(question(id = 200), listOf(answer(id = 1)))
+
+        interactor.stopSurvey()
+
+        assertFalse(localStorage.getSurveyStatus(survey).hasBeenFinished())
+
+        interactor.displaySurvey()
+        interactor.questionAnswered(question(id = 300), emptyList())
+
+        assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
+    }
 
 }

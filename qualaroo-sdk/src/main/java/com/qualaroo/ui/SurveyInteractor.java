@@ -53,6 +53,7 @@ public class SurveyInteractor {
     public void displaySurvey() {
         if (currentNode == null) {
             reportManager.recordImpression(survey);
+            markSurveyAsSeen();
             Node startNode = selectStartNode(survey.spec().startMap());
             followNode(startNode);
         } else {
@@ -95,6 +96,7 @@ public class SurveyInteractor {
     private void followNode(@Nullable Node node) {
         this.currentNode = node;
         if (node == null) {
+            markSurveyAsFinished();
             eventsObserver.closeSurvey();
         } else if (node.nodeType().equals("message")) {
             eventsObserver.showMessage(messages.get(node.id()));
@@ -117,6 +119,22 @@ public class SurveyInteractor {
 
     void stopSurvey() {
         this.eventsObserver.closeSurvey();
+    }
+
+    private void markSurveyAsSeen() {
+        backgroundExecutor.execute(new Runnable() {
+            @Override public void run() {
+                localStorage.markSurveyAsSeen(survey);
+            }
+        });
+    }
+
+    private void markSurveyAsFinished() {
+        backgroundExecutor.execute(new Runnable() {
+            @Override public void run() {
+                localStorage.markSurveyFinished(survey);
+            }
+        });
     }
 
     private static class UiThreadEventsObserverDelegate implements EventsObserver {
