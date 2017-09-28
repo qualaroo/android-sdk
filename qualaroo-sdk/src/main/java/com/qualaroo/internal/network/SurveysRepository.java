@@ -3,6 +3,7 @@ package com.qualaroo.internal.network;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Survey;
@@ -77,8 +78,10 @@ public class SurveysRepository {
         final HttpUrl requestUrl = buildSurveyRequestUrl();
         Result<Survey[]> result = restClient.get(requestUrl, Survey[].class);
         if (result.isSuccessful()) {
+            QualarooLogger.debug("Acquired %1$d surveys", result.getData().length);
             return Arrays.asList(result.getData());
         } else {
+            QualarooLogger.debug("Could not acquire surveys");
             return null;
         }
     }
