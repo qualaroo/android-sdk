@@ -3,6 +3,8 @@ package com.qualaroo.internal.storage;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
@@ -70,6 +72,14 @@ public class DatabaseLocalStorage implements LocalStorage {
             }
         }
         return requests;
+    }
+
+    @Override public int getFailedRequestsCount() {
+        try {
+            return (int) DatabaseUtils.queryNumEntries(writeableDb(), FAILED_REPORTS_TABLE);
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     @Override public void markSurveyAsSeen(Survey survey) {
