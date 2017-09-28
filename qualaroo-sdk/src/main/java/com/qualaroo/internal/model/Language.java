@@ -3,6 +3,7 @@ package com.qualaroo.internal.model;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 public final class Language implements Serializable {
 
@@ -10,8 +11,8 @@ public final class Language implements Serializable {
 
     private final String value;
 
-    public Language(String value) {
-        this.value = value;
+    public Language(@NonNull String value) {
+        this.value = value.toLowerCase(Locale.ROOT);
     }
 
     @NonNull
