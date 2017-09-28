@@ -77,6 +77,10 @@ class QualarooJobIntentServiceTest {
         restClient.returnedResponseCode = 500
         service.onHandleWork(uploadIntent)
         assertEquals(1, localStorage.failedRequestsCount)
+        
+        restClient.throwsIoException = true
+        service.onHandleWork(uploadIntent)
+        assertEquals(1, localStorage.failedRequestsCount)
     }
 
     class OverridableQualarooJobIntentService(val localStorage: LocalStorage, val restClient: RestClient) : QualarooJobIntentService() {
