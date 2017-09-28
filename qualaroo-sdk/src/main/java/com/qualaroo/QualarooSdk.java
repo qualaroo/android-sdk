@@ -19,11 +19,17 @@ public interface QualarooSdk {
     /**
      * Sets a single custom user property to a specific value.
      * Stored values can be later used for targeting and tracking purposes.
-     * Passing null values will remove keys.
+     * Passing null values will implicitly have the same effect as calling {@link #removeUserProperty(String)} method.
      * @param key - name of the property
      * @param value - value of the property
      */
     void setUserProperty(@NonNull String key, @Nullable String value);
+
+    /**
+     * Removes stored user property.
+     * @param key - name of the property to be removed
+     */
+    void removeUserProperty(@NonNull String key);
 
     /**
      * Sets default language for surveys.

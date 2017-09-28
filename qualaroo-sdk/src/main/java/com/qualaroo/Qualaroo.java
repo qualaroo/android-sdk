@@ -161,6 +161,16 @@ public class Qualaroo implements QualarooSdk {
         });
     }
 
+    @Override public void removeUserProperty(@NonNull final String key) {
+        dataExecutor.execute(new Runnable() {
+            @Override public void run() {
+                //implicit removal of a key from local storage
+                //TODO: expose removeUserProperty method
+                userInfo.setUserProperty(key, null);
+            }
+        });
+    }
+
     @Override public synchronized void setPreferredLanguage(@NonNull String iso2Language) {
         this.preferredLanguage = new Language(iso2Language);
     }
