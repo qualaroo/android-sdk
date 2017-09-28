@@ -8,9 +8,10 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.Script;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-final class UserPropertiesMatcher {
+public final class UserPropertiesMatcher {
 
     private final UserInfo userInfo;
     private final JexlEngine jexlEngine;
@@ -27,11 +28,12 @@ final class UserPropertiesMatcher {
         try {
             JexlExpression expression = jexlEngine.createExpression(customMap);
             MapContext expressionContext = new MapContext();
+            Map<String, String> userProperties = userInfo.getUserProperties();
             if (expression instanceof org.apache.commons.jexl3.internal.Script) {
                 Set<List<String>> variablesSet = ((Script) expression).getVariables();
                 for (List<String> variables : variablesSet) {
                     for (String variable : variables) {
-                        expressionContext.set(variable, userInfo.getUserProperty(variable));
+                        expressionContext.set(variable, userProperties.get(variable));
                     }
                 }
             }

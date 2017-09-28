@@ -1,10 +1,8 @@
 package com.qualaroo.internal;
 
-import android.support.annotation.Nullable;
-
+import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,10 +12,11 @@ public class UserInfo {
     private static final String KEY_DEVICE_ID = "q.did";
 
     private final Settings settings;
-    private Map<String, String> properties = new HashMap<>();
+    private final LocalStorage localStorage;
 
-    public UserInfo(Settings settings) {
+    public UserInfo(Settings settings, LocalStorage localStorage) {
         this.settings = settings;
+        this.localStorage = localStorage;
     }
 
     synchronized void setUserId(String userId) {
@@ -38,11 +37,11 @@ public class UserInfo {
     }
 
     public void setUserProperty(String key, String value) {
-        properties.put(key, value);
+        localStorage.updateUserProperty(key, value);
     }
 
-    @Nullable public String getUserProperty(String key) {
-        return properties.get(key);
+    public Map<String, String> getUserProperties() {
+        return localStorage.getUserProperties();
     }
 
 }

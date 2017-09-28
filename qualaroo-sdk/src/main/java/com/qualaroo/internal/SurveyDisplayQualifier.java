@@ -4,7 +4,7 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
 import com.qualaroo.internal.storage.LocalStorage;
 
-final class SurveyDisplayQualifier {
+public final class SurveyDisplayQualifier {
 
     private final LocalStorage localStorage;
     private final UserPropertiesMatcher propertiesMatcher;
@@ -34,6 +34,7 @@ final class SurveyDisplayQualifier {
         if (!propertiesMatcher.match(survey.spec().requireMap().customMap())) {
             return false;
         }
+
         return true;
     }
 }

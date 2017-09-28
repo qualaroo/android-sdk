@@ -7,7 +7,7 @@ public class ApiConfig {
     private static final String QUALAROO = "testapp1.qualaroo.com";
     private static final String REPORT_API = "stage1.turbo.qualaroo.com";
 
-    HttpUrl qualarooApi() {
+    public HttpUrl qualarooApi() {
         return new HttpUrl.Builder()
                 .scheme("https")
                 .host(QUALAROO)

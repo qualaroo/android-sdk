@@ -8,8 +8,8 @@ public class Credentials {
     private final String apiSecret;
     private final String siteId;
 
-    public Credentials(String exampleKey) {
-        ByteString byteKey = ByteString.decodeBase64(exampleKey);
+    public Credentials(String apiKey) {
+        ByteString byteKey = ByteString.decodeBase64(apiKey);
         String key = byteKey.utf8();
         String[] keyParts = key.split(":");
         if (keyParts.length != 3) {

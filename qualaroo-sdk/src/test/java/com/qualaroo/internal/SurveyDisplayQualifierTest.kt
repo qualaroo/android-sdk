@@ -18,7 +18,7 @@ import org.junit.Test
 class SurveyDisplayQualifierTest {
 
     val localStorage = InMemoryLocalStorage(TimeProvider())
-    private val userPropertiesMatcher = UserPropertiesMatcher(UserInfo(InMemorySettings()))
+    private val userPropertiesMatcher = UserPropertiesMatcher(UserInfo(InMemorySettings(), localStorage))
     private val timeMatcher = mock<TimeMatcher>()
 
     private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher)
@@ -99,7 +99,7 @@ class SurveyDisplayQualifierTest {
 
     @Test
     fun `should show only if custom matching is satisfied`() {
-        val userInfo = UserInfo(InMemorySettings())
+        val userInfo = UserInfo(InMemorySettings(), localStorage)
         val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher)
         var survey = survey(
                 id = 1,

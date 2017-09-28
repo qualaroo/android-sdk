@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-class DatabaseLocalStorage implements LocalStorage {
+public class DatabaseLocalStorage implements LocalStorage {
 
     static final String DB_NAME = "qualaroo.db";
 
@@ -37,7 +37,7 @@ class DatabaseLocalStorage implements LocalStorage {
 
     private final SQLiteOpenHelper dbHelper;
 
-    DatabaseLocalStorage(Context context) {
+    public DatabaseLocalStorage(Context context) {
         this.dbHelper = new QualarooSQLiteOpenHelper(context, DB_NAME);
     }
 
