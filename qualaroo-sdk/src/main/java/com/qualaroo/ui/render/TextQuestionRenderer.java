@@ -3,7 +3,6 @@ package com.qualaroo.ui.render;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.RestrictTo;
-import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -28,31 +27,34 @@ final class TextQuestionRenderer extends QuestionRenderer {
 
     @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = View.inflate(context, R.layout.qualaroo__view_question_text, null);
-        final TextInputLayout textInputLayout = view.findViewById(R.id.qualaroo__view_question_text_input);
-        ThemeUtils.applyTheme(textInputLayout, getTheme());
-        final EditText editText = textInputLayout.getEditText();
+        final EditText editText = view.findViewById(R.id.qualaroo__view_question_text_input);
         editText.setTextColor(getTheme().accentColor());
+        editText.setHint("...");
+        ThemeUtils.applyTheme(editText, getTheme());
         final Button button = view.findViewById(R.id.qualaroo__view_question_text_confirm);
         ThemeUtils.applyTheme(button, getTheme());
         button.setText(question.sendText());
+        button.setTextColor(getTheme().buttonTextColor());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                if (editText.getText() != null) {
+                    onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                }
             }
         });
         ThemeUtils.applyTheme(editText, getTheme());
         button.setEnabled(!question.isRequired());
         editText.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (question.isRequired()) {
-                    button.setEnabled(count > 0);
-                }
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override public void afterTextChanged(Editable s) {
+                if (question.isRequired()) {
+                    button.setEnabled(s.length() > 0);
+                }
             }
         });
         return QuestionView.forQuestionId(question.id())
