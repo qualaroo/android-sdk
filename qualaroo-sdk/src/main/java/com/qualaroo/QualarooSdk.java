@@ -38,7 +38,6 @@ public interface QualarooSdk {
      */
     void setPreferredLanguage(@NonNull String iso2Language);
 
-
     interface Builder {
         /**
          * Sets an API key.

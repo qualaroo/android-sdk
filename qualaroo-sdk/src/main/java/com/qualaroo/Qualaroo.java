@@ -240,13 +240,13 @@ public class Qualaroo implements QualarooSdk {
         }
 
         @Override
-        public Builder setApiKey(String apiKey) {
+        public QualarooSdk.Builder setApiKey(String apiKey) {
             this.credentials = new Credentials(apiKey);
             return this;
         }
 
         @Override
-        public Builder setDebugMode(boolean debugMode) {
+        public QualarooSdk.Builder setDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
             return this;
         }
