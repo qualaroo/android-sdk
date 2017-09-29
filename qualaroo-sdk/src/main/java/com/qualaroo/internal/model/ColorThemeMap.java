@@ -1,9 +1,13 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
 import java.io.Serializable;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class ColorThemeMap implements Serializable {
 
     private String dimType;

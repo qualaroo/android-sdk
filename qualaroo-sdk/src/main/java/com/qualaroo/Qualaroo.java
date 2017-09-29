@@ -3,7 +3,6 @@ package com.qualaroo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -48,10 +47,10 @@ public class Qualaroo implements QualarooSdk {
     /**
      * Starts initialization phase of the SDK.
      * Make sure to call {@link QualarooSdk.Builder#init()} to finish initialization properly.
-     * @param context - application {@link Context}
+     * @param context application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    public static Builder initializeWith(Context context) {
+    @SuppressWarnings({"WeakerAccess", "unused"}) public static Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
@@ -69,7 +68,7 @@ public class Qualaroo implements QualarooSdk {
      * @throws IllegalStateException when SDK was not initialized before
      * @return current instance of {@link QualarooSdk}
      */
-    public static QualarooSdk getInstance() {
+    @SuppressWarnings("WeakerAccess") public static QualarooSdk getInstance() {
         if (INSTANCE == null) {
             throw new IllegalStateException(
                     "Qualaroo SDK has not been properly initialized. Make sure you finish initalizeWith");
@@ -107,13 +106,17 @@ public class Qualaroo implements QualarooSdk {
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
         userInfo = new UserInfo(settings, localStorage);
+
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
-        TimeMatcher timeMatcher = new TimeMatcher(TimeUnit.DAYS.toMillis(3));
+        long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
+        TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
         this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
+
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
 
         QualarooLogger.info("Initialized QualarooSdk");
+        QualarooJobIntentService.start(this.context);
     }
 
     private void initLogging(boolean debugMode) {
@@ -202,15 +205,8 @@ public class Qualaroo implements QualarooSdk {
     }
 
     private OkHttpClient buildOkHttpClient(Credentials credentials) {
-        final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-            @Override public void log(String message) {
-                Log.d("OkHttp", message);
-            }
-        });
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         final String authToken = okhttp3.Credentials.basic(credentials.apiKey(), credentials.apiSecret());
-        return new OkHttpClient.Builder()
-                .addInterceptor(httpLoggingInterceptor)
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override public Response intercept(Chain chain) throws IOException {
                         Request request = chain.request().newBuilder()
@@ -218,8 +214,17 @@ public class Qualaroo implements QualarooSdk {
                                 .build();
                         return chain.proceed(request);
                     }
-                })
-                .build();
+                });
+        if (BuildConfig.DEBUG) {
+            final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                @Override public void log(String message) {
+                    QualarooLogger.info(message);
+                }
+            });
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            builder.addInterceptor(httpLoggingInterceptor);
+        }
+        return builder.build();
     }
 
     private Gson buildGson() {
@@ -240,13 +245,13 @@ public class Qualaroo implements QualarooSdk {
         }
 
         @Override
-        public Builder setApiKey(String apiKey) {
+        public QualarooSdk.Builder setApiKey(String apiKey) {
             this.credentials = new Credentials(apiKey);
             return this;
         }
 
         @Override
-        public Builder setDebugMode(boolean debugMode) {
+        public QualarooSdk.Builder setDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
             return this;
         }

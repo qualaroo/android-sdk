@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.qualaroo.Qualaroo;
-import com.qualaroo.util.DebouncingOnClickListener;
 
 public class SurveyDemoActivity extends AppCompatActivity {
 
@@ -13,11 +12,11 @@ public class SurveyDemoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
 
-        findViewById(R.id.show_surveys_button).setOnClickListener(new DebouncingOnClickListener() {
-            @Override public void doClick(View v) {
+        Qualaroo.getInstance().setUserProperty("something", "gold");
+        findViewById(R.id.show_surveys_button).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
                 Qualaroo.getInstance().showSurvey("mobile_test_survey");
             }
         });
     }
-
 }

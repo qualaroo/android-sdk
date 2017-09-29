@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.RestrictTo;
 import android.support.v7.widget.AppCompatTextView;
 import android.widget.TextView;
 
@@ -10,6 +11,9 @@ import com.qualaroo.ui.OnAnsweredListener;
 
 import java.util.Locale;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 final class UnknownQuestionTypeRenderer extends QuestionRenderer {
 
     UnknownQuestionTypeRenderer(Theme theme) {

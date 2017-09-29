@@ -1,8 +1,12 @@
 package com.qualaroo.ui;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.RestrictTo;
 
-public class SurveyViewModel {
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
+class SurveyViewModel {
 
     private final @ColorInt int textColor;
     private final @ColorInt int backgroundColor;
@@ -40,7 +44,7 @@ public class SurveyViewModel {
         return buttonDisabledColor;
     }
 
-    public int dimColor() {
+    int dimColor() {
         return dimColor;
     }
 }

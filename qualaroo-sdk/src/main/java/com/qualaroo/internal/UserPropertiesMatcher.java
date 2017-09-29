@@ -1,5 +1,7 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
+
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -11,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class UserPropertiesMatcher {
 
     private final UserInfo userInfo;

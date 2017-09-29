@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.res.ColorStateList;
 import android.support.annotation.ColorInt;
+import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.TintableBackgroundView;
 import android.support.v4.widget.TintableCompoundButton;
@@ -13,6 +14,9 @@ import android.widget.Spinner;
 
 import java.lang.reflect.Field;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 class ThemeUtils {
 
     private ThemeUtils() {

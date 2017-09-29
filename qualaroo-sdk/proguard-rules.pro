@@ -27,12 +27,18 @@
 -keep public enum * {
     public *;
 }
-
+-keepparameternames
 -keep public class com.qualaroo.Qualaroo {
+    public static *;
+}
+-keep interface com.qualaroo.QualarooSdk {*;}
+-keep interface com.qualaroo.QualarooSdk$Builder {*;}
+-keep public class com.qualaroo.Qualaroo$Builder {
     public *;
+}
+-keep public class com.qualaroo.internal.model.** {
+    private *;
+    <init>(...);
 }
 
--keep public class com.qualaroo.internal.model.* {
-    public *;
-}
 -dontwarn org.apache.commons.**

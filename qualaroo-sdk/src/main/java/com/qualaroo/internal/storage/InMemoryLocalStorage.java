@@ -2,6 +2,7 @@ package com.qualaroo.internal.storage;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
@@ -11,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class InMemoryLocalStorage implements LocalStorage {
 
     private final List<String> failedRequests = new ArrayList<>();

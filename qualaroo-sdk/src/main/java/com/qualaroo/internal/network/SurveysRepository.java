@@ -2,6 +2,7 @@ package com.qualaroo.internal.network;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.SessionInfo;
@@ -16,6 +17,9 @@ import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SurveysRepository {
 
     private final String siteId;

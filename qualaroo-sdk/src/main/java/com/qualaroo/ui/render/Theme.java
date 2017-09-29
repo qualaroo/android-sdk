@@ -2,9 +2,13 @@ package com.qualaroo.ui.render;
 
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.model.ColorThemeMap;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class Theme {
 
     private static final @ColorInt int DIM_TYPE_LIGHT = Color.parseColor("#D4CACED6");

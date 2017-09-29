@@ -1,8 +1,12 @@
 package com.qualaroo.ui.render;
 
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.view.View;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class QuestionView {
 
     static Builder forQuestionId(int questionId) {

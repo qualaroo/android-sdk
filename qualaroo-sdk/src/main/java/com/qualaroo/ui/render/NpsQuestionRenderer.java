@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,6 +14,9 @@ import com.qualaroo.ui.NpsView;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class NpsQuestionRenderer extends QuestionRenderer {
 
     private static final String KEY_NPS_SCORE = "question.nps_score";

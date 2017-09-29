@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v7.app.AppCompatActivity;
 
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.ui.SurveyComponent;
 import com.qualaroo.ui.SurveyFragment;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class QualarooActivity extends AppCompatActivity {
 
     private static final String KEY_SURVEY = "com.qualaroo.survey";

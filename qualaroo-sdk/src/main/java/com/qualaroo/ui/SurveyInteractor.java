@@ -1,6 +1,7 @@
 package com.qualaroo.ui;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.util.SparseArrayCompat;
 
 import com.qualaroo.internal.ReportManager;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SurveyInteractor {
 
     public interface EventsObserver {

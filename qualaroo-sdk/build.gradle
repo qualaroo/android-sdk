@@ -5,6 +5,7 @@
 apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 
 int major = 1
 int minor = 0
@@ -27,10 +28,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'proguard-rules.pro'
             lintOptions {
-                abortOnError false
+                abortOnError true
+                disable 'InvalidPackage'
             }
         }
-        debug {        
+        debug {
             minifyEnabled false
         }
     }
@@ -48,26 +50,103 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.google.code.gson:gson:2.8.0'
-    implementation files('libs/commons-jexl3-3.1.jar')
-    implementation files('libs/commons-logging-1.2.jar')
+    implementation ('org.apache.commons:commons-jexl3:3.1') {
+        exclude group: 'commons-logging'
+    }
 
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     testImplementation 'org.mockito:mockito-core:2.9.0'
     testImplementation 'com.nhaarman:mockito-kotlin-kt1.1:1.5.0'
     testImplementation 'junit:junit:4.12'
+    testImplementation 'commons-logging:commons-logging:1.2'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
-
-
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
-    source = android.sourceSets.main.java.srcDirs
+    source android.sourceSets.main.java.srcDirs
     ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
     classpath = files() + files(ext.androidJar)
     options.links("http://docs.oracle.com/javase/7/docs/api/")
     options.links("http://d.android.com/reference/")
+    options.addStringOption('Xdoclint:none', '-quiet')
+    include '**//*Qualaroo.java'
+    include '**//*QualarooSdk.java'
 }
+
+task javadocJar(type: Jar, dependsOn: generateJavadoc) {
+    classifier = 'javadoc'
+    from generateJavadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    include("**/QualarooSdk.java")
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+    repositories {
+        maven {
+            url "s3://qualaroo-android-sdk/libs/"
+            credentials(AwsCredentials) {
+                accessKey QUALAROO_S3_ACCESS_KEY
+                secretKey QUALAROO_S3_SECRET_KEY
+            }
+        }
+        maven {
+            url "$buildDir/localRepo"
+        }
+    }
+
+    publications {
+        aar(MavenPublication) {
+            groupId 'com.qualaroo'
+            artifactId 'qualaroo-sdk'
+            version "$major.$minor.$patch-SNAPSHOT"
+            artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                println(configurations.implementation.getAllDependencies())
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                // List all compile dependencies and write to POM
+                configurations.implementation.getAllDependencies().each { Dependency dep ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
+
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    dependencyNode.appendNode('version', dep.version)
+
+                    if (!dep.transitive) {
+                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                        def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
+                    } else if (!dep.properties.excludeRules.empty) {
+                        // Otherwise add specified exclude rules
+                        def exclusionsNode = dependencyNode.appendNode('exclusions')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            def exclusionNode = exclusionsNode.appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 

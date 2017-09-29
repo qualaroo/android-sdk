@@ -1,10 +1,14 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 abstract class QuestionRenderer {
 
     private final Theme theme;

@@ -1,5 +1,7 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.RestrictTo;
+
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Survey;
@@ -9,6 +11,9 @@ import com.qualaroo.ui.render.Theme;
 
 import java.util.concurrent.Executor;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SurveyComponent {
 
     private final SurveyInteractor surveyInteractor;
