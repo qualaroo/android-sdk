@@ -8,7 +8,7 @@ import org.junit.Test
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class UserInfoTest {
 
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val localStorage = InMemoryLocalStorage()
     val userInfo = UserInfo(InMemorySettings(), localStorage)
 
     @Test

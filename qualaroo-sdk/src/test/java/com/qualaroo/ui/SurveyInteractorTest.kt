@@ -51,7 +51,7 @@ class SurveyInteractorTest {
                     surveyVariations = listOf(language("en"), language("pl"))
             )
     )
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val localStorage = InMemoryLocalStorage()
     val reportManager = mock<ReportManager>()
 
     val backgroundExecutor = TestExecutors.currentThread()

@@ -1,13 +1,12 @@
 package com.qualaroo.internal.storage
 
-import com.qualaroo.internal.TimeProvider
 import com.qualaroo.internal.model.TestModels.survey
 import org.junit.Assert.*
 import org.junit.Test
 
 class InMemoryLocalStorageTest {
 
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val localStorage = InMemoryLocalStorage()
 
     @Test
     fun storeFailedReportRequests() {

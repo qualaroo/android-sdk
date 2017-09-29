@@ -17,7 +17,7 @@ import org.junit.Test
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class SurveyDisplayQualifierTest {
 
-    val localStorage = InMemoryLocalStorage(TimeProvider())
+    val localStorage = InMemoryLocalStorage()
     private val userPropertiesMatcher = UserPropertiesMatcher(UserInfo(InMemorySettings(), localStorage))
     private val timeMatcher = mock<TimeMatcher>()
 

@@ -1,18 +1,24 @@
 package com.qualaroo.internal;
 
-import java.util.concurrent.TimeUnit;
+import android.support.annotation.VisibleForTesting;
 
 public final class TimeMatcher {
 
-    private static final long PAUSE_BETWEEN_SAME_SURVEYS = TimeUnit.DAYS.toMillis(3);
+    private final long pauseBetweenSurveysInMillis;
 
-    private final TimeProvider timeProvider;
+    @VisibleForTesting TimeProvider timeProvider = new TimeProvider();
 
-    public TimeMatcher(TimeProvider timeProvider) {
-        this.timeProvider = timeProvider;
+    public TimeMatcher(long pauseBetweenSurveysInMillis) {
+        this.pauseBetweenSurveysInMillis = pauseBetweenSurveysInMillis;
     }
 
     public boolean enoughTimePassedFrom(long fromInMillis) {
-        return timeProvider.nowInMillis() - fromInMillis >= PAUSE_BETWEEN_SAME_SURVEYS;
+        return timeProvider.getCurrentTimeMillis() - fromInMillis >= pauseBetweenSurveysInMillis;
+    }
+
+    class TimeProvider {
+        long getCurrentTimeMillis() {
+            return System.currentTimeMillis();
+        }
     }
 }

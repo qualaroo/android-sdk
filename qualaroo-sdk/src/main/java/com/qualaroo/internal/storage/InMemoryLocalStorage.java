@@ -3,7 +3,6 @@ package com.qualaroo.internal.storage;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.qualaroo.internal.TimeProvider;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
 
@@ -14,14 +13,9 @@ import java.util.Map;
 
 public class InMemoryLocalStorage implements LocalStorage {
 
-    private final TimeProvider timeProvider;
     private final List<String> failedRequests = new ArrayList<>();
     private final Map<Integer, SurveyStatus> surveyStatusMap = new HashMap<>();
     private final Map<String, String> userProperties = new HashMap<>();
-
-    public InMemoryLocalStorage(TimeProvider timeProvider) {
-        this.timeProvider = timeProvider;
-    }
 
     @Override public synchronized void storeFailedReportRequest(String reportRequestUrl) {
         failedRequests.add(reportRequestUrl);
@@ -49,7 +43,7 @@ public class InMemoryLocalStorage implements LocalStorage {
         SurveyStatus.Builder builder = SurveyStatus.builder();
         builder.setSurveyId(survey.id());
         builder.setHasBeenSeen(true);
-        builder.setSeenAtInMillis(timeProvider.nowInMillis());
+        builder.setSeenAtInMillis(System.currentTimeMillis());
         if (surveyStatusMap.containsKey(survey.id())) {
             SurveyStatus current = surveyStatusMap.get(survey.id());
             builder.setHasBeenFinished(current.hasBeenFinished());
@@ -63,7 +57,7 @@ public class InMemoryLocalStorage implements LocalStorage {
         SurveyStatus.Builder builder = SurveyStatus.builder();
         builder.setSurveyId(survey.id());
         builder.setHasBeenFinished(true);
-        builder.setSeenAtInMillis(timeProvider.nowInMillis());
+        builder.setSeenAtInMillis(System.currentTimeMillis());
         if (surveyStatusMap.containsKey(survey.id())) {
             SurveyStatus current = surveyStatusMap.get(survey.id());
             builder.setHasBeenSeen(current.hasBeenSeen());
