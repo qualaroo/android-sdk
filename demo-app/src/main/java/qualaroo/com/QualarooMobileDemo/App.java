@@ -10,7 +10,7 @@ public class App extends Application {
         super.onCreate();
         Qualaroo.initializeWith(this)
                 .setApiKey("API_KEY_HERE")
-                .setDebugMode(false)
+                .setDebugMode(true)
                 .init();
     }
 }

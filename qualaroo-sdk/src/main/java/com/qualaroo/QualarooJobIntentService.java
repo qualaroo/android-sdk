@@ -43,6 +43,7 @@ public class QualarooJobIntentService extends JobIntentService {
         final List<String> failedReportRequests = localStorage.getFailedReportRequests(MAX_UPLOADS_PER_JOB);
 
         if (failedReportRequests.size() == 0) {
+            QualarooLogger.debug("No failed reports found");
             return;
         }
 
