@@ -14,6 +14,6 @@
 
     <dimen name="qualaroo__message_text_size">22dp</dimen>
 
-    <fraction name="qualaroo__survey_empty_space_weight">1.0</fraction>
+    <fraction name="qualaroo__survey_empty_space_weight">0.9</fraction>
 
 </resources>
