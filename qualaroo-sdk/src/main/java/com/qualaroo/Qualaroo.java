@@ -47,10 +47,10 @@ public class Qualaroo implements QualarooSdk {
     /**
      * Starts initialization phase of the SDK.
      * Make sure to call {@link QualarooSdk.Builder#init()} to finish initialization properly.
-     * @param context - application {@link Context}
+     * @param context application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    @SuppressWarnings("WeakerAccess") public static Builder initializeWith(Context context) {
+    @SuppressWarnings({"WeakerAccess", "unused"}) public static Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
