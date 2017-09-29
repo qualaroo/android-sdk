@@ -38,22 +38,24 @@ final class TextQuestionRenderer extends QuestionRenderer {
         button.setTextColor(getTheme().buttonTextColor());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                if (editText.getText() != null) {
+                    onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                }
             }
         });
         ThemeUtils.applyTheme(editText, getTheme());
         button.setEnabled(!question.isRequired());
         editText.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (question.isRequired()) {
-                    button.setEnabled(count > 0);
-                }
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override public void afterTextChanged(Editable s) {
+                if (question.isRequired()) {
+                    button.setEnabled(s.length() > 0);
+                }
             }
         });
         return QuestionView.forQuestionId(question.id())
