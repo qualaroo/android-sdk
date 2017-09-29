@@ -31,6 +31,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         Button confirmButton = view.findViewById(R.id.qualaroo__view_question_dropdown_confirm);
         final Spinner spinner = view.findViewById(R.id.qualaroo__view_question_dropdown_spinner);
         confirmButton.setText(question.sendText());
+        confirmButton.setTextColor(getTheme().buttonTextColor());
         ArrayAdapter<AnswerItem> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
         List<AnswerItem> spinnerItems = new ArrayList<>();
         for (Answer answer : question.answerList()) {

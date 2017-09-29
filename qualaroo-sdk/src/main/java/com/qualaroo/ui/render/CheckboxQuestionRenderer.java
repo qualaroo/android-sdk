@@ -37,6 +37,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
         button.setText(question.sendText());
         button.setEnabled(false);
+        button.setTextColor(getTheme().buttonTextColor());
         ThemeUtils.applyTheme(button, getTheme());
         CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

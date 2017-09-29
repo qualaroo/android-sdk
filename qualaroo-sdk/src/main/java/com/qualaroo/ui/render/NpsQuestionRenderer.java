@@ -32,6 +32,7 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
 
         final Button button = view.findViewById(R.id.qualaroo__nps_view_confirm);
         ThemeUtils.applyTheme(button, getTheme());
+        button.setTextColor(getTheme().buttonTextColor());
         button.setText(question.sendText());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {

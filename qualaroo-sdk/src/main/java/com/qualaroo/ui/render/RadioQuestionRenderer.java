@@ -35,6 +35,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         final View view = View.inflate(context, R.layout.qualaroo__view_question_radio, null);
         final Button button = view.findViewById(R.id.qualaroo__question_radio_confirm);
         button.setText(question.sendText());
+        button.setTextColor(getTheme().buttonTextColor());
         ThemeUtils.applyTheme(button, getTheme());
         final RadioGroup radioGroup = view.findViewById(R.id.qualaroo__question_radio_options);
         RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
