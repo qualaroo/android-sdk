@@ -1,5 +1,7 @@
 package com.qualaroo.internal.network;
 
+import android.support.annotation.RestrictTo;
+
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -12,6 +14,9 @@ import java.util.Locale;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class ReportClient {
     private final RestClient restClient;
     private final ApiConfig apiConfig;

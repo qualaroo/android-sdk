@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -14,6 +15,9 @@ import com.qualaroo.internal.model.Message;
 import com.qualaroo.ui.OnMessageConfirmedListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class MessageRenderer {
 
     private final Theme theme;

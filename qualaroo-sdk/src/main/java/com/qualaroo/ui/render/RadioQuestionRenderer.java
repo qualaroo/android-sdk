@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.util.TypedValue;
 import android.view.View;
@@ -18,6 +19,9 @@ import com.qualaroo.util.DimenUtils;
 
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 final class RadioQuestionRenderer extends QuestionRenderer {
 
     private final static String KEY_SELECTED_ITEM = "radio.selectedItem";

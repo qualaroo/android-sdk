@@ -1,7 +1,11 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class TimeMatcher {
 
     private final long pauseBetweenSurveysInMillis;

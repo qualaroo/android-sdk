@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.model.Survey;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class DatabaseLocalStorage implements LocalStorage {
 
     static final String DB_NAME = "qualaroo.db";

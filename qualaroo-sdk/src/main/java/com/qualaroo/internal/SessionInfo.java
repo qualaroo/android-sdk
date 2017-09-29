@@ -2,9 +2,13 @@ package com.qualaroo.internal;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.BuildConfig;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SessionInfo {
 
     private static final String SDK_VERSION = BuildConfig.VERSION_NAME;

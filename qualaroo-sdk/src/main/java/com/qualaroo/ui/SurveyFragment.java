@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
@@ -25,6 +26,9 @@ import com.qualaroo.util.DebouncingOnClickListener;
 
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SurveyFragment extends Fragment implements SurveyView {
 
     private static final String KEY_PRESENTER_STATE = "pstate";

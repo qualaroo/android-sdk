@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,9 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 final class TextQuestionRenderer extends QuestionRenderer {
 
     private static final String KEY_TEXT = "question.text";

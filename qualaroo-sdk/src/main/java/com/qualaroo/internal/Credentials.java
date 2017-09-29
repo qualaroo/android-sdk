@@ -1,7 +1,12 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
+
 import okio.ByteString;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class Credentials {
 
     private final String apiKey;

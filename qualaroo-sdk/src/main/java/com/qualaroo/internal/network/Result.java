@@ -1,5 +1,10 @@
 package com.qualaroo.internal.network;
 
+import android.support.annotation.RestrictTo;
+
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class Result<T> {
 
     private final T data;

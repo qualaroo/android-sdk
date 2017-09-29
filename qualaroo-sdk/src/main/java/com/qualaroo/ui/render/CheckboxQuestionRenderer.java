@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.util.TypedValue;
 import android.view.View;
@@ -19,6 +20,9 @@ import com.qualaroo.util.DebouncingOnClickListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class CheckboxQuestionRenderer extends QuestionRenderer {
 
     private static final String KEY_CHECKED_ELEMENTS = "question.checkedElements";

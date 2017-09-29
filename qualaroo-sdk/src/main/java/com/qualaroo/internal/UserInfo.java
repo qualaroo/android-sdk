@@ -1,11 +1,16 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
+
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 
 import java.util.Map;
 import java.util.UUID;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class UserInfo {
 
     private static final String KEY_USER_ID = "q.uid";

@@ -1,10 +1,14 @@
 package com.qualaroo.internal.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.RestrictTo;
 
 import java.io.Serializable;
 import java.util.Locale;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class Language implements Serializable {
 
     public static final Language UNKNOWN = new Language("");

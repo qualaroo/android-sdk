@@ -1,5 +1,6 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
 import java.io.Serializable;
@@ -7,6 +8,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class Survey implements Serializable {
     private int id;
     private String name;

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
+import android.support.annotation.RestrictTo;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.Space;
 import android.support.v7.widget.AppCompatTextView;
@@ -26,6 +27,9 @@ import com.qualaroo.ui.render.Theme;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class NpsView extends FrameLayout {
 
     private final LinearLayout scoresContainer;

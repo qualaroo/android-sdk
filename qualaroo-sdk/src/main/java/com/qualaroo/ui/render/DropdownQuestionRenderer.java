@@ -1,6 +1,7 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
+import android.support.annotation.RestrictTo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,9 @@ import com.qualaroo.util.DebouncingOnClickListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class DropdownQuestionRenderer extends QuestionRenderer {
 
     DropdownQuestionRenderer(Theme theme) {

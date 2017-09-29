@@ -3,7 +3,11 @@ package com.qualaroo.ui.render;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.RestrictTo;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class QuestionViewState implements Parcelable {
 
     private final int questionId;

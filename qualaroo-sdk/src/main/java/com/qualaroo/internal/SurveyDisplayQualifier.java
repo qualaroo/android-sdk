@@ -1,10 +1,15 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
+
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.SurveyStatus;
 import com.qualaroo.internal.storage.LocalStorage;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class SurveyDisplayQualifier {
 
     private final LocalStorage localStorage;

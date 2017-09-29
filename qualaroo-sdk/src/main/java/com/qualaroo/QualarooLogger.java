@@ -1,7 +1,11 @@
 package com.qualaroo;
 
+import android.support.annotation.RestrictTo;
 import android.util.Log;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public final class QualarooLogger {
 
     private static final String TAG = "QularooSDK";

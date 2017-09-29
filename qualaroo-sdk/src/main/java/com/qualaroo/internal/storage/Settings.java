@@ -2,7 +2,11 @@ package com.qualaroo.internal.storage;
 
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class Settings {
 
     private final SharedPreferences sharedPreferences;

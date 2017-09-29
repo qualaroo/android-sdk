@@ -1,5 +1,10 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.RestrictTo;
+
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public enum QuestionType {
     NPS("nps"),
     RADIO("radio"),

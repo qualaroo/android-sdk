@@ -1,6 +1,7 @@
 package com.qualaroo.ui;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
@@ -12,6 +13,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class SurveyPresenter implements SurveyInteractor.EventsObserver {
 
     private final SurveyInteractor interactor;

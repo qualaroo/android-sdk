@@ -1,5 +1,7 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.RestrictTo;
+
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -8,6 +10,9 @@ import com.qualaroo.internal.network.ReportClient;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class ReportManager {
 
     private final ReportClient reportClient;

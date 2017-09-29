@@ -1,7 +1,11 @@
 package com.qualaroo.util;
 
+import android.support.annotation.RestrictTo;
 import android.view.View;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public abstract class DebouncingOnClickListener implements View.OnClickListener {
 
     private static final long BLOCK_TIME_IN_MILLIS = 600;

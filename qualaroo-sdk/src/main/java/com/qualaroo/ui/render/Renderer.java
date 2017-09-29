@@ -1,6 +1,7 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
+import android.support.annotation.RestrictTo;
 import android.view.View;
 
 import com.qualaroo.internal.model.Message;
@@ -12,6 +13,9 @@ import com.qualaroo.ui.OnMessageConfirmedListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class Renderer {
 
     private final Theme theme;

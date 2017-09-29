@@ -1,5 +1,7 @@
 package com.qualaroo.internal.network;
 
+import android.support.annotation.RestrictTo;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -9,6 +11,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+
+@RestrictTo(LIBRARY)
 public class RestClient {
 
     private final OkHttpClient okHttpClient;

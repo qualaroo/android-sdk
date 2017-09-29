@@ -50,7 +50,7 @@ public class Qualaroo implements QualarooSdk {
      * @param context - application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    public static Builder initializeWith(Context context) {
+    @SuppressWarnings("WeakerAccess") public static Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
@@ -68,7 +68,7 @@ public class Qualaroo implements QualarooSdk {
      * @throws IllegalStateException when SDK was not initialized before
      * @return current instance of {@link QualarooSdk}
      */
-    public static QualarooSdk getInstance() {
+    @SuppressWarnings("WeakerAccess") public static QualarooSdk getInstance() {
         if (INSTANCE == null) {
             throw new IllegalStateException(
                     "Qualaroo SDK has not been properly initialized. Make sure you finish initalizeWith");
