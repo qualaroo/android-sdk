@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    releaseImplementation 'com.qualaroo:qualaroo-sdk:1.0.0-SNAPSHOT'
+    releaseImplementation 'com.qualaroo:qualaroo-sdk:1.0.0'
     debugImplementation project(':qualaroo-sdk')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'

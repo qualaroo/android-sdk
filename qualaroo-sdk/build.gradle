@@ -106,7 +106,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version '1.0.0'
+            version '1.0.1-SNAPSHOT'
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar
