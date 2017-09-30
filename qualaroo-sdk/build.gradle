@@ -7,10 +7,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-int major = 1
-int minor = 0
-int patch = 0
-
 android {
     compileSdkVersion 26
     buildToolsVersion "25.0.2"
@@ -110,7 +106,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version "$major.$minor.$patch-SNAPSHOT"
+            version '1.0.0'
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar
