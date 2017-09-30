@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Survey Demo APP</string>
-    <string name="apikey_textview">API Key</string>
+    <string name="hint_api_key">API Key</string>
+    <string name="hint_survey_alias">Survey alias</string>
     <string name="survey_alias">Survey Alias</string>
     <string name="apikey_hint">Enter API Key</string>
     <string name="survey_hint">Enter Survey Alias</string>
