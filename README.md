@@ -55,22 +55,23 @@ After initialization, the SDK will be accessible via `Qualaroo.getInstance()` me
 #### Display survey with a given alias.
 The survey will be displayed if all conditions configured in our dashboard are met
 ```java
-Qualaroo.getInstance().showSurvey("your survey alias to show");
+//Show survey with "your_survey_alias" alias
+Qualaroo.getInstance().showSurvey("your_survey_alias");
 ```
 #### Set user properties
 ```java
 //Set unique user id
-Qualaroo.getInstance().setUserId("name", "Hal");
+Qualaroo.getInstance().setUserId("HAL_9000");
 //Set user property "name" to "Hal"
 Qualaroo.getInstance().setUserProperty("name", "Hal");
 //remove property "name"
 Qualaroo.getInstance().removeProperty("name");
 ```
 
-
 #### Set preferred language
-You can set preffered language that you want to use when displaying surveys.
+You can set preferred language that you want to use when displaying surveys.
 ```java
+//Set preferred display language to French
 Qualaroo.getInstance().setPrefferedLanguage("fr");
 ```
 Language that you provide should be an ISO 639-1 compatible language code (two lowercase letters)
