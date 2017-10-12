@@ -47,4 +47,28 @@ class SurveyViewModel {
     int dimColor() {
         return dimColor;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SurveyViewModel that = (SurveyViewModel) o;
+
+        if (textColor != that.textColor) return false;
+        if (backgroundColor != that.backgroundColor) return false;
+        if (buttonDisabledColor != that.buttonDisabledColor) return false;
+        if (dimColor != that.dimColor) return false;
+        if (cannotBeClosed != that.cannotBeClosed) return false;
+        return isFullscreen == that.isFullscreen;
+    }
+
+    @Override public int hashCode() {
+        int result = textColor;
+        result = 31 * result + backgroundColor;
+        result = 31 * result + buttonDisabledColor;
+        result = 31 * result + dimColor;
+        result = 31 * result + (cannotBeClosed ? 1 : 0);
+        result = 31 * result + (isFullscreen ? 1 : 0);
+        return result;
+    }
 }

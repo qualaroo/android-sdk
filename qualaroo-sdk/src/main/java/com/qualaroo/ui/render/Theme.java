@@ -58,6 +58,21 @@ public final class Theme {
     @ColorInt private int buttonDisabledColor;
     @ColorInt private int accentColor;
 
+    @VisibleForTesting Theme(int dimColor, int backgroundColor, int borderColor, int textColor, int buttonTextColor, int buttonEnabledColor, int buttonDisabledColor, int accentColor) {
+        this.dimColor = dimColor;
+        this.backgroundColor = backgroundColor;
+        this.borderColor = borderColor;
+        this.textColor = textColor;
+        this.buttonTextColor = buttonTextColor;
+        this.buttonEnabledColor = buttonEnabledColor;
+        this.buttonDisabledColor = buttonDisabledColor;
+        this.accentColor = accentColor;
+    }
+
+    private Theme() {
+        //for static factory method
+    }
+
     public int dimColor() {
         return dimColor;
     }
