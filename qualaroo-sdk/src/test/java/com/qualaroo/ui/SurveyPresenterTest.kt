@@ -137,4 +137,11 @@ class SurveyPresenterTest {
         verify(view, times(1)).closeSurvey()
     }
 
+    @Test
+    fun `passes close requests to interactor`() {
+        presenter.onCloseClicked()
+
+        verify(interactor, times(1)).stopSurvey()
+    }
+
 }
