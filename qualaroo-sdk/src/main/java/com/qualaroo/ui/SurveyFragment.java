@@ -45,6 +45,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private ImageView surveyLogo;
     private View emptySpace;
 
+    private boolean isFullScreen;
     private boolean mandatory;
     private QuestionView questionView;
     private QuestionViewState viewState;
@@ -122,6 +123,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         mandatory = viewModel.cannotBeClosed();
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
+        isFullScreen = viewModel.isFullscreen();
     }
 
     @Override public void showWithAnimation() {
@@ -186,9 +188,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     private void transformToMessageStyle() {
+        float translationY = isFullScreen ? 0 : -surveyLogo.getY() - surveyLogo.getHeight()/2;
         surveyLogo.animate()
                 .translationX(surveyContainer.getWidth()/2 - surveyLogo.getX() - surveyLogo.getWidth()/2)
-                .translationY(-surveyLogo.getY() - surveyLogo.getHeight()/2)
+                .translationY(translationY)
                 .start();
         questionsTitle.animate().alpha(0.0f).start();
     }
