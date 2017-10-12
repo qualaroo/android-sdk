@@ -17,13 +17,15 @@ public final class Survey implements Serializable {
     private String canonicalName;
     private boolean active;
     private Spec spec;
+    private String type;
 
-    @VisibleForTesting Survey(int id, String name, String canonicalName, boolean active, Spec spec) {
+    @VisibleForTesting Survey(int id, String name, String canonicalName, boolean active, Spec spec, String type) {
         this.id = id;
         this.name = name;
         this.canonicalName = canonicalName;
         this.active = active;
         this.spec = spec;
+        this.type = type;
     }
 
     Survey() {
@@ -48,6 +50,10 @@ public final class Survey implements Serializable {
 
     public Spec spec() {
         return spec;
+    }
+
+    public String type() {
+        return type;
     }
 
     @Override public String toString() {

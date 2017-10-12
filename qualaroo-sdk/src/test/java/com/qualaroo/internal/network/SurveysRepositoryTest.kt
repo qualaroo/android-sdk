@@ -92,6 +92,24 @@ class SurveysRepositoryTest {
         verify(restClient, times(1)).get(any(), eq(Array<Survey>::class.java))
     }
 
+    @Test
+    fun `filters out surveys that are not of "sdk" type`() {
+        val surveys = arrayOf(
+                survey(id = 1, type = "sdk"),
+                survey(id = 2, type = "nps"),
+                survey(id = 3, type = "definitely_not_sdk"),
+                survey(id = 4, type = "sdk")
+        )
+        resetClientReturns(surveys)
+
+        val filteredSurveys = surveysRepository.surveys
+
+        assertEquals(2, filteredSurveys.size)
+        assertTrue(filteredSurveys.contains(survey(id = 1)))
+        assertTrue(filteredSurveys.contains(survey(id = 4)))
+    }
+
+
     private fun resetClientReturns(surveys: Array<Survey>) {
         whenever(restClient.get(any(), eq(Array<Survey>::class.java))).thenReturn(Result.of(surveys))
     }

@@ -9,7 +9,7 @@ import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Survey;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -21,6 +21,8 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class SurveysRepository {
+
+    private static final String SURVEY_SDK_TYPE = "sdk";
 
     private final String siteId;
     private final RestClient restClient;
@@ -83,7 +85,13 @@ public class SurveysRepository {
         Result<Survey[]> result = restClient.get(requestUrl, Survey[].class);
         if (result.isSuccessful()) {
             QualarooLogger.debug("Acquired %1$d surveys", result.getData().length);
-            return Arrays.asList(result.getData());
+            List<Survey> surveys = new ArrayList<>();
+            for (Survey survey : result.getData()) {
+                if (SURVEY_SDK_TYPE.equals(survey.type())) {
+                    surveys.add(survey);
+                }
+            }
+            return surveys;
         } else {
             QualarooLogger.debug("Could not acquire surveys");
             return null;
