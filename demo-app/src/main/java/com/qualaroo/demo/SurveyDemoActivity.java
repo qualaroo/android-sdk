@@ -1,4 +1,4 @@
-package qualaroo.com.QualarooMobileDemo;
+package com.qualaroo.demo;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -24,6 +24,8 @@ import com.qualaroo.Qualaroo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import qualaroo.com.QualarooMobileDemo.R;
 
 public class SurveyDemoActivity extends AppCompatActivity {
 

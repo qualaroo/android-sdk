@@ -1,4 +1,4 @@
-package qualaroo.com.QualarooMobileDemo;
+package com.qualaroo.demo;
 
 import android.app.Application;
 import android.widget.Toast;
