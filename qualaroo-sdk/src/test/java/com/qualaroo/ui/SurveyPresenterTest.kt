@@ -1,9 +1,6 @@
 package com.qualaroo.ui
 
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.optionMap
@@ -18,18 +15,19 @@ import org.mockito.ArgumentCaptor
 @Suppress("IllegalIdentifier", "MemberVisibilityCanPrivate")
 class SurveyPresenterTest {
 
+
     private val interactor = mock<SurveyInteractor>()
     private val presenter = SurveyPresenter(interactor, survey(id = 10), theme())
 
     val view = mock<SurveyView>()
 
+    val captor = ArgumentCaptor.forClass(SurveyInteractor.EventsObserver::class.java)
     lateinit var capturedEventsObserver: SurveyInteractor.EventsObserver
 
     @Before
     fun setupDefaultPresenter() {
+        doNothing().whenever(interactor).registerObserver(captor.capture())
         presenter.setView(view)
-        val captor = ArgumentCaptor.forClass(SurveyInteractor.EventsObserver::class.java)
-        verify(interactor).registerObserver(captor.capture())
         capturedEventsObserver = captor.value
     }
 
