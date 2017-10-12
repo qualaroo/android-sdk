@@ -68,7 +68,7 @@ class SurveyPresenter {
             surveyView.showMessage(message, shouldAnimate);
             currentlyDisplayedQuestion = null;
         }
-        
+
         @Override public void closeSurvey() {
             surveyView.closeSurvey();
         }

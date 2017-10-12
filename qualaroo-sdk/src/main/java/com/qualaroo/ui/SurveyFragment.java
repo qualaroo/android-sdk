@@ -46,7 +46,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private View emptySpace;
 
     private boolean isFullScreen;
-    private boolean mandatory;
     private QuestionView questionView;
     private QuestionViewState viewState;
 
@@ -120,7 +119,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         closeButton.setColorFilter(viewModel.buttonDisabledColor());
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
         emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
-        mandatory = viewModel.cannotBeClosed();
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
         isFullScreen = viewModel.isFullscreen();
@@ -223,12 +221,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }, 600);
     }
 
-    /**
-     * Callback for onBackPressed event happening in containing Activity.
-     * @return true if SurveyFragment consumed the event, false if Activity should handle the event by itself
-     */
-    public boolean onBackPressed() {
-        boolean shouldBlockClosing = mandatory;
-        return shouldBlockClosing;
+    public void onBackPressed() {
+        surveyPresenter.onCloseClicked();
     }
 }
