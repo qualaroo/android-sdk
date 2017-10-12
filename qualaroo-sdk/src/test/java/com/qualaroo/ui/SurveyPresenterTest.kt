@@ -122,10 +122,14 @@ class SurveyPresenterTest {
     }
 
     @Test
-    fun `shows message()`() {
+    fun `shows message`() {
         capturedEventsObserver.showMessage(message(id = 10))
 
-        verify(view, times(1)).showMessage(message(id = 10))
+        verify(view, times(1)).showMessage(message(id = 10), false)
+
+        capturedEventsObserver.showQuestion(question(id = 10))
+        capturedEventsObserver.showMessage(message(id = 20))
+        verify(view, times(1)).showMessage(message(id = 20), true)
     }
 
     @Test
