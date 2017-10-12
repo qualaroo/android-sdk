@@ -62,7 +62,9 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
     }
 
     @Override public void showMessage(Message message) {
-        surveyView.showMessage(message);
+        boolean shouldAnimate = currentlyDisplayedQuestion != null;
+        surveyView.showMessage(message, shouldAnimate);
+        currentlyDisplayedQuestion = null;
     }
 
     @Override public void closeSurvey() {

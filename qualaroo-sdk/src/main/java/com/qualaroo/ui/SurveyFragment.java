@@ -45,6 +45,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private ImageView surveyLogo;
     private View emptySpace;
 
+    private boolean isFullScreen;
     private boolean mandatory;
     private QuestionView questionView;
     private QuestionViewState viewState;
@@ -122,6 +123,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         mandatory = viewModel.cannotBeClosed();
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
+        isFullScreen = viewModel.isFullscreen();
     }
 
     @Override public void showWithAnimation() {
@@ -174,8 +176,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
     }
 
-    @Override public void showMessage(Message message) {
-        transformToMessageStyle();
+    @Override public void showMessage(Message message, boolean withAnimation) {
+        transformToMessageStyle(withAnimation);
         questionsContent.removeAllViews();
         Context context = getContext();
         questionsContent.addView(renderer.renderMessage(context, message, new OnMessageConfirmedListener() {
@@ -185,12 +187,25 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }));
     }
 
-    private void transformToMessageStyle() {
-        surveyLogo.animate()
-                .translationX(surveyContainer.getWidth()/2 - surveyLogo.getX() - surveyLogo.getWidth()/2)
-                .translationY(-surveyLogo.getY() - surveyLogo.getHeight()/2)
-                .start();
-        questionsTitle.animate().alpha(0.0f).start();
+    private void transformToMessageStyle(final boolean withAnimation) {
+        surveyContainer.post(new Runnable() {
+            @Override public void run() {
+                float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
+                float translationY = isFullScreen ? 0 : -surveyLogo.getY() - surveyLogo.getHeight() / 2;
+                float alpha = 0.0f;
+                if (withAnimation) {
+                    surveyLogo.animate()
+                            .translationX(translationX)
+                            .translationY(translationY)
+                            .start();
+                    questionsTitle.animate().alpha(alpha).start();
+                } else {
+                    surveyLogo.setTranslationX(translationX);
+                    surveyLogo.setTranslationY(translationY);
+                    questionsTitle.setAlpha(alpha);
+                }
+            }
+        });
     }
 
     private void transformToQuestionStyle() {

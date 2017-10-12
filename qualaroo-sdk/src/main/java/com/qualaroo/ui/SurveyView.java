@@ -13,6 +13,6 @@ public interface SurveyView {
     void showWithAnimation();
     void showImmediately();
     void showQuestion(Question question);
-    void showMessage(Message message);
+    void showMessage(Message message, boolean withAnimation);
     void closeSurvey();
 }
