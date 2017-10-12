@@ -8,6 +8,7 @@ import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.ui.render.ThemeUtil.Companion.theme
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
@@ -144,6 +145,14 @@ class SurveyPresenterTest {
         presenter.onCloseClicked()
 
         verify(interactor, times(1)).stopSurvey()
+    }
+
+    @Test
+    fun `returns current state`() {
+        capturedEventsObserver.showQuestion(question(id = 10))
+
+        val savedState = presenter.savedState
+        assertEquals(question(id = 10),savedState.question())
     }
 
 }
