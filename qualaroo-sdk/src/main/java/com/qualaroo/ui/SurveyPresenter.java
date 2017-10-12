@@ -2,6 +2,7 @@ package com.qualaroo.ui;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.support.annotation.VisibleForTesting;
 
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
@@ -16,7 +17,7 @@ import java.util.List;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
-public class SurveyPresenter implements SurveyInteractor.EventsObserver {
+class SurveyPresenter {
 
     private final SurveyInteractor interactor;
     private final Survey survey;
@@ -31,10 +32,10 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
         this.theme = theme;
     }
 
-    public void setView(SurveyView view) {
+    void setView(SurveyView view) {
         surveyView = view;
         surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
-        interactor.registerObserver(this);
+        interactor.registerObserver(eventsObserver);
     }
 
     void init(@Nullable State state) {
@@ -56,20 +57,22 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
         surveyView = null;
     }
 
-    @Override public void showQuestion(Question question) {
-        surveyView.showQuestion(question);
-        currentlyDisplayedQuestion = question;
-    }
+    private SurveyInteractor.EventsObserver eventsObserver = new SurveyInteractor.EventsObserver() {
+        @Override public void showQuestion(Question question) {
+            surveyView.showQuestion(question);
+            currentlyDisplayedQuestion = question;
+        }
 
-    @Override public void showMessage(Message message) {
-        boolean shouldAnimate = currentlyDisplayedQuestion != null;
-        surveyView.showMessage(message, shouldAnimate);
-        currentlyDisplayedQuestion = null;
-    }
+        @Override public void showMessage(Message message) {
+            boolean shouldAnimate = currentlyDisplayedQuestion != null;
+            surveyView.showMessage(message, shouldAnimate);
+            currentlyDisplayedQuestion = null;
+        }
 
-    @Override public void closeSurvey() {
-        surveyView.closeSurvey();
-    }
+        @Override public void closeSurvey() {
+            surveyView.closeSurvey();
+        }
+    };
 
     void onCloseClicked() {
         interactor.stopSurvey();
@@ -91,7 +94,7 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
 
         private final Question question;
 
-        private State(Question question) {
+        @VisibleForTesting State(Question question) {
             this.question = question;
         }
 

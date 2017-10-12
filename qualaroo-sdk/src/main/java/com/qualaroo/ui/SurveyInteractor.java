@@ -122,7 +122,9 @@ public class SurveyInteractor {
     }
 
     void stopSurvey() {
-        this.eventsObserver.closeSurvey();
+        if (!survey.spec().optionMap().isMandatory()) {
+            this.eventsObserver.closeSurvey();
+        }
     }
 
     private void markSurveyAsSeen() {

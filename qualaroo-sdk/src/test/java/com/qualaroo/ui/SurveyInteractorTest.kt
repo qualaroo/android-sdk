@@ -2,12 +2,12 @@ package com.qualaroo.ui
 
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ReportManager
-import com.qualaroo.internal.TimeProvider
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.language
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.node
+import com.qualaroo.internal.model.TestModels.optionMap
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
@@ -559,6 +559,24 @@ class SurveyInteractorTest {
         interactor.questionAnswered(question(id = 300), emptyList())
 
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
+    }
+
+    @Test
+    fun `ignores stopSurvey requests when survey is mandatory`() {
+        val survey = survey(
+                id = 1,
+                spec = spec(
+                        optionMap = optionMap(
+                            mandatory = true
+                        )
+                )
+        )
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+
+        interactor.stopSurvey()
+
+        verifyZeroInteractions(observer)
     }
 
 }

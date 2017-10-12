@@ -3,6 +3,7 @@ package com.qualaroo.ui.render;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.RestrictTo;
+import android.support.annotation.VisibleForTesting;
 
 import com.qualaroo.internal.model.ColorThemeMap;
 
@@ -10,10 +11,6 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Theme {
-
-    private static final @ColorInt int DIM_TYPE_LIGHT = Color.parseColor("#D4CACED6");
-    private static final @ColorInt int DIM_TYPE_VERY_LIGHT = Color.parseColor("#D4FAFAFA");
-    private static final @ColorInt int DIM_TYPE_DARK = Color.parseColor("#D4323433");
 
     public static Theme from(ColorThemeMap colorThemeMap) {
         Theme theme = new Theme();
@@ -38,15 +35,15 @@ public final class Theme {
 
     private static @ColorInt int parseDimType(String dimType) {
         if (dimType == null) {
-            return DIM_TYPE_DARK;
+            return Color.parseColor("#D4323433");
         }
         switch(dimType) {
             case "light":
-                return DIM_TYPE_LIGHT;
+                return Color.parseColor("#D4CACED6");
             case "very_light":
-                return DIM_TYPE_VERY_LIGHT;
+                return Color.parseColor("#D4FAFAFA");
         }
-        return DIM_TYPE_DARK;
+        return Color.parseColor("#D4323433");
     }
 
     @ColorInt private int dimColor;
@@ -57,6 +54,21 @@ public final class Theme {
     @ColorInt private int buttonEnabledColor;
     @ColorInt private int buttonDisabledColor;
     @ColorInt private int accentColor;
+
+    @VisibleForTesting Theme(int dimColor, int backgroundColor, int borderColor, int textColor, int buttonTextColor, int buttonEnabledColor, int buttonDisabledColor, int accentColor) {
+        this.dimColor = dimColor;
+        this.backgroundColor = backgroundColor;
+        this.borderColor = borderColor;
+        this.textColor = textColor;
+        this.buttonTextColor = buttonTextColor;
+        this.buttonEnabledColor = buttonEnabledColor;
+        this.buttonDisabledColor = buttonDisabledColor;
+        this.accentColor = accentColor;
+    }
+
+    private Theme() {
+        //for static factory method
+    }
 
     public int dimColor() {
         return dimColor;
