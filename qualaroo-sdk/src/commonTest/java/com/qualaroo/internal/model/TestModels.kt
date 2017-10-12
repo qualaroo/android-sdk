@@ -2,8 +2,8 @@ package com.qualaroo.internal.model
 
 object TestModels {
 
-    fun survey(id: Int, name: String = "Test survey", canonicalName: String = "test_survey", active: Boolean = true, spec: Survey.Spec = spec()): Survey {
-        return Survey(id, name, canonicalName, active, spec)
+    fun survey(id: Int, name: String = "Test survey", canonicalName: String = "test_survey", active: Boolean = true, spec: Survey.Spec = spec(), type: String = "sdk"): Survey {
+        return Survey(id, name, canonicalName, active, spec, type)
     }
 
     fun spec(requireMap: Survey.RequireMap = requireMap(), optionMap: Survey.OptionMap = optionMap(), questionList: Map<Language, List<Question>> = mapOf(), msgScreenList: Map<Language, List<Message>> = mapOf(), startMap: Map<Language, Node> = mapOf(), surveyVariations: List<Language> = emptyList()): Survey.Spec {
@@ -39,4 +39,3 @@ object TestModels {
     }
 
 }
-

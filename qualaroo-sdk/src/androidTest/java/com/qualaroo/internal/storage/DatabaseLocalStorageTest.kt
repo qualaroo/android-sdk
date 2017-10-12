@@ -3,7 +3,7 @@ package com.qualaroo.internal.storage
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import com.qualaroo.internal.model.UiTestModels.survey
+import com.qualaroo.internal.model.TestModels.survey
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
