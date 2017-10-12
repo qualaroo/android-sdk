@@ -32,6 +32,16 @@ android {
             minifyEnabled false
         }
     }
+
+    sourceSets {
+        String commonTestClasses = 'src/commonTest/java'
+        test {
+            java.srcDirs += commonTestClasses
+        }
+        androidTest {
+            java.srcDirs += commonTestClasses
+        }
+    }
 }
 
 repositories {
