@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,7 @@ public class MessageRenderer {
         });
         text.setText(sanitizeMessageDescription(message.description()));
         text.setTextColor(theme.textColor());
+        text.setMovementMethod(new ScrollingMovementMethod());
         ThemeUtils.applyTheme(callToAction, theme);
         return view;
     }
