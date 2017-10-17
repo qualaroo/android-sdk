@@ -28,7 +28,7 @@ public final class Survey implements Serializable {
         this.type = type;
     }
 
-    Survey() {
+    @SuppressWarnings("unused") Survey() {
         //deserializing with gson requires a default constructor
     }
 
@@ -114,7 +114,7 @@ public final class Survey implements Serializable {
             this.surveyVariations = surveyVariations;
         }
 
-        Spec() {
+        @SuppressWarnings("unused") Spec() {
             //deserializing with gson requires a default constructor
         }
     }
@@ -124,6 +124,11 @@ public final class Survey implements Serializable {
         private boolean isPersistent;
         private boolean isOneShot;
         private String customMap;
+        private String wantUserStr;
+
+        public String wantUserStr() {
+            return wantUserStr;
+        }
 
         public List<String> deviceTypeList() {
             return deviceTypeList;
@@ -141,11 +146,12 @@ public final class Survey implements Serializable {
             return customMap;
         }
 
-        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap) {
+        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap, String wantUserStr) {
             this.deviceTypeList = deviceTypeList;
             this.isPersistent = isPersistent;
             this.isOneShot = isOneShot;
             this.customMap = customMap;
+            this.wantUserStr = wantUserStr;
         }
 
         RequireMap() {

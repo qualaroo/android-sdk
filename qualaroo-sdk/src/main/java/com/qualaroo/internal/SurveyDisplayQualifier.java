@@ -15,11 +15,13 @@ public final class SurveyDisplayQualifier {
     private final LocalStorage localStorage;
     private final UserPropertiesMatcher propertiesMatcher;
     private final TimeMatcher timeMatcher;
+    private final UserIdentityMatcher userIdentityMatcher;
 
-    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher) {
+    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher) {
         this.localStorage = localStorage;
         this.propertiesMatcher = propertiesMatcher;
         this.timeMatcher = timeMatcher;
+        this.userIdentityMatcher = userIdentityMatcher;
     }
 
     public boolean shouldShowSurvey(Survey survey) {
@@ -42,6 +44,11 @@ public final class SurveyDisplayQualifier {
 
         if (!propertiesMatcher.match(survey.spec().requireMap().customMap())) {
             QualarooLogger.debug("User properties do not match survey %1$s's requirements", survey.canonicalName());
+            return false;
+        }
+
+        if (!userIdentityMatcher.shouldShow(survey)) {
+            QualarooLogger.debug("Current user identity type is incompatible with the one required by survey");
             return false;
         }
 
