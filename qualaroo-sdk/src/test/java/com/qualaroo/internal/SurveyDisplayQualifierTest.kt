@@ -18,10 +18,12 @@ import org.junit.Test
 class SurveyDisplayQualifierTest {
 
     val localStorage = InMemoryLocalStorage()
-    private val userPropertiesMatcher = UserPropertiesMatcher(UserInfo(InMemorySettings(), localStorage))
+    val userInfo = UserInfo(InMemorySettings(), localStorage)
+    private val userPropertiesMatcher = UserPropertiesMatcher(userInfo)
+    private val userIdentityMatcher = UserIdentityMatcher(userInfo)
     private val timeMatcher = mock<TimeMatcher>()
 
-    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher)
+    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher)
 
     @Before
     fun setup() {
@@ -99,8 +101,6 @@ class SurveyDisplayQualifierTest {
 
     @Test
     fun `should show only if custom matching is satisfied`() {
-        val userInfo = UserInfo(InMemorySettings(), localStorage)
-        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher)
         var survey = survey(
                 id = 1,
                 spec = spec(
@@ -123,6 +123,22 @@ class SurveyDisplayQualifierTest {
         assertFalse(qualifier.shouldShowSurvey(survey))
 
         userInfo.setUserProperty("premium", "true")
+        assertTrue(qualifier.shouldShowSurvey(survey))
+    }
+
+    @Test
+    fun `should show if target type is satisfied`() {
+        val survey = survey(
+                id = 1,
+                spec = spec(
+                        requireMap = requireMap(
+                                wantUserStr = "yes"
+                        )
+                )
+        )
+        assertFalse(qualifier.shouldShowSurvey(survey))
+
+        userInfo.userId = "some_id"
         assertTrue(qualifier.shouldShowSurvey(survey))
     }
 

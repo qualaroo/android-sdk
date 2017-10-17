@@ -12,6 +12,7 @@ import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.TimeMatcher;
+import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
 import com.qualaroo.internal.executor.UiThreadExecutor;
@@ -108,9 +109,10 @@ public class Qualaroo implements QualarooSdk {
         userInfo = new UserInfo(settings, localStorage);
 
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
+        UserIdentityMatcher userIdentityMatcher = new UserIdentityMatcher(userInfo);
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
         TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
-        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
+        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher);
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
