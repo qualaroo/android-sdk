@@ -16,6 +16,6 @@ public class SamplePercentMatcher {
             return true;
         }
         int percent = percentageProvider.userGroupPercent(survey);
-        return percent <= samplePercent;
+        return percent < samplePercent;
     }
 }

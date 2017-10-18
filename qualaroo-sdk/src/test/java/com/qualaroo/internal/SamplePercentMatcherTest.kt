@@ -34,7 +34,7 @@ class SamplePercentMatcherTest {
     }
 
     @Test
-    fun `returns true when random percent is below or equal sample percent`() {
+    fun `returns true when random percent is below sample percent`() {
         val survey = survey(id = 10, spec = spec(
                 requireMap = requireMap(
                         samplePercent = 50
@@ -48,6 +48,9 @@ class SamplePercentMatcherTest {
         assertFalse(matcher.matches(survey))
 
         whenever(percentageProvider.userGroupPercent(survey)).thenReturn(50)
+        assertFalse(matcher.matches(survey))
+
+        whenever(percentageProvider.userGroupPercent(survey)).thenReturn(49)
         assertTrue(matcher.matches(survey))
 
         whenever(percentageProvider.userGroupPercent(survey)).thenReturn(0)
