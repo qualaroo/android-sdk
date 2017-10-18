@@ -42,6 +42,9 @@ public class DatabaseLocalStorage implements LocalStorage {
     private static final String SURVEY_STATUS_HAS_FINISHED = "hasBeenFinished";
     private static final String SURVEY_STATUS_TIMESTAMP = "seenAt";
 
+    private static final String USER_GROUP_PERCENT_SURVEY_TABLE = "userGroupPercentTable";
+    private static final String USER_GROUP_PERCENT_SURVEY_ID = "surveyId";
+    private static final String USER_GROUP_PERCENT_SURVEY_VALUE = "percent";
     private final SQLiteOpenHelper dbHelper;
 
     public DatabaseLocalStorage(Context context) {
@@ -161,11 +164,33 @@ public class DatabaseLocalStorage implements LocalStorage {
     }
 
     @Override public void storeUserGroupPercent(Survey survey, int percent) {
-
+        ContentValues values = new ContentValues();
+        values.put(USER_GROUP_PERCENT_SURVEY_ID, survey.id());
+        values.put(USER_GROUP_PERCENT_SURVEY_VALUE, percent);
+        insertOrUpdate(USER_GROUP_PERCENT_SURVEY_TABLE, values, USER_GROUP_PERCENT_SURVEY_ID + "=?", new String[]{String.valueOf(survey.id())});
     }
 
     @Nullable @Override public Integer getUserGroupPercent(Survey survey) {
-        return null;
+        Cursor cursor = null;
+        Integer result = null;
+        try {
+            cursor = writeableDb().query(
+                    USER_GROUP_PERCENT_SURVEY_TABLE,
+                    new String[]{USER_GROUP_PERCENT_SURVEY_VALUE},
+                    USER_GROUP_PERCENT_SURVEY_ID + "=?", new String[]{String.valueOf(survey.id())},
+                    null, null, null, String.valueOf(1));
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                result = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            result = null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return result;
     }
 
 
@@ -225,6 +250,16 @@ public class DatabaseLocalStorage implements LocalStorage {
                     SURVEY_STATUS_TIMESTAMP
             );
             db.execSQL(surveyStatusTable);
+
+            String userPercentGroupTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s INTEGER PRIMARY KEY," +
+                            "%3$s INTEGER DEFAULT 0);",
+                    USER_GROUP_PERCENT_SURVEY_TABLE,
+                    USER_GROUP_PERCENT_SURVEY_ID,
+                    USER_GROUP_PERCENT_SURVEY_VALUE
+            );
+            db.execSQL(userPercentGroupTable);
         }
 
         @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

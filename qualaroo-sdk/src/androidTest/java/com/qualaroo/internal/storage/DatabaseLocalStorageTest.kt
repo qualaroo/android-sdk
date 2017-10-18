@@ -139,4 +139,16 @@ class DatabaseLocalStorageTest {
         assertFalse(localStorage.userProperties.containsKey("someKey"))
     }
 
+    @Test
+    fun storesUsersGroupSurveyPercent() {
+        localStorage.storeUserGroupPercent(survey(id = 1), 25)
+        localStorage.storeUserGroupPercent(survey(id = 2), 40)
+        localStorage.storeUserGroupPercent(survey(id = 3), 100)
+
+        assertEquals(25, localStorage.getUserGroupPercent(survey(id = 1)))
+        assertEquals(40, localStorage.getUserGroupPercent(survey(id = 2)))
+        assertEquals(100, localStorage.getUserGroupPercent(survey(id = 3)))
+
+        assertNull(localStorage.getUserGroupPercent(survey(id = 4)))
+    }
 }
