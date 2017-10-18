@@ -1,5 +1,6 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -125,6 +126,7 @@ public final class Survey implements Serializable {
         private boolean isOneShot;
         private String customMap;
         private String wantUserStr;
+        private Integer samplePercent;
 
         public String wantUserStr() {
             return wantUserStr;
@@ -146,12 +148,17 @@ public final class Survey implements Serializable {
             return customMap;
         }
 
-        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap, String wantUserStr) {
+        @Nullable public Integer samplePercent() {
+            return samplePercent;
+        }
+
+        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap, String wantUserStr, Integer samplePercent) {
             this.deviceTypeList = deviceTypeList;
             this.isPersistent = isPersistent;
             this.isOneShot = isOneShot;
             this.customMap = customMap;
             this.wantUserStr = wantUserStr;
+            this.samplePercent = samplePercent;
         }
 
         RequireMap() {
