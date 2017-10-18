@@ -10,7 +10,7 @@ object TestModels {
         return Survey.Spec(requireMap, optionMap, questionList, msgScreenList, startMap, surveyVariations)
     }
 
-    fun requireMap(deviceTypeList: List<String> = listOf("phone"), isPersistent: Boolean = false, isOneShot: Boolean = false, customMap: String = "", wantUserStr: String? = null, samplePercent: Int = 100): Survey.RequireMap {
+    fun requireMap(deviceTypeList: List<String> = listOf("phone"), isPersistent: Boolean = false, isOneShot: Boolean = false, customMap: String = "", wantUserStr: String? = null, samplePercent: Int? = 100): Survey.RequireMap {
         return Survey.RequireMap(deviceTypeList, isPersistent, isOneShot, customMap, wantUserStr, samplePercent)
     }
 

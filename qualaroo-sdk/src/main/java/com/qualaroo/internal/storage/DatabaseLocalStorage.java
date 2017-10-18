@@ -160,6 +160,14 @@ public class DatabaseLocalStorage implements LocalStorage {
         return properties;
     }
 
+    @Override public void storeUserGroupPercent(Survey survey, int percent) {
+
+    }
+
+    @Nullable @Override public Integer getUserGroupPercent(Survey survey) {
+        return null;
+    }
+
 
     private void insertOrUpdate(String tableName, ContentValues values, String whereClause, String[] whereArgs) {
         int affectedRows = writeableDb().update(tableName, values, whereClause, whereArgs);
