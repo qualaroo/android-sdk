@@ -1,0 +1,1616 @@
+[
+  {
+    "id": 177158,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Mobile Test Survey",
+    "active": true,
+    "kind": "embed",
+    "canonical_name": "mobile_test_survey",
+    "created_at": "2017-07-11 08:16:42 +0000",
+    "spec": {
+      "id": 177158,
+      "name": "Mobile Test Survey",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": "https://s3.amazonaws.com/staging-qualaroo/logos/5212/toaster/Screen%20Shot%202017-08-31%20at%2018.13.03.png",
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [
+          "https://s3.amazonaws.com/staging-qualaroo/logos/5212/toaster/Screen%20Shot%202017-08-31%20at%2018.13.03.png"
+        ],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "custom",
+          "background": "#e7e7e7",
+          "border": "#53575a",
+          "hr_top": "#cbcbcb",
+          "hr_bottom": "#ffffff",
+          "text": "#53575a",
+          "answer_text": "#5e6367",
+          "answer_bkg": "#d8d8d8",
+          "answer_bkg_hover": "#e1e1e1",
+          "nps_bkg_hover": "#ffffff",
+          "button_bkg": "#919191",
+          "button_bkg_hover": "#888888",
+          "check_bkg": "#68a844",
+          "check_top": "#68a844",
+          "__base": "light",
+          "background_color": "#f8f8f8",
+          "border_color": "#000000",
+          "text_color": "#000000",
+          "button_text_color": "#ffffff",
+          "button_disabled_color": "#ABB3BA",
+          "button_enabled_color": "#4a90e2",
+          "dim_type": "dark"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "sample_percent": 10,
+        "is_persistent": true,
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 356775,
+            "cname": null,
+            "type": "radio",
+            "title": "What are you looking for?\nThis should be very long text.\nAt least four lines long.\nFour was ok. What about five lines?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1041711,
+                "title": "Text",
+                "next_map": {
+                  "id": 356776,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1041712,
+                "title": "NPS",
+                "next_map": {
+                  "id": 356778,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1041713,
+                "title": "Checkbox",
+                "next_map": {
+                  "id": 356777,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1041714,
+                "title": "Message",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055314,
+                "title": "Very long answer that is 60 characters. So we will check it."
+              },
+              {
+                "id": 1055315,
+                "title": "Very long answer that is 60 characters. So we will check it."
+              }
+            ],
+            "is_required": null,
+            "anchor_last": true,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": true,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 356776,
+            "cname": null,
+            "type": "text",
+            "title": "Why did you open this app?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 356777,
+              "node_type": "question"
+            }
+          },
+          {
+            "id": 356777,
+            "cname": null,
+            "type": "checkbox",
+            "title": "Who should get a raise?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055316,
+                "title": "Sales"
+              },
+              {
+                "id": 1055317,
+                "title": "Marketing"
+              },
+              {
+                "id": 1055318,
+                "title": "CEO"
+              },
+              {
+                "id": 1055319,
+                "title": "Designers"
+              },
+              {
+                "id": 1055320,
+                "title": "We should buy a kangaroo."
+              },
+              {
+                "id": 1055321,
+                "title": "Nobody"
+              },
+              {
+                "id": 1055322,
+                "title": "Everybody"
+              },
+              {
+                "id": 1055323,
+                "title": "We should buy a kangaroo."
+              },
+              {
+                "id": 1055324,
+                "title": "We really should buy a kangaroo."
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 356778,
+              "node_type": "question"
+            }
+          },
+          {
+            "id": 356778,
+            "cname": null,
+            "type": "nps",
+            "title": "How good was this survey?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055342,
+                "title": "0",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055343,
+                "title": "1",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055344,
+                "title": "2",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055345,
+                "title": "3",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055346,
+                "title": "4",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055347,
+                "title": "5",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055348,
+                "title": "6",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055349,
+                "title": "7",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055350,
+                "title": "8",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055351,
+                "title": "9",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055352,
+                "title": "10",
+                "next_map": {
+                  "id": 109830,
+                  "node_type": "message"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": true,
+            "disable_random": true,
+            "send_text": "Next",
+            "nps_min_label": "Just good",
+            "nps_max_label": "Very good",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 109830,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>We are very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very interested in what you wanted to say to us :)<br>Thanks!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 356775,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "sdk"
+  },
+  {
+    "id": 177494,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Autoshow Stats Survey",
+    "active": true,
+    "kind": "embed",
+    "canonical_name": "Stats",
+    "created_at": "2017-07-21 09:41:10 +0000",
+    "spec": {
+      "id": 177494,
+      "name": "Autoshow Stats Survey",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": null,
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "dark",
+          "background": "#e7e7e7",
+          "border": "#53575a",
+          "hr_top": "#cbcbcb",
+          "hr_bottom": "#ffffff",
+          "text": "#53575a",
+          "answer_text": "#5e6367",
+          "answer_bkg": "#d8d8d8",
+          "answer_bkg_hover": "#e1e1e1",
+          "nps_bkg_hover": "#ffffff",
+          "button_bkg": "#919191",
+          "button_bkg_hover": "#888888",
+          "check_bkg": "#68a844",
+          "check_top": "#68a844",
+          "__base": "dark",
+          "background_color": "#000000",
+          "border_color": "#ffffff",
+          "text_color": "#ffffff",
+          "button_text_color": "#ffffff",
+          "button_disabled_color": "#ABB3BA",
+          "button_enabled_color": "#82BF4A",
+          "dim_type": "very_light"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "is_persistent": true,
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 355594,
+            "cname": null,
+            "type": "radio",
+            "title": "Why do you need stats?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1037150,
+                "title": "I'm curious"
+              },
+              {
+                "id": 1037151,
+                "title": "I want to check how long I'm using the app. That's all. :)"
+              },
+              {
+                "id": 1037152,
+                "title": "I want to know how many quote I've seen already"
+              }
+            ],
+            "is_required": null,
+            "anchor_last": true,
+            "disable_random": true,
+            "send_text": "SEND",
+            "always_show_send": true,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 355595,
+            "cname": null,
+            "type": "text",
+            "title": "Curiosity is not a sin.\nBut you can just ask me a question.",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "SEND",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 109459,
+              "node_type": "message"
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 109459,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>OK. Thank you!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 355594,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "sdk"
+  },
+  {
+    "id": 177500,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Purpose of visit: var1",
+    "active": false,
+    "kind": "embed",
+    "canonical_name": "StatsView",
+    "created_at": "2017-07-21 12:30:06 +0000",
+    "spec": {
+      "id": 177500,
+      "name": "Purpose of visit: var1",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": null,
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "ans_bg_hex": "#d8d8d8",
+          "ans_bg_hvr_hex": "#e1e1e1",
+          "ans_txt_hex": "#5e6367",
+          "ans_txt_hvr_hex": "#5e6367",
+          "bg_hex": "#e7e7e7",
+          "bg_hvr_hex": "#e7e7e7",
+          "border_hex": "#53575a",
+          "hr_base_hex": "#cbcbcb",
+          "hr_hi_hex": "#ffffff",
+          "indicator_hex": "#53575a",
+          "inp_border_hex": "#cbcbcb",
+          "inp_border_hi_hex": "#cbcbcb",
+          "line_dk_hex": "#424242",
+          "line_lt_hex": "#aaaaaa",
+          "line_mid_hex": "#626262",
+          "link_bg_hex": "#d6d6d6",
+          "mask_hex": "#ebebeb",
+          "nps_hvr_hex": "#ffffff",
+          "txt_hex": "#53575a",
+          "ans_border_hex": "transparent",
+          "ans_border_hi_hex": "transparent",
+          "ans_border_hvr_hex": "transparent",
+          "btn_bg_hex": "#919191",
+          "btn_bg_hvr_hex": "#888888",
+          "btn_fg_hex": "#eeeeee",
+          "btn_fg_hvr_hex": "#ffffff",
+          "check_bg_hex": "#68a844",
+          "check_border_hex": "#68a844",
+          "check_fg_hex": "#ffffff",
+          "inp_bg_hex": "#ffffff",
+          "inp_bg_hi_hex": "#ffffff",
+          "inp_txt_hex": "#333333",
+          "inp_txt_hi_hex": "#333333",
+          "line_err_hex": "#aa6666",
+          "tick_bg_hex": "#48494a",
+          "tick_border_hex": "#919191",
+          "tick_border_hi_hex": "#919191",
+          "tick_check_hex": "#444444",
+          "txt_link_hex": "#687dd9",
+          "grad_list": [
+            "-ms-linear-gradient(top,#ffffff 0%,#c8c8c8 50%,#f8f8f8 100%)",
+            "-moz-linear-gradient(top,#ffffff 0%,#c8c8c8 50%,#f8f8f8 100%)",
+            "-webkit-linear-gradient(top,#ffffff 0%,#c8c8c8 50%,#f8f8f8 100%)",
+            "linear-gradient(to bottom,#ffffff 0%,#c8c8c8 50%,#f8f8f8 100%)"
+          ]
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "is_one_shot": true,
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {},
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 109466,
+            "type": "message",
+            "show_checkmark": true,
+            "description": "<p>We interrupt our program to say one important thing:You are important to us!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 109466,
+          "node_type": "message"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "survey"
+  },
+  {
+    "id": 177801,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Kuba's playground",
+    "active": true,
+    "kind": "embed",
+    "canonical_name": "kubas_playground",
+    "created_at": "2017-09-21 14:42:06 +0000",
+    "spec": {
+      "id": 177801,
+      "name": "Kuba's playground",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": "https://s3.amazonaws.com/staging-qualaroo/logos/5224/toaster/jb.jpg",
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [
+          "https://s3.amazonaws.com/staging-qualaroo/logos/5224/toaster/jb.jpg"
+        ],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "custom",
+          "dim_type": "dark",
+          "background_color": "#ffe225",
+          "border_color": "#000000",
+          "text_color": "#4a4a4a",
+          "button_text_color": "#4a4a4a",
+          "button_enabled_color": "#333333",
+          "button_disabled_color": "#fdf050",
+          "__base": "light"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 356834,
+            "cname": null,
+            "type": "radio",
+            "title": "Did you find what you were looking for?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1041917,
+                "title": "Text",
+                "next_map": {
+                  "id": 356835,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1041918,
+                "title": "NPS",
+                "next_map": {
+                  "id": 356842,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1041966,
+                "title": "Radio button",
+                "next_map": {
+                  "id": 356843,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1042000,
+                "title": "Multiple",
+                "next_map": {
+                  "id": 356846,
+                  "node_type": "question"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": true,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 356835,
+            "cname": null,
+            "type": "text",
+            "title": "Why do you like Qualaroo?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 109852,
+              "node_type": "message"
+            }
+          },
+          {
+            "id": 356842,
+            "cname": null,
+            "type": "nps",
+            "title": "NPS / What question do you want to ask?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1041967,
+                "title": "0",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041968,
+                "title": "1",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041969,
+                "title": "2",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041970,
+                "title": "3",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041971,
+                "title": "4",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041972,
+                "title": "5",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041973,
+                "title": "6",
+                "next_map": {
+                  "id": 109857,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041974,
+                "title": "7",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041975,
+                "title": "8",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041976,
+                "title": "9",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041977,
+                "title": "10",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "nps_min_label": "Not likely",
+            "nps_max_label": "Most likely",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 356843,
+            "cname": null,
+            "type": "radio",
+            "title": "Select your favorite Qualaroo's integrations:",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1041978,
+                "title": "1. Optimzely",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041979,
+                "title": "2. Hubspot",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                },
+                "explain_type": "short"
+              },
+              {
+                "id": 1041980,
+                "title": "3. Salesforce",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                },
+                "explain_type": "long"
+              },
+              {
+                "id": 1041981,
+                "title": "4. Tableau",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1041982,
+                "title": "5. Google Analytics Integration",
+                "next_map": {
+                  "id": 109852,
+                  "node_type": "message"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": true,
+            "disable_random": false,
+            "send_text": "Next",
+            "always_show_send": true,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 356846,
+            "cname": null,
+            "type": "checkbox",
+            "title": "Your favorite Qualaroo's feature?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1041990,
+                "title": "Advanced Targeting Options"
+              },
+              {
+                "id": 1041991,
+                "title": "Native mobile surveys for iOS and Android",
+                "explain_type": "long"
+              },
+              {
+                "id": 1041992,
+                "title": "NPS with skip logic"
+              },
+              {
+                "id": 1041993,
+                "title": "Integrations",
+                "explain_type": "short"
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 109852,
+              "node_type": "message"
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 109852,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Thanks and best regards!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 109857,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Enjoy your day!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 356834,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "sdk"
+  },
+  {
+    "id": 179000,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Mobile App survey",
+    "active": false,
+    "kind": "embed",
+    "canonical_name": "mobile_app_survey",
+    "created_at": "2017-09-29 14:08:39 +0000",
+    "spec": {
+      "id": 179000,
+      "name": "Mobile App survey",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": null,
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "custom",
+          "dim_type": "light",
+          "background_color": "#4a90e2",
+          "border_color": "#000000",
+          "text_color": "#000000",
+          "button_text_color": "#ffffff",
+          "button_enabled_color": "#82BF4A",
+          "button_disabled_color": "#c0ccd8",
+          "__base": "light"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 361290,
+            "cname": null,
+            "type": "radio",
+            "title": "Did you find what you were looking for?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055155,
+                "title": "Yes",
+                "next_map": {
+                  "id": 361291,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1055156,
+                "title": "No",
+                "next_map": {
+                  "id": 361291,
+                  "node_type": "question"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": true,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 361291,
+            "cname": null,
+            "type": "text",
+            "title": "What did you come to the site to do?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 111371,
+              "node_type": "message"
+            }
+          }
+        ],
+        "fr": [
+          {
+            "id": 361292,
+            "cname": null,
+            "type": "radio",
+            "title": "As-tu trouvé ce que tu cherchais?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055157,
+                "title": "Oui",
+                "next_map": {
+                  "id": 361293,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1055158,
+                "title": "Non",
+                "next_map": {
+                  "id": 361293,
+                  "node_type": "question"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": false,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 361293,
+            "cname": null,
+            "type": "text",
+            "title": "Qu'as-tu venu sur le site pour faire?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 111372,
+              "node_type": "message"
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 111371,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Thank you!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ],
+        "fr": [
+          {
+            "id": 111372,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Merci!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 361290,
+          "node_type": "question"
+        },
+        "fr": {
+          "id": 361292,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en",
+        "fr"
+      ]
+    },
+    "type": "sdk"
+  },
+  {
+    "id": 179004,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "NPs survey test",
+    "active": false,
+    "kind": "embed",
+    "canonical_name": "nps_survey_test",
+    "created_at": "2017-10-06 10:00:13 +0000",
+    "spec": {
+      "id": 179004,
+      "name": "NPs survey test",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": null,
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "custom",
+          "dim_type": "light",
+          "background_color": "#ffffff",
+          "border_color": "#000000",
+          "text_color": "#000000",
+          "button_text_color": "#ffffff",
+          "button_enabled_color": "#82BF4A",
+          "button_disabled_color": "#ABB3BA",
+          "__base": "light"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 361304,
+            "cname": null,
+            "type": "radio",
+            "title": "Did you find what you were looking for?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055202,
+                "title": "Yes",
+                "next_map": {
+                  "id": 361305,
+                  "node_type": "question"
+                }
+              },
+              {
+                "id": 1055203,
+                "title": "No",
+                "next_map": {
+                  "id": 361305,
+                  "node_type": "question"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": false,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 361305,
+            "cname": null,
+            "type": "text",
+            "title": "What did you come to the site to do?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            },
+            "next_map": {
+              "id": 111377,
+              "node_type": "message"
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 111377,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Thank you!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 361304,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "sdk"
+  },
+  {
+    "id": 179009,
+    "site_id": 64832,
+    "uuid": null,
+    "name": "Mobile App survey",
+    "active": false,
+    "kind": "embed",
+    "canonical_name": "just_long_message_test",
+    "created_at": "2017-10-12 12:14:56 +0000",
+    "spec": {
+      "id": 179009,
+      "name": "Mobile App survey",
+      "option_map": {
+        "base_font_pt": 9,
+        "giveup_ms": 20000,
+        "long_end_ms": 30000,
+        "start_delay_ms": 0,
+        "start_scroll_ms": 0,
+        "start_topcursor_ms": 0,
+        "start_scroll_ratio": 0.5,
+        "start_topcursor_px": 10,
+        "do_start_delay": true,
+        "contain_key": "pu_br",
+        "logo_url": null,
+        "disable_tagline": true,
+        "short_end_ms": 10000,
+        "tagline_text": "Not using Qualaroo yet?",
+        "tagline_url": "https://app.qualaroo.com/r/n",
+        "thanks_text": "Thank you!",
+        "preload_img_list": [],
+        "nps_max_label": "Most likely",
+        "nps_min_label": "Not likely",
+        "send_text": "SEND",
+        "color_theme_map": {
+          "__theme": "custom",
+          "dim_type": "light",
+          "background_color": "#ffffff",
+          "border_color": "#000000",
+          "text_color": "#000000",
+          "button_text_color": "#ffffff",
+          "button_enabled_color": "#82BF4A",
+          "button_disabled_color": "#ABB3BA",
+          "__base": "light"
+        },
+        "do_enable_scrnr": true,
+        "scrnr_title": "We love feedback",
+        "scrnr_action": "Take a 10s survey",
+        "scrnr_link_text": "I'll give feedback",
+        "use_scrnr_img": true
+      },
+      "require_map": {
+        "device_type_list": [
+          "phone"
+        ],
+        "cookie_check_policy": null
+      },
+      "action_list": {},
+      "question_list": {
+        "en": [
+          {
+            "id": 361319,
+            "cname": null,
+            "type": "radio",
+            "title": "What question do you want to ask?",
+            "description": null,
+            "description_placement": "before",
+            "row_list": [],
+            "answer_list": [
+              {
+                "id": 1055229,
+                "title": "Answer 1",
+                "next_map": {
+                  "id": 111382,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055230,
+                "title": "Answer 2",
+                "next_map": {
+                  "id": 111382,
+                  "node_type": "message"
+                }
+              },
+              {
+                "id": 1055231,
+                "title": "Answer 3",
+                "next_map": {
+                  "id": 111382,
+                  "node_type": "message"
+                }
+              }
+            ],
+            "is_required": null,
+            "anchor_last": false,
+            "disable_random": true,
+            "send_text": "Next",
+            "always_show_send": false,
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "msg_screen_list": {
+        "en": [
+          {
+            "id": 111382,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          },
+          {
+            "id": 111385,
+            "type": "message",
+            "show_checkmark": false,
+            "description": "<p>Thank you!</p>",
+            "css_node_map": {
+              "div#ki-ol.ki-ol": {
+                "background_image": null,
+                "background_repeat": "repeat"
+              }
+            }
+          }
+        ]
+      },
+      "qscreen_list": {},
+      "start_map": {
+        "en": {
+          "id": 361319,
+          "node_type": "question"
+        }
+      },
+      "variation_options": {
+        "primary_lang": "en",
+        "render_option": "dynamic"
+      },
+      "survey_variations": [
+        "en"
+      ]
+    },
+    "type": "sdk"
+  }
+]
