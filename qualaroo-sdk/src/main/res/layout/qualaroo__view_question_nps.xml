@@ -10,14 +10,12 @@
     <com.qualaroo.ui.NpsView
         android:id="@+id/qualaroo__nps_scores"
         android:clipChildren="false"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <FrameLayout
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp">
