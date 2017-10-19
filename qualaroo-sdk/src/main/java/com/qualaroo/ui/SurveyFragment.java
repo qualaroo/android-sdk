@@ -197,9 +197,13 @@ public class SurveyFragment extends Fragment implements SurveyView {
                             .translationY(translationY)
                             .start();
                     questionsTitle.animate().alpha(alpha).start();
+                    surveyLogo.animate().scaleX(1.5f);
+                    surveyLogo.animate().scaleY(1.5f);
                 } else {
                     surveyLogo.setTranslationX(translationX);
                     surveyLogo.setTranslationY(translationY);
+                    surveyLogo.setScaleX(1.5f);
+                    surveyLogo.setScaleY(1.5f);
                     questionsTitle.setAlpha(alpha);
                 }
             }
@@ -209,6 +213,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private void transformToQuestionStyle() {
         surveyLogo.animate().translationY(0).translationX(0).start();
         questionsTitle.animate().alpha(1.0f).start();
+        surveyLogo.animate().scaleX(1.0f);
+        surveyLogo.animate().scaleY(1.0f);
     }
 
     @Override public void closeSurvey() {
