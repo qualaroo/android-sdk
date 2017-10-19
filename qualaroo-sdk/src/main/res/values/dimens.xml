@@ -14,7 +14,7 @@
     <dimen name="qualaroo__checkbox_padding">8dp</dimen>
     <dimen name="qualaroo__checkbox_text_size">@dimen/qualaroo__answer_text_size</dimen>
 
-    <dimen name="qualaroo__nps_label_text_size">@dimen/qualaroo__answer_text_size</dimen>
+    <dimen name="qualaroo__nps_label_text_size">18dp</dimen>
 
     <dimen name="qualaroo__message_text_size">22dp</dimen>
 
