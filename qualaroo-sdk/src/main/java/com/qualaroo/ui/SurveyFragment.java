@@ -185,6 +185,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {
+        questionsTitle.setText(null);
         surveyContainer.post(new Runnable() {
             @Override public void run() {
                 float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
