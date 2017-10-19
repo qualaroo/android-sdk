@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
+import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
@@ -110,9 +111,10 @@ public class Qualaroo implements QualarooSdk {
 
         UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
         UserIdentityMatcher userIdentityMatcher = new UserIdentityMatcher(userInfo);
+        DeviceTypeMatcher deviceTypeMatcher = new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context));
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
         TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
-        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher);
+        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher);
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));

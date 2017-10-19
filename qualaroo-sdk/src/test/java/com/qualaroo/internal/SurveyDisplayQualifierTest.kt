@@ -22,8 +22,9 @@ class SurveyDisplayQualifierTest {
     private val userPropertiesMatcher = UserPropertiesMatcher(userInfo)
     private val userIdentityMatcher = UserIdentityMatcher(userInfo)
     private val timeMatcher = mock<TimeMatcher>()
+    private val deviceTypeMatcher = DeviceTypeMatcher(PhoneDeviceTypeProvider())
 
-    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher)
+    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher)
 
     @Before
     fun setup() {
@@ -101,6 +102,8 @@ class SurveyDisplayQualifierTest {
 
     @Test
     fun `should show only if custom matching is satisfied`() {
+        val userInfo = UserInfo(InMemorySettings(), localStorage)
+        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher, userIdentityMatcher, deviceTypeMatcher)
         var survey = survey(
                 id = 1,
                 spec = spec(
@@ -127,7 +130,7 @@ class SurveyDisplayQualifierTest {
     }
 
     @Test
-    fun `should show if target type is satisfied`() {
+    fun `should show if identity target type is satisfied`() {
         val survey = survey(
                 id = 1,
                 spec = spec(
@@ -141,6 +144,30 @@ class SurveyDisplayQualifierTest {
         userInfo.userId = "some_id"
         assertTrue(qualifier.shouldShowSurvey(survey))
     }
+    fun `matches users device type`() {
+        val survey = survey(
+                id = 1,
+                spec = spec(
+                        requireMap = requireMap(
+                                deviceTypeList = listOf(
+                                        "phone",
+                                        "tablet"
+                                )
+                        )
+                )
+        )
+        assertTrue(qualifier.shouldShowSurvey(survey))
+
+        val surveyForDesktops = survey(
+                id = 1,
+                spec = spec(
+                        requireMap = requireMap(
+                                deviceTypeList = listOf("desktop")
+                        )
+                )
+        )
+        assertFalse(qualifier.shouldShowSurvey(surveyForDesktops))
+    }
 
     fun markSurveyAsSeen(survey: Survey) {
         localStorage.markSurveyAsSeen(survey)
@@ -150,4 +177,9 @@ class SurveyDisplayQualifierTest {
         localStorage.markSurveyFinished(survey)
     }
 
+    class PhoneDeviceTypeProvider : DeviceTypeMatcher.DeviceTypeProvider {
+        override fun deviceType(): String {
+            return "phone"
+        }
+    }
 }

@@ -16,12 +16,14 @@ public final class SurveyDisplayQualifier {
     private final UserPropertiesMatcher propertiesMatcher;
     private final TimeMatcher timeMatcher;
     private final UserIdentityMatcher userIdentityMatcher;
+    private final DeviceTypeMatcher deviceTypeMatcher;
 
-    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher) {
+    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher, DeviceTypeMatcher deviceTypeMatcher) {
         this.localStorage = localStorage;
         this.propertiesMatcher = propertiesMatcher;
         this.timeMatcher = timeMatcher;
         this.userIdentityMatcher = userIdentityMatcher;
+        this.deviceTypeMatcher = deviceTypeMatcher;
     }
 
     public boolean shouldShowSurvey(Survey survey) {
@@ -48,7 +50,12 @@ public final class SurveyDisplayQualifier {
         }
 
         if (!userIdentityMatcher.shouldShow(survey)) {
-            QualarooLogger.debug("Current user identity type is incompatible with the one required by survey");
+            QualarooLogger.debug("User identity type does not match survey %1$s`s requirements", survey.canonicalName());
+            return false;
+        }
+
+        if (!deviceTypeMatcher.doesDeviceMatch(survey)) {
+            QualarooLogger.debug("User device type does not match survey %1$s`s requirements", survey.canonicalName());
             return false;
         }
 
