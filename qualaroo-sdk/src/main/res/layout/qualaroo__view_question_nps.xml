@@ -6,11 +6,6 @@
     android:clipChildren="false"
     android:orientation="vertical">
 
-    <android.support.v4.widget.Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
     <com.qualaroo.ui.NpsView
         android:id="@+id/qualaroo__nps_scores"
         android:layout_width="match_parent"
@@ -36,11 +31,6 @@
             android:textSize="@dimen/qualaroo__nps_label_text_size"
             tools:text="Max label" />
     </FrameLayout>
-
-    <android.support.v4.widget.Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/qualaroo__nps_view_confirm"
