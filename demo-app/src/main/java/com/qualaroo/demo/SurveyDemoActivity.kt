@@ -36,8 +36,8 @@ class SurveyDemoActivity : AppCompatActivity() {
         val showSurveyButton = findViewById<View>(R.id.qualaroo__demo_show_survey)
         val surveyAlias = findViewById<EditText>(R.id.qualaroo__demo_survey_alias_edit_text)
         surveyAlias.addTextChangedListener(object : TextWatcherAdapter() {
-            override fun afterTextChanged(editable: Editable) {
-                showSurveyButton.isEnabled = editable.isNotEmpty()
+            override fun afterTextChanged(s: Editable) {
+                showSurveyButton.isEnabled = s.isNotEmpty()
             }
         })
         surveyAlias.setText(settings.recentSurveyAlias())
