@@ -64,11 +64,11 @@ public class NpsView extends FrameLayout {
         scoresContainer = new LinearLayout(context);
         addView(scoresContainer);
         scoresContainer.setOrientation(LinearLayout.HORIZONTAL);
-        spaceWidth = DimenUtils.px(context, SPACE_WIDTH_IN_DP);
+        spaceWidth = (int) DimenUtils.toPx(context, SPACE_WIDTH_IN_DP);
         inflateScoreViews();
         inflateHint();
         float[] cornerRadius = new float[8];
-        Arrays.fill(cornerRadius, DimenUtils.px(context, SCORE_CORNER_RADIUS));
+        Arrays.fill(cornerRadius, DimenUtils.toPx(context, SCORE_CORNER_RADIUS));
         inactiveDrawable = new ShapeDrawable(new RoundRectShape(cornerRadius, null, null));
         activeDrawable = new ShapeDrawable(new RoundRectShape(cornerRadius, null, null));
     }
