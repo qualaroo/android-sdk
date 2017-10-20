@@ -35,31 +35,29 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public class NpsView extends FrameLayout {
 
-    private final LinearLayout scoresContainer;
-
     public interface OnScoreChangedListener {
         void onScoreChanged(int score);
     }
-    private static final int NUM_OF_SCORES = 11;
 
     private static final int MIN_SCORE = 0;
     private static final int MAX_SCORE = 10;
     private static final int SPACE_WIDTH_IN_DP = 4;
     private static final int SCORE_CORNER_RADIUS = 2;
-    private final List<AppCompatTextView> scores = new ArrayList<>();
+    private static final int NUM_OF_SCORES = 11;
 
+    private final List<AppCompatTextView> scores = new ArrayList<>();
+    private final Rect hitRect = new Rect();
+    private final LinearLayout scoresContainer;
     private final Drawable activeDrawable;
     private final Drawable inactiveDrawable;
     private final @Px int spaceWidth;
-    private TextView hintView;
 
+    private TextView hintView;
     private int currentlySelectedScore = -1;
     private OnScoreChangedListener onScoreChangedListener;
 
     private @ColorInt int inactiveTextColor = Color.WHITE;
     private @ColorInt int activeTextColor = Color.BLACK;
-
-    private final Rect hitRect = new Rect();
 
     public NpsView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -101,7 +99,7 @@ public class NpsView extends FrameLayout {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
             if (scoreValue == MAX_SCORE) {
                 LinearLayout.LayoutParams lastItemParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-                lastItemParams.setMargins(0, 0, 0 ,0);
+                lastItemParams.setMargins(0, 0, 0, 0);
                 lastItemParams.weight = 1;
                 textView.setLayoutParams(lastItemParams);
             } else {
