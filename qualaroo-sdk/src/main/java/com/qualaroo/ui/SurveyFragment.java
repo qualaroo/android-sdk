@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qualaroo.R;
@@ -121,6 +122,15 @@ public class SurveyFragment extends Fragment implements SurveyView {
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
         isFullScreen = viewModel.isFullscreen();
+        if (isFullScreen) {
+            ViewGroup.LayoutParams surveyLayoutParams = surveyContainer.getLayoutParams();
+            surveyLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            surveyContainer.setLayoutParams(surveyLayoutParams);
+
+            LinearLayout.LayoutParams questionLayoutParams = (LinearLayout.LayoutParams) questionsContent.getLayoutParams();
+            questionLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            questionsContent.setLayoutParams(questionLayoutParams);
+        }
     }
 
     @Override public void showWithAnimation() {

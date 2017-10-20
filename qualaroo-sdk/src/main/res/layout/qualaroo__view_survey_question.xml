@@ -46,7 +46,6 @@
 
     </LinearLayout>
 
-
     <FrameLayout
         android:id="@+id/qualaroo__question_content"
         android:layout_width="match_parent"
