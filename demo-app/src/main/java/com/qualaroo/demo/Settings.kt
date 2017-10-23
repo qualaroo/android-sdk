@@ -21,8 +21,8 @@ class Settings(context: Context) {
         sharedPreferences.edit().putString(KEY_API_KEY, apiKey).commit()
     }
 
-    fun apiKey(): String {
-        return sharedPreferences.getString(KEY_API_KEY, "")
+    fun apiKey(): String? {
+        return sharedPreferences.getString(KEY_API_KEY, null)
     }
 
     fun storeRecentSurveyAlias(alias: String) {
