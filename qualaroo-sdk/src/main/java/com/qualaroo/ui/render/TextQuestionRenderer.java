@@ -6,6 +6,7 @@ import android.support.annotation.RestrictTo;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -13,6 +14,7 @@ import com.qualaroo.R;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.KeyboardUtil;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -29,7 +31,20 @@ final class TextQuestionRenderer extends QuestionRenderer {
         View view = View.inflate(context, R.layout.qualaroo__view_question_text, null);
         final EditText editText = view.findViewById(R.id.qualaroo__view_question_text_input);
         editText.setTextColor(getTheme().accentColor());
-        editText.setHint("...");
+        editText.setSelection(0);
+        editText.requestFocus();
+        editText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override public void onGlobalLayout() {
+                if (editText != null) {
+                    editText.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    editText.postDelayed(new Runnable() {
+                        @Override public void run() {
+                            KeyboardUtil.showKeyboard(editText);
+                        }
+                    }, 300);
+                }
+            }
+        });
         ThemeUtils.applyTheme(editText, getTheme());
         final Button button = view.findViewById(R.id.qualaroo__view_question_text_confirm);
         ThemeUtils.applyTheme(button, getTheme());
@@ -37,9 +52,14 @@ final class TextQuestionRenderer extends QuestionRenderer {
         button.setTextColor(getTheme().buttonTextColor());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                if (editText.getText() != null) {
-                    onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
-                }
+                KeyboardUtil.hideKeyboard(editText);
+                button.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        if (editText.getText() != null) {
+                            onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                        }
+                    }
+                }, 300);
             }
         });
         ThemeUtils.applyTheme(editText, getTheme());

@@ -4,11 +4,15 @@
     <dimen name="qualaroo__question_title_size">22dp</dimen>
     <dimen name="qualaroo__question_logo_size">48dp</dimen>
 
-    <dimen name="qualaroo__radio_text_size">18dp</dimen>
-    <dimen name="qualaroo__radio_drawable_padding">8dp</dimen>
-    <dimen name="qualaroo__radio_button_top_margin">8dp</dimen>
+    <dimen name="qualaroo__answer_text_size">20dp</dimen>
 
-    <dimen name="qualaroo__checkbox_text_size">18dp</dimen>
+    <dimen name="qualaroo__radio_button_drawable_padding">8dp</dimen>
+    <dimen name="qualaroo__radio_button_padding">8dp</dimen>
+    <dimen name="qualaroo__radio_text_size">@dimen/qualaroo__answer_text_size</dimen>
+
+    <dimen name="qualaroo__checkbox_drawable_padding">8dp</dimen>
+    <dimen name="qualaroo__checkbox_padding">8dp</dimen>
+    <dimen name="qualaroo__checkbox_text_size">@dimen/qualaroo__answer_text_size</dimen>
 
     <dimen name="qualaroo__nps_label_text_size">18dp</dimen>
 

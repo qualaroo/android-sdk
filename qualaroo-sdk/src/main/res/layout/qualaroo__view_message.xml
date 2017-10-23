@@ -10,6 +10,7 @@
         android:id="@+id/qualaroo__view_message_text"
         android:gravity="center"
         android:textSize="@dimen/qualaroo__message_text_size"
+        android:textStyle="bold"
         android:text="@android:string/untitled"
         tools:text="@tools:sample/lorem/random"
         android:scrollbarAlwaysDrawVerticalTrack="true"
@@ -19,7 +20,7 @@
         android:layout_weight="1"/>
 
     <Button
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:id="@+id/qualaroo__view_message_cta"
         tools:text="@tools:sample/lorem"
         android:layout_width="match_parent"

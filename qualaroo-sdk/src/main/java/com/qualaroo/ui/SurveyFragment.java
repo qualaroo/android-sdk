@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qualaroo.R;
@@ -23,6 +24,7 @@ import com.qualaroo.ui.render.QuestionView;
 import com.qualaroo.ui.render.QuestionViewState;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
 
@@ -43,7 +45,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private FrameLayout questionsContent;
     private ImageView closeButton;
     private ImageView surveyLogo;
-    private View emptySpace;
 
     private boolean isFullScreen;
     private QuestionView questionView;
@@ -60,7 +61,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
         surveyLogo = view.findViewById(R.id.qualaroo__survey_logo);
-        emptySpace = view.findViewById(R.id.qualaroo__survey_empty_space);
         try {
             Drawable applicationIcon = getContext().getPackageManager().getApplicationIcon(getContext().getPackageName());
             surveyLogo.setImageDrawable(applicationIcon);
@@ -109,6 +109,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void onDestroyView() {
+        KeyboardUtil.hideKeyboard(surveyContainer);
         surveyPresenter.dropView();
         super.onDestroyView();
     }
@@ -118,10 +119,18 @@ public class SurveyFragment extends Fragment implements SurveyView {
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
         closeButton.setColorFilter(viewModel.buttonDisabledColor());
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
-        emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
         isFullScreen = viewModel.isFullscreen();
+        if (isFullScreen) {
+            ViewGroup.LayoutParams surveyLayoutParams = surveyContainer.getLayoutParams();
+            surveyLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            surveyContainer.setLayoutParams(surveyLayoutParams);
+
+            LinearLayout.LayoutParams questionLayoutParams = (LinearLayout.LayoutParams) questionsContent.getLayoutParams();
+            questionLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            questionsContent.setLayoutParams(questionLayoutParams);
+        }
     }
 
     @Override public void showWithAnimation() {
@@ -186,6 +195,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {
+        questionsTitle.setText(null);
         surveyContainer.post(new Runnable() {
             @Override public void run() {
                 float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
@@ -197,9 +207,13 @@ public class SurveyFragment extends Fragment implements SurveyView {
                             .translationY(translationY)
                             .start();
                     questionsTitle.animate().alpha(alpha).start();
+                    surveyLogo.animate().scaleX(1.5f);
+                    surveyLogo.animate().scaleY(1.5f);
                 } else {
                     surveyLogo.setTranslationX(translationX);
                     surveyLogo.setTranslationY(translationY);
+                    surveyLogo.setScaleX(1.5f);
+                    surveyLogo.setScaleY(1.5f);
                     questionsTitle.setAlpha(alpha);
                 }
             }
@@ -209,6 +223,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private void transformToQuestionStyle() {
         surveyLogo.animate().translationY(0).translationX(0).start();
         questionsTitle.animate().alpha(1.0f).start();
+        surveyLogo.animate().scaleX(1.0f);
+        surveyLogo.animate().scaleY(1.0f);
     }
 
     @Override public void closeSurvey() {
