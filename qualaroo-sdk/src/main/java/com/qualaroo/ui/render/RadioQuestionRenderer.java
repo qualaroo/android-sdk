@@ -6,6 +6,7 @@ import android.support.annotation.RestrictTo;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
@@ -39,6 +40,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         final RadioGroup radioGroup = view.findViewById(R.id.qualaroo__question_radio_options);
         int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_drawable_padding);
         int padding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_padding);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (int i = 0; i < question.answerList().size(); i++) {
             Answer answer = question.answerList().get(i);
             AppCompatRadioButton radioButton = new AppCompatRadioButton(context);
@@ -48,6 +50,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
             ThemeUtils.applyTheme(radioButton, getTheme());
             radioButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__radio_text_size));
             radioButton.setPadding(drawablePadding, padding, padding, padding);
+            radioButton.setLayoutParams(layoutParams);
             radioGroup.addView(radioButton);
         }
         button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
