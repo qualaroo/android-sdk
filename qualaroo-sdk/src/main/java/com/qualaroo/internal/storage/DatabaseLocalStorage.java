@@ -210,33 +210,38 @@ public class DatabaseLocalStorage implements LocalStorage {
     }
 
     private static class QualarooSQLiteOpenHelper extends SQLiteOpenHelper {
-        private static final int DB_VERSION = 1;
+        private static final int DB_VERSION = 2;
 
         QualarooSQLiteOpenHelper(Context context, String databaseName) {
             super(context, databaseName, null, DB_VERSION);
         }
 
         @Override public void onCreate(SQLiteDatabase db) {
-            String failedReportsTable = format(
-                    "CREATE TABLE %1$s (" +
-                            "%2$s INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "%3$s TEXT NOT NULL);",
-                    FAILED_REPORTS_TABLE,
-                    FAILED_REPORTS_ID,
-                    FAILED_REPORTS_URL
-            );
-            db.execSQL(failedReportsTable);
+            createFailedReportsTable(db);
+            createUserPropertiesTable(db);
+            createSurveyStatusTable(db);
+            createUserPercentGroupTable(db);
+        }
 
-            String userPropertiesTable = format(
-                    "CREATE TABLE %1$s (" +
-                            "%2$s TEXT PRIMARY KEY NOT NULL," +
-                            "%3$s TEXT);",
-                    USER_PROPERTIES_TABLE,
-                    USER_PROPERTIES_KEY,
-                    USER_PROPERTIES_VALUE
-            );
-            db.execSQL(userPropertiesTable);
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion < 2) {
+                createUserPercentGroupTable(db);
+            }
+        }
 
+        private void createUserPercentGroupTable(SQLiteDatabase db) {
+            String userPercentGroupTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s INTEGER PRIMARY KEY," +
+                            "%3$s INTEGER DEFAULT 0);",
+                    USER_GROUP_PERCENT_SURVEY_TABLE,
+                    USER_GROUP_PERCENT_SURVEY_ID,
+                    USER_GROUP_PERCENT_SURVEY_VALUE
+            );
+            db.execSQL(userPercentGroupTable);
+        }
+
+        private void createSurveyStatusTable(SQLiteDatabase db) {
             String surveyStatusTable = format(
                     "CREATE TABLE %1$s (" +
                             "%2$s INTEGER PRIMARY KEY," +
@@ -250,20 +255,30 @@ public class DatabaseLocalStorage implements LocalStorage {
                     SURVEY_STATUS_TIMESTAMP
             );
             db.execSQL(surveyStatusTable);
-
-            String userPercentGroupTable = format(
-                    "CREATE TABLE %1$s (" +
-                            "%2$s INTEGER PRIMARY KEY," +
-                            "%3$s INTEGER DEFAULT 0);",
-                    USER_GROUP_PERCENT_SURVEY_TABLE,
-                    USER_GROUP_PERCENT_SURVEY_ID,
-                    USER_GROUP_PERCENT_SURVEY_VALUE
-            );
-            db.execSQL(userPercentGroupTable);
         }
 
-        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            //no upgrade yet
+        private void createUserPropertiesTable(SQLiteDatabase db) {
+            String userPropertiesTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s TEXT PRIMARY KEY NOT NULL," +
+                            "%3$s TEXT);",
+                    USER_PROPERTIES_TABLE,
+                    USER_PROPERTIES_KEY,
+                    USER_PROPERTIES_VALUE
+            );
+            db.execSQL(userPropertiesTable);
+        }
+
+        private void createFailedReportsTable(SQLiteDatabase db) {
+            String failedReportsTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "%3$s TEXT NOT NULL);",
+                    FAILED_REPORTS_TABLE,
+                    FAILED_REPORTS_ID,
+                    FAILED_REPORTS_URL
+            );
+            db.execSQL(failedReportsTable);
         }
 
         private static String format(String string, Object... args) {
