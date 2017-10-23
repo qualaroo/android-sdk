@@ -1,6 +1,7 @@
 package com.qualaroo.demo
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -16,6 +17,7 @@ class App : Application() {
         }
         val settings = Settings(this)
         val apiKey = settings.apiKey()
+        Log.d("Qualaroo Demo App", "Using API key: ${settings.apiKey()}")
         try {
             Qualaroo.initializeWith(this)
                     .setApiKey(apiKey)
