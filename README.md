@@ -35,6 +35,10 @@ Ensure that the necessary permissions are declared in your application's `Androi
 ```xml
 <!-- Required for Internet connection . -->
 <uses-permission android:name"android.permission.INTERNET"/>
+
+<!-- IMPORTANT! For pre-Oreo devices -->
+<!-- will no longer be neccessary in the next release -->
+<uses-permission android:name="android.permission.WAKE_LOCK"/> 
 ```
 
 ## Step 3. Code Integration
