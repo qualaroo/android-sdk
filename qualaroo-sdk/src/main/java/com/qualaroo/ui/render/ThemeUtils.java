@@ -66,7 +66,7 @@ class ThemeUtils {
     static void applyTheme(Spinner spinner, Theme theme) {
         if (spinner instanceof TintableBackgroundView) {
             int[][] states = new int[][]{
-                    new int[] {-android.R.attr.state_enabled},
+                    new int[] {android.R.attr.state_enabled},
                     new int[] {android.R.attr.state_enabled, android.R.attr.state_pressed}
             };
             int[] colors = new int[] {

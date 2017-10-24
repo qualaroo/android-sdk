@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/qualaroo__view_question_dropdown_item_text"
+    tools:text="Item 1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:duplicateParentState="true"
+    android:padding="@dimen/qualaroo__dropdown_item_padding"
+    android:textSize="@dimen/qualaroo__answer_text_size" />

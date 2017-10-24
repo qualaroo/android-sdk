@@ -4,6 +4,7 @@
 
     <Spinner
         android:id="@+id/qualaroo__view_question_dropdown_spinner"
+        android:spinnerMode="dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

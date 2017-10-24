@@ -16,6 +16,9 @@
 
     <dimen name="qualaroo__nps_label_text_size">18dp</dimen>
 
+    <dimen name="qualaroo__dropdown_text_size">@dimen/qualaroo__answer_text_size</dimen>
+    <dimen name="qualaroo__dropdown_item_padding">8dp</dimen>
+
     <dimen name="qualaroo__message_text_size">22dp</dimen>
 
     <fraction name="qualaroo__survey_empty_space_weight">0.9</fraction>
