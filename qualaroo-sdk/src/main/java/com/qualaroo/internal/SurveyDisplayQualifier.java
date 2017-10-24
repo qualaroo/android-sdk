@@ -40,7 +40,7 @@ public final class SurveyDisplayQualifier {
         }
 
         if (!timeMatcher.enoughTimePassedFrom(status.seenAtInMillis())) {
-            QualarooLogger.debug("Survey %1$s has already been seen", survey.canonicalName());
+            QualarooLogger.debug("Survey %1$s cannot be shown yet.", survey.canonicalName());
             return false;
         }
 
