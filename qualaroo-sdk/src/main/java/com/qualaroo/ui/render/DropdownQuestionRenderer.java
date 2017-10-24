@@ -53,7 +53,6 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         }
         adapter.addAll(spinnerItems);
         spinner.setAdapter(adapter);
-        spinner.setPopupBackgroundDrawable(new ColorDrawable(Color.WHITE));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 confirmButton.setEnabled(true);
