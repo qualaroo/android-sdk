@@ -34,8 +34,12 @@ object TestModels {
         return ColorThemeMap(dimType, backgroundColor, borderColor, textColor, buttonTextColor, buttonEnabledColor, buttonDisabledColor)
     }
 
-    fun message(id: Int, description: String = ""): Message {
-        return Message(id, description)
+    fun message(id: Int, type: MessageType = MessageType.REGULAR, description: String = "", ctaMap: Message.CtaMap = ctaMap()): Message {
+        return Message(id, type, description, ctaMap)
+    }
+
+    fun ctaMap(text: String = "Go!", url: String = "http://qualaroo.com"): Message.CtaMap {
+        return Message.CtaMap(text, url)
     }
 
 }

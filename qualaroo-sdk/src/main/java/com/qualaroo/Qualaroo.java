@@ -19,6 +19,8 @@ import com.qualaroo.internal.UserPropertiesMatcher;
 import com.qualaroo.internal.executor.UiThreadExecutor;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.LanguageJsonDeserializer;
+import com.qualaroo.internal.model.MessageType;
+import com.qualaroo.internal.model.MessageTypeDeserializer;
 import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
@@ -235,6 +237,7 @@ public class Qualaroo implements QualarooSdk {
         return new GsonBuilder()
                 .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
                 .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
+                .registerTypeAdapter(MessageType.class, new MessageTypeDeserializer())
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
     }
