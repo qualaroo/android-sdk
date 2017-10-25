@@ -9,7 +9,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public class QuestionView {
 
-    static Builder forQuestionId(int questionId) {
+    static Builder forQuestionId(long questionId) {
         return new Builder()
                 .setQuestionId(questionId);
     }
@@ -21,13 +21,13 @@ public class QuestionView {
         void onSaveState(Bundle into);
     }
 
-    private final int questionId;
+    private final long questionId;
     private final View view;
 
     private final OnRestoreState onRestoreState;
     private final OnSaveState onSaveState;
 
-    QuestionView(int questionId, View view, OnSaveState onSaveState, OnRestoreState onRestoreState) {
+    QuestionView(long questionId, View view, OnSaveState onSaveState, OnRestoreState onRestoreState) {
         this.questionId = questionId;
         this.view = view;
         this.onRestoreState = onRestoreState;
@@ -54,12 +54,12 @@ public class QuestionView {
 
     static class Builder {
 
-        private int questionId;
+        private long questionId;
         private View view;
         private OnSaveState onSaveState;
         private OnRestoreState onRestoreState;
 
-        Builder setQuestionId(int questionId) {
+        Builder setQuestionId(long questionId) {
             this.questionId = questionId;
             return this;
         }

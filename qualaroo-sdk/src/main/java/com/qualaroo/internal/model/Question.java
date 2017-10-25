@@ -11,7 +11,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Question implements Serializable {
-    private int id;
+    private long id;
     private QuestionType type;
     private String title;
     private String description;
@@ -25,7 +25,7 @@ public final class Question implements Serializable {
     private boolean alwaysShowSend;
     private boolean isRequired;
 
-    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -45,7 +45,7 @@ public final class Question implements Serializable {
         //deserializing with gson requires a default constructor
     }
 
-    public int id() {
+    public long id() {
         return id;
     }
 
@@ -126,7 +126,7 @@ public final class Question implements Serializable {
     }
 
     @Override public int hashCode() {
-        return id;
+        return (int) (id ^ (id >>> 32));
     }
 
     @Override public String toString() {

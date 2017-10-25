@@ -10,15 +10,15 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public class QuestionViewState implements Parcelable {
 
-    private final int questionId;
+    private final long questionId;
     private final Bundle bundle;
 
-    QuestionViewState(int questionId, Bundle bundle) {
+    QuestionViewState(long questionId, Bundle bundle) {
         this.questionId = questionId;
         this.bundle = bundle;
     }
 
-    int questionId() {
+    long questionId() {
         return questionId;
     }
 
@@ -33,7 +33,7 @@ public class QuestionViewState implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(questionId);
+        dest.writeLong(questionId);
         dest.writeBundle(bundle);
     }
 

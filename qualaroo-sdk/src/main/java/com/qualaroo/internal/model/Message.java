@@ -10,12 +10,12 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Message implements Serializable {
-    private int id;
+    private long id;
     private MessageType type;
     private String description;
     private CtaMap ctaMap;
 
-    @VisibleForTesting Message(int id, MessageType type, String description, CtaMap ctaMap) {
+    @VisibleForTesting Message(long id, MessageType type, String description, CtaMap ctaMap) {
         this.id = id;
         this.type = type;
         this.description = description;
@@ -26,7 +26,7 @@ public final class Message implements Serializable {
 
     }
 
-    public int id() {
+    public long id() {
         return id;
     }
 
@@ -51,8 +51,9 @@ public final class Message implements Serializable {
         return id == message.id;
     }
 
+
     @Override public int hashCode() {
-        return id;
+        return (int) (id ^ (id >>> 32));
     }
 
     public static class CtaMap {

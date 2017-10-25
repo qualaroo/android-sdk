@@ -2,7 +2,7 @@ package com.qualaroo.ui;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.v4.util.SparseArrayCompat;
+import android.support.v4.util.LongSparseArray;
 
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Answer;
@@ -36,8 +36,8 @@ public class SurveyInteractor {
     private final Language preferredLanguage;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
-    private final SparseArrayCompat<Question> questions;
-    private final SparseArrayCompat<Message> messages;
+    private final LongSparseArray<Question> questions;
+    private final LongSparseArray<Message> messages;
 
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
@@ -77,7 +77,7 @@ public class SurveyInteractor {
         followNode(nextNode);
     }
 
-    private Node findNextNode(int questionId, List<Answer> selectedAnswers) {
+    private Node findNextNode(long questionId, List<Answer> selectedAnswers) {
         Node nextNode = null;
         //TODO: Question and Answer objects provided by a presenter are not trusted and local copies are used instead.
         //This was done to avoid having to pass fully built objects in tests. Could be fixed by either passing simple int ids
@@ -188,9 +188,9 @@ public class SurveyInteractor {
         @Override public void closeSurvey() {}
     }
 
-    private SparseArrayCompat<Question> prepareQuestions() {
+    private LongSparseArray<Question> prepareQuestions() {
         List<Question> originalQuestions = preferredLanguageOrDefault(survey.spec().questionList());
-        SparseArrayCompat<Question> result = new SparseArrayCompat<>();
+        LongSparseArray<Question> result = new LongSparseArray<>();
         for (Question originalQuestion : originalQuestions) {
             if (originalQuestion.enableRandom()) {
                 final LinkedList<Answer> answerList = new LinkedList<>(originalQuestion.answerList());
@@ -210,18 +210,10 @@ public class SurveyInteractor {
         return result;
     }
 
-    private SparseArrayCompat<Message> convertMessagesToSparseArray(List<Message> messages) {
-        final SparseArrayCompat<Message> result = new SparseArrayCompat<>(messages.size());
+    private LongSparseArray<Message> convertMessagesToSparseArray(List<Message> messages) {
+        final LongSparseArray<Message> result = new LongSparseArray<>(messages.size());
         for (Message message : messages) {
             result.append(message.id(), message);
-        }
-        return result;
-    }
-
-    private SparseArrayCompat<Question> prepareQuestions(List<Question> questions) {
-        final SparseArrayCompat<Question> result = new SparseArrayCompat<>(questions.size());
-        for (Question question : questions) {
-            result.append(question.id(), question);
         }
         return result;
     }
