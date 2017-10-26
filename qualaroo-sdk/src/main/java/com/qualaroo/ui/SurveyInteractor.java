@@ -9,10 +9,12 @@ import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.Node;
+import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.storage.LocalStorage;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class SurveyInteractor {
     public interface EventsObserver {
         void showQuestion(Question question);
         void showMessage(Message message);
+        void showLeadGen(QScreen qscreen, List<Question> questions);
         void closeSurvey();
     }
 
@@ -38,9 +41,11 @@ public class SurveyInteractor {
     private final Executor uiExecutor;
     private final LongSparseArray<Question> questions;
     private final LongSparseArray<Message> messages;
+    private final LongSparseArray<QScreen> qscreens;
 
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
+    private Question currentQuestion;
 
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
@@ -50,8 +55,16 @@ public class SurveyInteractor {
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
-        List<Message> messages = preferredLanguageOrDefault(survey.spec().msgScreenList());
-        this.messages = convertMessagesToSparseArray(messages);
+        this.messages = prepareData(survey.spec().msgScreenList(), new IdExtractor<Message>() {
+            @Override public long getId(Message message) {
+                return message.id();
+            }
+        });
+        this.qscreens = prepareData(survey.spec().qscreenList(), new IdExtractor<QScreen>() {
+            @Override public long getId(QScreen qScreen) {
+                return qScreen.id();
+            }
+        });
     }
 
     public void displaySurvey() {
@@ -65,15 +78,21 @@ public class SurveyInteractor {
         }
     }
 
-    public void questionAnsweredWithText(Question question, String answer) {
-        reportManager.recordTextAnswer(survey, question, answer);
-        Node nextNode = findNextNode(question.id(), Collections.<Answer>emptyList());
+    public void questionAnsweredWithText(String answer) {
+        reportManager.recordTextAnswer(survey, currentQuestion, answer);
+        Node nextNode = findNextNode(currentQuestion.id(), Collections.<Answer>emptyList());
         followNode(nextNode);
     }
 
-    public void questionAnswered(Question question, List<Answer> selectedAnswers) {
-        reportManager.recordAnswer(survey, question, selectedAnswers);
-        Node nextNode = findNextNode(question.id(), selectedAnswers);
+    public void questionAnswered(List<Answer> selectedAnswers) {
+        reportManager.recordAnswer(survey, currentQuestion, selectedAnswers);
+        Node nextNode = findNextNode(currentQuestion.id(), selectedAnswers);
+        followNode(nextNode);
+    }
+
+    public void leadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+        reportManager.recordLeadGenAnswer(survey, questionIdsWithAnswers);
+        Node nextNode = qscreens.get(currentNode.id()).nextMap();
         followNode(nextNode);
     }
 
@@ -99,13 +118,22 @@ public class SurveyInteractor {
 
     private void followNode(@Nullable Node node) {
         this.currentNode = node;
+        this.currentQuestion = null;
         if (node == null) {
             markSurveyAsFinished();
             eventsObserver.closeSurvey();
         } else if (node.nodeType().equals("message")) {
             eventsObserver.showMessage(messages.get(node.id()));
         } else if (node.nodeType().equals("question")) {
-            eventsObserver.showQuestion(questions.get(node.id()));
+            currentQuestion = questions.get(node.id());
+            eventsObserver.showQuestion(currentQuestion);
+        } else if (node.nodeType().equals("qscreen")) {
+            QScreen leadGen = qscreens.get(node.id());
+            List<Question> leadGenQuestions = new ArrayList<>(leadGen.questionList().size());
+            for (Long questionId : leadGen.questionList()) {
+                leadGenQuestions.add(questions.get(questionId));
+            }
+            eventsObserver.showLeadGen(leadGen, leadGenQuestions);
         }
     }
 
@@ -173,6 +201,14 @@ public class SurveyInteractor {
             });
         }
 
+        @Override public void showLeadGen(final QScreen qScreen, final List<Question> questionList) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.showLeadGen(qScreen, questionList);
+                }
+            });
+        }
+
         @Override public void closeSurvey() {
             executor.execute(new Runnable() {
                 @Override public void run() {
@@ -185,6 +221,7 @@ public class SurveyInteractor {
     private static class StubEventsObserver implements EventsObserver {
         @Override public void showQuestion(Question question) {}
         @Override public void showMessage(Message message) {}
+        @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {}
         @Override public void closeSurvey() {}
     }
 
@@ -210,10 +247,16 @@ public class SurveyInteractor {
         return result;
     }
 
-    private LongSparseArray<Message> convertMessagesToSparseArray(List<Message> messages) {
-        final LongSparseArray<Message> result = new LongSparseArray<>(messages.size());
-        for (Message message : messages) {
-            result.append(message.id(), message);
+    private <T> LongSparseArray<T> prepareData(Map<Language, List<T>> data, IdExtractor<T> extractor) {
+        final List<T> dataList = preferredLanguageOrDefault(data);
+        return convertToLongSparseArray(dataList, extractor);
+    }
+
+    private <T> LongSparseArray<T> convertToLongSparseArray(List<T> objects, IdExtractor<T> extractor) {
+        final LongSparseArray<T> result = new LongSparseArray<>(objects.size());
+        for (T object : objects) {
+            long id = extractor.getId(object);
+            result.append(id, object);
         }
         return result;
     }
@@ -246,6 +289,10 @@ public class SurveyInteractor {
         }
         Language firstLanguage = survey.spec().surveyVariations().get(0);
         return map.get(firstLanguage);
+    }
+
+    private interface IdExtractor<T> {
+        long getId(T t);
     }
 
 }

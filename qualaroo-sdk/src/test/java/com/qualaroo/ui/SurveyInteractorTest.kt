@@ -8,6 +8,7 @@ import com.qualaroo.internal.model.TestModels.language
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.node
 import com.qualaroo.internal.model.TestModels.optionMap
+import com.qualaroo.internal.model.TestModels.qscreen
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
@@ -38,7 +39,15 @@ class SurveyInteractorTest {
                             language("en") to listOf(
                                     question(
                                             id = 100,
-                                            answerList = listOf(answer(id = 123), answer(id = 124))
+                                            answerList = listOf(answer(id = 123), answer(id = 124)),
+                                            nextMap = node(
+                                                    id = 101,
+                                                    nodeType = "question"
+                                            )
+                                    ),
+                                    question(
+                                            id = 101,
+                                            answerList = listOf(answer(id = 1010), answer(id = 1011))
                                     )
                             ),
                             language("pl") to listOf(
@@ -188,16 +197,15 @@ class SurveyInteractorTest {
 
         interactor.displaySurvey()
         verify(observer).showQuestion(question(id = 100))
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
         verify(observer).showQuestion(question(id = 200))
-        interactor.questionAnswered(question(id = 200), listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
         verify(observer, atMost(1)).showQuestion(question(id = 300))
 
         //presenter got lost and calls displaySurvey() again when it's ready to display it
         interactor.displaySurvey()
         verify(observer, atMost(1)).showQuestion(question(id = 100))
         verify(observer, atMost(2)).showQuestion(question(id = 300))
-
     }
 
     @Test
@@ -260,7 +268,7 @@ class SurveyInteractorTest {
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
         verify(observer).showQuestion(question(id = 200))
     }
 
@@ -279,7 +287,7 @@ class SurveyInteractorTest {
                                 language("en") to listOf(
                                         question(
                                                 id = 100,
-                                                nextMap = node(
+                                                 nextMap = node(
                                                         id = 200,
                                                         nodeType = "question"
                                                 ),
@@ -301,13 +309,14 @@ class SurveyInteractorTest {
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 101)))
+        interactor.questionAnswered(listOf(answer(id = 101)))
         verify(observer).showQuestion(question(id = 200))
     }
 
     @Test
     fun `reports text answers`() {
-        interactor.questionAnsweredWithText(question(id = 100), "This is my answer")
+        interactor.displaySurvey()
+        interactor.questionAnsweredWithText("This is my answer")
 
         verify(reportManager, times(1))
                 .recordTextAnswer(survey, question(id = 100), "This is my answer")
@@ -315,7 +324,8 @@ class SurveyInteractorTest {
 
     @Test
     fun `reports answers`() {
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 123)))
+        interactor.displaySurvey()
+        interactor.questionAnswered(listOf(answer(id = 123)))
 
         verify(reportManager, times(1))
                 .recordAnswer(
@@ -324,43 +334,116 @@ class SurveyInteractorTest {
                         listOf(answer(id = 123)))
 
         interactor.questionAnswered(
-                question(id = 100),
-                listOf(answer(id = 123), answer(id = 124)))
+                listOf(answer(id = 1010), answer(id = 1011)))
 
         verify(reportManager, times(1))
                 .recordAnswer(
                         survey,
-                        question(id = 100),
-                        listOf(answer(id = 123), answer(id = 124)))
+                        question(id = 101),
+                        listOf(answer(id = 1010), answer(id = 1011)))
     }
 
     @Test
-    fun `can show objects based on nodeType field`() {
-        var survey = survey(
+    fun `reports lead gen answers`() {
+        val survey = survey(
                 id = 123,
                 spec = spec(
                         startMap = mapOf(
                                 language("en") to node(
-                                        id = 100,
-                                        nodeType = "question"
+                                        id = 1,
+                                        nodeType = "qspec"
                                 )
                         ),
                         questionList = mapOf(
                                 language("en") to listOf(
-                                        question(
-                                                id = 100
+                                        question(id = 100),
+                                        question(id = 101),
+                                        question(id = 102)
+                                )
+                        ),
+                        qscreenList = mapOf(
+                                language("en") to listOf(
+                                        qscreen(
+                                                id = 1,
+                                                questionList = listOf(100, 101, 102)
                                         )
                                 )
                         )
                 )
         )
-        var interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        interactor.displaySurvey()
+
+        interactor.leadGenAnswered(
+                mapOf(
+                        100L to "John",
+                        101L to "Doe",
+                        102L to "+1 123 123 123"
+                )
+        )
+
+        verify(reportManager).recordLeadGenAnswer(survey, mapOf(
+                100L to "John",
+                101L to "Doe",
+                102L to "+1 123 123 123"
+        ))
+    }
+
+    @Test
+    fun `follows node from lead gen screens`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "qspec"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 100),
+                                        question(id = 101),
+                                        question(id = 102)
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 1)
+                                )
+                        ),
+                        qscreenList = mapOf(
+                                language("en") to listOf(
+                                        qscreen(
+                                                id = 1,
+                                                questionList = listOf(100, 101, 102),
+                                                nextMap = node(
+                                                        id = 1,
+                                                        nodeType = "message"
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
-        verify(observer, times(1)).showQuestion(question(id = 100))
+        interactor.leadGenAnswered(
+                mapOf(
+                        100L to "John",
+                        101L to "Doe",
+                        102L to "+1 123 123 123"
+                )
+        )
 
-        survey = survey(
+        verify(observer).showMessage(message(id = 1))
+    }
+
+    @Test
+    fun `can show screen with message nodeType`() {
+        val survey = survey(
                 id = 123,
                 spec = spec(
                         startMap = mapOf(
@@ -378,12 +461,78 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
         verify(observer, times(1)).showMessage(message(id = 1))
     }
+
+    @Test
+    fun `can show screens with question nodeType`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100
+                                        )
+                                )
+                        )
+                )
+        )
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        verify(observer, times(1)).showQuestion(question(id = 100))
+    }
+
+    @Test
+    fun `can show screens with qscreen nodeType`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = -123,
+                                        nodeType = "qscreen"
+                                )
+                        ),
+                        qscreenList = mapOf(
+                                language("en") to listOf(
+                                        qscreen(
+                                                id = -123,
+                                                questionList = listOf(
+                                                        100, 101, 102
+                                                )
+                                        )
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 99),
+                                        question(id = 100),
+                                        question(id = 101),
+                                        question(id = 102)
+                                )
+                        )
+                ))
+
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        verify(observer, times(1)).showLeadGen(qscreen(id = -123), listOf(question(id = 100), question(id = 101), question(id = 102)))
+    }
+
 
     @Test
     fun `closes survey on last question`() {
@@ -410,7 +559,7 @@ class SurveyInteractorTest {
         val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 10)))
+        interactor.questionAnswered(listOf(answer(id = 10)))
 
         verify(observer).closeSurvey()
     }
@@ -498,12 +647,12 @@ class SurveyInteractorTest {
         interactor.displaySurvey()
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
 
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
-        interactor.questionAnswered(question(id = 200), listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
 
         interactor.stopSurvey()
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 300), emptyList())
+        interactor.questionAnswered(emptyList())
 
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
     }
@@ -535,7 +684,7 @@ class SurveyInteractorTest {
                                                         id = 300,
                                                         nodeType = "question"
                                                 ),
-                                                answerList = listOf(answer(id = 1))
+                                                answerList = listOf(answer(id = 2))
                                         ),
                                         question(
                                                 id = 300
@@ -548,15 +697,15 @@ class SurveyInteractorTest {
         val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 100), listOf(answer(id = 1)))
-        interactor.questionAnswered(question(id = 200), listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.questionAnswered(listOf(answer(id = 2)))
 
         interactor.stopSurvey()
 
         assertFalse(localStorage.getSurveyStatus(survey).hasBeenFinished())
 
         interactor.displaySurvey()
-        interactor.questionAnswered(question(id = 300), emptyList())
+        interactor.questionAnswered(emptyList())
 
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
     }
