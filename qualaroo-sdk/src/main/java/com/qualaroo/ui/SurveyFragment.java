@@ -1,6 +1,5 @@
 package com.qualaroo.ui;
 
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,14 +18,17 @@ import android.widget.TextView;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.render.QuestionView;
 import com.qualaroo.ui.render.QuestionViewState;
 import com.qualaroo.ui.render.Renderer;
+import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
+import java.util.Map;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -192,6 +194,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 surveyPresenter.onCloseClicked();
             }
         }));
+    }
+
+    @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
+        questionView = null;
+        transformToQuestionStyle();
+        questionsContent.removeAllViews();
+        questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
+        questionsContent.addView(renderer.renderLeadGen(getContext(), qscreen, questions));
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {

@@ -45,6 +45,7 @@ class ThemeUtils {
             int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
             ((TintableBackgroundView) editText).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
+        editText.setTextColor(theme.textColor());
     }
 
     static void applyTheme(Button button, Theme theme) {

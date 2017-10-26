@@ -4,11 +4,12 @@ import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.optionMap
+import com.qualaroo.internal.model.TestModels.qscreen
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.ui.render.ThemeUtil.Companion.theme
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
@@ -81,7 +82,7 @@ class SurveyPresenterTest {
 
     @Test
     fun `does not animate when restoring state`() {
-        val state: SurveyPresenter.State = SurveyPresenter.State(question(id = 1))
+        val state: SurveyPresenter.State = SurveyPresenter.State(true)
         presenter.init(state)
 
         verify(view, times(1)).showImmediately()
@@ -106,13 +107,13 @@ class SurveyPresenterTest {
         capturedEventsObserver.showQuestion(question(id = 10))
 
         presenter.onAnswered(answer(id = 20))
-        verify(interactor, times(1)).questionAnswered(question(id = 10), listOf(answer(id = 20)))
+        verify(interactor, times(1)).questionAnswered(listOf(answer(id = 20)))
 
         presenter.onAnswered(listOf(answer(id = 20), answer(id = 30)))
-        verify(interactor, times(1)).questionAnswered(question(id = 10), listOf(answer(id = 20), answer(id = 30)))
+        verify(interactor, times(1)).questionAnswered(listOf(answer(id = 20), answer(id = 30)))
 
         presenter.onAnsweredWithText("lorem ipsum")
-        verify(interactor, times(1)).questionAnsweredWithText(question(id = 10), "lorem ipsum")
+        verify(interactor, times(1)).questionAnsweredWithText("lorem ipsum")
     }
 
     @Test
@@ -134,6 +135,13 @@ class SurveyPresenterTest {
     }
 
     @Test
+    fun `shows lead gen`() {
+        capturedEventsObserver.showLeadGen(qscreen(id = -123), listOf(question(id = 10), question(id = 20)))
+
+        verify(view, times(1)).showLeadGen(qscreen(id = -123), listOf(question(id = 10), question(id = 20)))
+    }
+
+    @Test
     fun `closes survey`() {
         capturedEventsObserver.closeSurvey()
 
@@ -152,7 +160,7 @@ class SurveyPresenterTest {
         capturedEventsObserver.showQuestion(question(id = 10))
 
         val savedState = presenter.savedState
-        assertEquals(question(id = 10),savedState.question())
+        assertTrue(savedState.isDisplayingQuestion)
     }
 
 }

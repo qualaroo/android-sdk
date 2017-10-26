@@ -56,7 +56,7 @@ final class TextQuestionRenderer extends QuestionRenderer {
                 button.postDelayed(new Runnable() {
                     @Override public void run() {
                         if (editText.getText() != null) {
-                            onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
+                            onAnsweredListener.onAnsweredWithText(editText.getText().toString());
                         }
                     }
                 }, 300);
