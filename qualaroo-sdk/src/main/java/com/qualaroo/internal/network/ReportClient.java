@@ -10,6 +10,7 @@ import com.qualaroo.internal.storage.LocalStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.HttpUrl;
 import okhttp3.Response;
@@ -69,6 +70,24 @@ public class ReportClient {
         }
     }
 
+    public void recordLeadGenAnswer(Survey survey, Map<Long, String> questionIdToAnswer) {
+        HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
+                .addPathSegment("r.js")
+                .addQueryParameter("id", String.valueOf(survey.id()));
+        for (Map.Entry<Long, String> entry : questionIdToAnswer.entrySet()) {
+            String key = String.format(Locale.ROOT, "r[%d][text]", entry.getKey());
+            String value = entry.getValue().replace("+", "%2B");
+            builder.addEncodedQueryParameter(key, value);
+        }
+        final HttpUrl url = builder.build();
+        try {
+            Response response = restClient.get(url);
+            storeIfFailed(response);
+        } catch (IOException e) {
+            storeFailedRequestForLater(url.toString());
+        }
+    }
+
     private void storeIfFailed(Response response) {
         if (ResponseHelper.shouldRetry(response)) {
             storeFailedRequestForLater(response.request().url().toString());
@@ -108,5 +127,4 @@ public class ReportClient {
             builder.addQueryParameter(String.format(Locale.ROOT,"r[%d]", question.id()), String.valueOf(answer.id()));
         }
     }
-
 }

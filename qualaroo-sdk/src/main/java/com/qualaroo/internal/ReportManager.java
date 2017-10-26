@@ -8,6 +8,7 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ReportClient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
@@ -44,6 +45,14 @@ public class ReportManager {
         executor.execute(new Runnable() {
             @Override public void run() {
                 reportClient.recordTextAnswer(survey, question, answer);
+            }
+        });
+    }
+
+    public void recordLeadGenAnswer(final Survey survey, final Map<Long, String> questionIdToAnswer) {
+        executor.execute(new Runnable() {
+            @Override public void run() {
+                reportClient.recordLeadGenAnswer(survey, questionIdToAnswer);
             }
         });
     }

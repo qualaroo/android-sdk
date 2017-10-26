@@ -118,6 +118,27 @@ class ReportClientTest {
     }
 
     @Test
+    fun `builds proper url for lead gen answers`() {
+        client.recordLeadGenAnswer(survey, mapOf(
+                1L to "John",
+                2L to "Doe",
+                3L to "mail@mail.com",
+                4L to "+1 123 123 123"
+        ))
+
+        val url = restClient.recentHttpUrl!!
+
+        assertEquals("https", url.scheme())
+        assertEquals("turbo.qualaroo.com", url.host())
+        assertEquals("/r.js", url.encodedPath())
+        assertEquals(survey.id().toString(), url.queryParameter("id"))
+        assertEquals("John", url.queryParameter("r[1][text]"))
+        assertEquals("Doe", url.queryParameter("r[2][text]"))
+        assertEquals("mail@mail.com", url.queryParameter("r[3][text]"))
+        assertEquals("+1 123 123 123", url.queryParameter("r[4][text]"))
+    }
+
+    @Test
     fun `stores requests on network errors`() {
         restClient.throwsIoException = true
 
@@ -160,7 +181,5 @@ class ReportClientTest {
         client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
     }
-
-
 
 }
