@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.RestrictTo;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -15,6 +14,7 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
+import com.qualaroo.util.TextWatcherAdapter;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -64,13 +64,7 @@ final class TextQuestionRenderer extends QuestionRenderer {
         });
         ThemeUtils.applyTheme(editText, getTheme());
         button.setEnabled(!question.isRequired());
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+        editText.addTextChangedListener(new TextWatcherAdapter() {
             @Override public void afterTextChanged(Editable s) {
                 if (question.isRequired()) {
                     button.setEnabled(s.length() > 0);

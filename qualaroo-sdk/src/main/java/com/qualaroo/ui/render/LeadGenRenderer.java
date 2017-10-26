@@ -4,16 +4,20 @@ import android.content.Context;
 import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.util.TextWatcherAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -37,12 +41,27 @@ public class LeadGenRenderer {
         button.setText(qScreen.sendText());
         ThemeUtils.applyTheme(button, theme);
 
-        final ViewGroup inputFieldsParent = view.findViewById(R.id.qualaroo__view_question_lead_gen_input_fields);
+        final ViewGroup parent = view.findViewById(R.id.qualaroo__view_question_lead_gen_input_fields);
+        final List<EditText> requiredFields = new ArrayList<>();
         for (Question question : questions) {
             TextInputLayout inputField = buildTextInput(context, question.title(), question.cname());
-            inputFieldsParent.addView(inputField);
+            inputField.setTag(question.id());
+
+            parent.addView(inputField);
             if (question.isRequired()) {
                 button.setEnabled(false);
+                requiredFields.add(inputField.getEditText());
+                inputField.getEditText().addTextChangedListener(new TextWatcherAdapter() {
+                    @Override public void afterTextChanged(Editable s) {
+                        boolean enableButton = true;
+                        for (EditText requiredField : requiredFields) {
+                            if (requiredField.length() == 0) {
+                                enableButton = false;
+                            }
+                        }
+                        button.setEnabled(enableButton);
+                    }
+                });
             }
         }
         return view;
