@@ -60,7 +60,7 @@ public class ReportClient {
         HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
-        builder.addEncodedQueryParameter(String.format(Locale.ROOT,"r[%d][text]", question.id()), answer);
+        builder.addQueryParameter(String.format(Locale.ROOT,"r[%d][text]", question.id()), answer);
         final HttpUrl url = builder.build();
         try {
             Response response = restClient.get(url);
@@ -76,8 +76,8 @@ public class ReportClient {
                 .addQueryParameter("id", String.valueOf(survey.id()));
         for (Map.Entry<Long, String> entry : questionIdToAnswer.entrySet()) {
             String key = String.format(Locale.ROOT, "r[%d][text]", entry.getKey());
-            String value = entry.getValue().replace("+", "%2B");
-            builder.addEncodedQueryParameter(key, value);
+            String value = entry.getValue();
+            builder.addQueryParameter(key, value);
         }
         final HttpUrl url = builder.build();
         try {
