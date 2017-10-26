@@ -9,6 +9,7 @@ import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.ui.OnAnsweredListener;
+import com.qualaroo.ui.OnLeadGenAnswerListener;
 import com.qualaroo.ui.OnMessageConfirmedListener;
 
 import java.util.HashMap;
@@ -45,8 +46,8 @@ public class Renderer {
         return questionRenderers.get(question.type()).render(context, question, onAnsweredListener);
     }
 
-    public View renderLeadGen(Context context, QScreen qScreen, List<Question> questions) {
-        return leadGenRenderer.render(context, qScreen, questions);
+    public View renderLeadGen(Context context, QScreen qScreen, List<Question> questions, OnLeadGenAnswerListener onLeadGenAnswerListener) {
+        return leadGenRenderer.render(context, qScreen, questions, onLeadGenAnswerListener);
     }
 
 }

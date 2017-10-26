@@ -177,10 +177,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
             @Override public void onAnsweredWithText(String answer) {
                 surveyPresenter.onAnsweredWithText(answer);
             }
-
-            @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
-                surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
-            }
         });
         questionsContent.addView(questionView.view());
         if (viewState != null) {
@@ -204,7 +200,11 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
-        questionsContent.addView(renderer.renderLeadGen(getContext(), qscreen, questions));
+        questionsContent.addView(renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
+            @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+                surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
+            }
+        }));
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {

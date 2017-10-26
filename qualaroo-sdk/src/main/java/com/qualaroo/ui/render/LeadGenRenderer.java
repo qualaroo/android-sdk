@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.util.LongSparseArray;
 import android.text.Editable;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -15,10 +16,14 @@ import android.widget.EditText;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.ui.OnLeadGenAnswerListener;
+import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.TextWatcherAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class LeadGenRenderer {
@@ -34,7 +39,7 @@ public class LeadGenRenderer {
         this.theme = theme;
     }
 
-    public View render(Context context, QScreen qScreen, List<Question> questions) {
+    public View render(Context context, QScreen qScreen, final List<Question> questions, final OnLeadGenAnswerListener onLeadGenAnswerListener) {
         final View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_question_lead_gen, null);
 
         final Button button = view.findViewById(R.id.qualaroo__view_question_lead_gen_confirm);
@@ -42,11 +47,10 @@ public class LeadGenRenderer {
         ThemeUtils.applyTheme(button, theme);
 
         final ViewGroup parent = view.findViewById(R.id.qualaroo__view_question_lead_gen_input_fields);
+        final LongSparseArray<TextInputLayout> fields = new LongSparseArray<>();
         final List<EditText> requiredFields = new ArrayList<>();
         for (Question question : questions) {
             TextInputLayout inputField = buildTextInput(context, question);
-            inputField.setTag(question.id());
-
             parent.addView(inputField);
             if (question.isRequired()) {
                 button.setEnabled(false);
@@ -63,7 +67,20 @@ public class LeadGenRenderer {
                     }
                 });
             }
+            fields.append(question.id(), inputField);
         }
+
+        button.setOnClickListener(new DebouncingOnClickListener() {
+            @Override public void doClick(View v) {
+                Map<Long, String> answers = new HashMap<>(questions.size());
+                for (Question question : questions) {
+                    TextInputLayout inputLayout = fields.get(question.id());
+                    String answer = inputLayout.getEditText().getText().toString();
+                    answers.put(question.id(), answer);
+                }
+                onLeadGenAnswerListener.onLeadGenAnswered(answers);
+            }
+        });
         return view;
     }
 
