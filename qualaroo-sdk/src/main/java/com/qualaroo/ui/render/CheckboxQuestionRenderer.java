@@ -70,10 +70,9 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         }
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                ViewGroup parent = (ViewGroup) v.getParent();
                 List<Answer> selectedAnswers = new ArrayList<>();
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    View child = parent.getChildAt(i);
+                for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
+                    View child = checkboxesContainer.getChildAt(i);
                     if (child instanceof CheckBox && ((CheckBox) child).isChecked()) {
                         selectedAnswers.add((Answer) child.getTag());
                     }
