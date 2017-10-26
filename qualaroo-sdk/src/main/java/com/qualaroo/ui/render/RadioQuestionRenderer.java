@@ -61,7 +61,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                     button.setEnabled(true);
                 } else {
                     Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                    onAnsweredListener.onAnswered(question, selectedAnswer);
+                    onAnsweredListener.onAnswered(selectedAnswer);
                 }
             }
         });
@@ -70,7 +70,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
             @Override public void doClick(View v) {
                 int answerId = radioGroup.getCheckedRadioButtonId();
                 Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                onAnsweredListener.onAnswered(question, selectedAnswer);
+                onAnsweredListener.onAnswered(selectedAnswer);
             }
         });
         return QuestionView.forQuestionId(question.id())

@@ -3,10 +3,7 @@ package com.qualaroo.ui.render;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +14,7 @@ import com.qualaroo.R;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.MessageType;
 import com.qualaroo.ui.OnMessageConfirmedListener;
+import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
@@ -33,7 +31,7 @@ public class MessageRenderer {
     public View render(final Context context, final Message message, final OnMessageConfirmedListener onMessageConfirmedListener) {
         final View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_message, null);
         TextView text = view.findViewById(R.id.qualaroo__view_message_text);
-        text.setText(sanitizeMessageDescription(message.description()));
+        text.setText(ContentUtils.sanitazeText(message.description()));
         text.setTextColor(theme.textColor());
         text.setMovementMethod(new ScrollingMovementMethod());
         final Button callToAction = view.findViewById(R.id.qualaroo__view_message_cta);
@@ -61,12 +59,5 @@ public class MessageRenderer {
         return view;
     }
 
-    private Spanned sanitizeMessageDescription(@Nullable String text) {
-        if (text == null) {
-            return null;
-        } else {
-            return Html.fromHtml(text);
-        }
-    }
 
 }

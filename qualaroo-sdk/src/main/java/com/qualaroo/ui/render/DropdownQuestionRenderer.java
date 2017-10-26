@@ -65,7 +65,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         confirmButton.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 AnswerItem answerItem = (AnswerItem) spinner.getSelectedItem();
-                onAnsweredListener.onAnswered(question, answerItem.answer);
+                onAnsweredListener.onAnswered(answerItem.answer);
             }
         });
         ThemeUtils.applyTheme(confirmButton, getTheme());

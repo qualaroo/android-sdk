@@ -165,20 +165,23 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(question.title());
-        Context context = getContext();
-        questionView = renderer.renderQuestion(context, question, new OnAnsweredListener() {
-                @Override public void onAnswered(Question question1, Answer answer) {
-                    surveyPresenter.onAnswered(answer);
-                }
+        questionView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
+            @Override public void onAnswered(Answer answer) {
+                surveyPresenter.onAnswered(answer);
+            }
 
-                @Override public void onAnswered(Question question1, List<Answer> answers) {
-                    surveyPresenter.onAnswered(answers);
-                }
+            @Override public void onAnswered(List<Answer> answers) {
+                surveyPresenter.onAnswered(answers);
+            }
 
-                @Override public void onAnsweredWithText(Question question1, String answer) {
-                    surveyPresenter.onAnsweredWithText(answer);
-                }
-            });
+            @Override public void onAnsweredWithText(String answer) {
+                surveyPresenter.onAnsweredWithText(answer);
+            }
+
+            @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+                surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
+            }
+        });
         questionsContent.addView(questionView.view());
         if (viewState != null) {
             questionView.restoreState(viewState);
@@ -186,10 +189,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void showMessage(Message message, boolean withAnimation) {
+        questionView = null;
         transformToMessageStyle(withAnimation);
         questionsContent.removeAllViews();
-        Context context = getContext();
-        questionsContent.addView(renderer.renderMessage(context, message, new OnMessageConfirmedListener() {
+        questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
             @Override public void onMessageConfirmed(Message message) {
                 surveyPresenter.onCloseClicked();
             }

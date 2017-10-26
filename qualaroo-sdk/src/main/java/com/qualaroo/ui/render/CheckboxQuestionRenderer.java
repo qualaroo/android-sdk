@@ -32,7 +32,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public QuestionView render(Context context, Question question, final OnAnsweredListener onAnsweredListener) {
         ViewGroup view = (ViewGroup) View.inflate(context, R.layout.qualaroo__view_question_checkbox, null);
         final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
@@ -78,7 +78,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                         selectedAnswers.add((Answer) child.getTag());
                     }
                 }
-                onAnsweredListener.onAnswered(question, selectedAnswers);
+                onAnsweredListener.onAnswered(selectedAnswers);
             }
         });
         return QuestionView.forQuestionId(question.id())

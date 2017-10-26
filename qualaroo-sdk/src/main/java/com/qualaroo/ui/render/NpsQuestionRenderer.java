@@ -37,7 +37,7 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 Answer answer = question.answerList().get(npsView.getCurrentlySelectedScore());
-                onAnsweredListener.onAnswered(question, answer);
+                onAnsweredListener.onAnswered(answer);
             }
         });
         TextView minLabel = view.findViewById(R.id.qualaroo__nps_view_min_label);
