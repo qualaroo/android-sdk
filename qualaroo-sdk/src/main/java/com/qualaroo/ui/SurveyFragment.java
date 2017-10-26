@@ -10,6 +10,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -205,6 +206,33 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
             }
         }));
+    }
+
+    @Override public void forceShowKeyboardWithDelay(long delayInMillis) {
+        final EditText editText = findEditText(questionsContent);
+        if (editText != null) {
+            editText.postDelayed(new Runnable() {
+                @Override public void run() {
+                    KeyboardUtil.showKeyboard(editText);
+                }
+            }, delayInMillis);
+        }
+    }
+
+    @Nullable private EditText findEditText(View view) {
+        if (view instanceof EditText) {
+            return (EditText) view;
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View child = ((ViewGroup) view).getChildAt(i);
+                EditText result = findEditText(child);
+                if (result != null) {
+                    return (EditText) result;
+                }
+            }
+        }
+        return null;
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {

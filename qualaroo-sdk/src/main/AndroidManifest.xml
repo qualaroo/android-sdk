@@ -10,6 +10,7 @@
     <application>
         <activity
             android:name=".QualarooActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Qualaroo.Translucent" />
         <service
             android:name=".QualarooJobIntentService"

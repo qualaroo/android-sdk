@@ -13,6 +13,7 @@ public final class KeyboardUtil {
         if (editText == null) {
             return;
         }
+        editText.requestFocus();
         InputMethodManager inputMethodManager = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.showSoftInput(editText, 0);

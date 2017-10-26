@@ -72,8 +72,11 @@ class SurveyPresenter {
         }
 
         @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
-            isDisplayingQuestion = true;
             surveyView.showLeadGen(qscreen, questions);
+            if (isDisplayingQuestion) {
+                surveyView.forceShowKeyboardWithDelay(600);
+            }
+            isDisplayingQuestion = true;
         }
 
         @Override public void closeSurvey() {

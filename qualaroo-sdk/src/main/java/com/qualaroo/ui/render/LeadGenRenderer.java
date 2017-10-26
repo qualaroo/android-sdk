@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnLeadGenAnswerListener;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.DimenUtils;
+import com.qualaroo.util.KeyboardUtil;
 import com.qualaroo.util.TextWatcherAdapter;
 
 import java.util.ArrayList;
@@ -72,20 +75,29 @@ public class LeadGenRenderer {
 
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                Map<Long, String> answers = new HashMap<>(questions.size());
+                final Map<Long, String> answers = new HashMap<>(questions.size());
                 for (Question question : questions) {
                     TextInputLayout inputLayout = fields.get(question.id());
                     String answer = inputLayout.getEditText().getText().toString();
                     answers.put(question.id(), answer);
                 }
-                onLeadGenAnswerListener.onLeadGenAnswered(answers);
+                KeyboardUtil.hideKeyboard(button);
+                button.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        onLeadGenAnswerListener.onLeadGenAnswered(answers);
+                    }
+                }, 600);
             }
         });
         return view;
     }
 
     private TextInputLayout buildTextInput(Context context, Question question) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int topMargin = (int) DimenUtils.toPx(context, 2);
+        layoutParams.setMargins(0, topMargin, 0, 0);
         TextInputLayout inputLayout = new TextInputLayout(context);
+        inputLayout.setLayoutParams(layoutParams);
         TextInputEditText editText = new TextInputEditText(context);
         String hint = question.title();
         if (question.isRequired()) {

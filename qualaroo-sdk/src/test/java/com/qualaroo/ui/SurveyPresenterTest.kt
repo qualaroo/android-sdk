@@ -142,6 +142,15 @@ class SurveyPresenterTest {
     }
 
     @Test
+    fun `shows keyboard when lead gen is not a first question in survey`() {
+        capturedEventsObserver.showLeadGen(qscreen(id = -123), listOf(question(id = 10)))
+        verify(view, never()).forceShowKeyboardWithDelay(any())
+
+        capturedEventsObserver.showLeadGen(qscreen(id = -124), listOf(question(id = 10)))
+        verify(view, times(1)).forceShowKeyboardWithDelay(any())
+    }
+
+    @Test
     fun `closes survey`() {
         capturedEventsObserver.closeSurvey()
 
