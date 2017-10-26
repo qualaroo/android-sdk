@@ -14,16 +14,16 @@ public final class ContentUtils {
     }
 
     private static String stripHtml(String html) {
-        html = html.replaceAll("<(.*?)\\>"," ");
-        html = html.replaceAll("<(.*?)\\\n"," ");
-        html = html.replaceFirst("(.*?)\\>", " ");
-        html = html.replaceAll("&nbsp;"," ");
-        html = html.replaceAll("&amp;"," ");
+        html = html.replaceAll("<(.*?)\\>", "");
+        html = html.replaceAll("<(.*?)\\\n", "");
+        html = html.replaceFirst("(.*?)\\>", "");
+        html = html.replaceAll("&nbsp;", " ");
+        html = html.replaceAll("&amp;", "&");
         return html;
     }
 
     private ContentUtils() {
-        //no instancesx
+        //no instances
     }
 
 }
