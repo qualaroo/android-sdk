@@ -26,6 +26,10 @@ object TestModels {
         return Answer(id, title, nextMap)
     }
 
+    fun qscreen(id: Long, questionList: List<Long> = emptyList(), description: String = "", sendText: String = "", nextMap: Node? = null): QScreen {
+        return QScreen(id, questionList, description, sendText, nextMap)
+    }
+
     fun language(value: String) = Language(value)
 
     fun node(id: Long, nodeType: String) = Node(id, nodeType)

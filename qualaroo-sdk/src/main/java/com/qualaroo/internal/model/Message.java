@@ -56,7 +56,7 @@ public final class Message implements Serializable {
         return (int) (id ^ (id >>> 32));
     }
 
-    public static class CtaMap {
+    public static class CtaMap implements Serializable{
         private String text;
         private String url;
 

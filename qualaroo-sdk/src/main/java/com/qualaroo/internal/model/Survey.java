@@ -79,6 +79,7 @@ public final class Survey implements Serializable {
         private OptionMap optionMap;
         private Map<Language, List<Question>> questionList;
         private Map<Language, List<Message>> msgScreenList;
+        private Map<Language, List<QScreen>> qscreenList;
         private Map<Language, Node> startMap;
         private List<Language> surveyVariations;
 
@@ -94,6 +95,10 @@ public final class Survey implements Serializable {
             return msgScreenList;
         }
 
+        public Map<Language, List<QScreen>> qscreenList() {
+            return qscreenList;
+        }
+
         public Map<Language, Node> startMap() {
             return startMap;
         }
@@ -106,11 +111,12 @@ public final class Survey implements Serializable {
             return optionMap;
         }
 
-        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, Node> startMap, List<Language> surveyVariations) {
+        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, List<QScreen>> qscreenList, Map<Language, Node> startMap, List<Language> surveyVariations) {
             this.requireMap = requireMap;
             this.optionMap = optionMap;
             this.questionList = questionList;
             this.msgScreenList = msgScreenList;
+            this.qscreenList = qscreenList;
             this.startMap = startMap;
             this.surveyVariations = surveyVariations;
         }
@@ -125,6 +131,7 @@ public final class Survey implements Serializable {
         private boolean isPersistent;
         private boolean isOneShot;
         private String customMap;
+        //whether identity of the user should be known or not
         private String wantUserStr;
         private Integer samplePercent;
 
