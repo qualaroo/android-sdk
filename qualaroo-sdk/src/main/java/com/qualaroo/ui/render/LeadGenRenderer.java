@@ -44,7 +44,7 @@ public class LeadGenRenderer {
         final ViewGroup parent = view.findViewById(R.id.qualaroo__view_question_lead_gen_input_fields);
         final List<EditText> requiredFields = new ArrayList<>();
         for (Question question : questions) {
-            TextInputLayout inputField = buildTextInput(context, question.title(), question.cname());
+            TextInputLayout inputField = buildTextInput(context, question);
             inputField.setTag(question.id());
 
             parent.addView(inputField);
@@ -67,11 +67,16 @@ public class LeadGenRenderer {
         return view;
     }
 
-    private TextInputLayout buildTextInput(Context context, String title, String fieldType) {
+    private TextInputLayout buildTextInput(Context context, Question question) {
         TextInputLayout inputLayout = new TextInputLayout(context);
         TextInputEditText editText = new TextInputEditText(context);
-        editText.setHint(title);
+        String hint = question.title();
+        if (question.isRequired()) {
+            hint = hint.concat(" *");
+        }
+        editText.setHint(hint);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
+        String fieldType = question.cname();
         if (FIELD_TYPE_FIRST_NAME.equals(fieldType) || FIELD_TYPE_LAST_NAME.equals(fieldType)) {
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         } else if (FIELD_TYPE_PHONE.equals(fieldType)) {
