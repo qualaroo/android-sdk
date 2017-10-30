@@ -46,7 +46,7 @@ public class Renderer {
         return questionRenderers.get(question.type()).render(context, question, onAnsweredListener);
     }
 
-    public View renderLeadGen(Context context, QScreen qScreen, List<Question> questions, OnLeadGenAnswerListener onLeadGenAnswerListener) {
+    public RestorableView renderLeadGen(Context context, QScreen qScreen, List<Question> questions, OnLeadGenAnswerListener onLeadGenAnswerListener) {
         return leadGenRenderer.render(context, qScreen, questions, onLeadGenAnswerListener);
     }
 

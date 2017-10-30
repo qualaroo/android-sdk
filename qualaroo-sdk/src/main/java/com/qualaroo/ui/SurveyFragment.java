@@ -201,11 +201,16 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
-        questionsContent.addView(renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
+        restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
             @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
                 surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
             }
-        }));
+        });
+        questionsContent.addView(restorableView.view());
+        if (viewState != null) {
+            restorableView.restoreState(viewState);
+        }
+
     }
 
     @Override public void forceShowKeyboardWithDelay(long delayInMillis) {
