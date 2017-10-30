@@ -21,8 +21,8 @@ import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
-import com.qualaroo.ui.render.QuestionView;
-import com.qualaroo.ui.render.QuestionViewState;
+import com.qualaroo.ui.render.RestorableView;
+import com.qualaroo.ui.render.ViewState;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
@@ -37,7 +37,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 public class SurveyFragment extends Fragment implements SurveyView {
 
     private static final String KEY_PRESENTER_STATE = "pstate";
-    private static final String QUESTION_VIEW_STATE = "qviewstate";
+    private static final String RESTORABLE_VIEW_STATE = "qviewstate";
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
@@ -50,8 +50,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private ImageView surveyLogo;
 
     private boolean isFullScreen;
-    private QuestionView questionView;
-    private QuestionViewState viewState;
+    private RestorableView restorableView;
+    private ViewState viewState;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qualaroo__fragment_survey, container, false);
@@ -85,14 +85,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
         SurveyPresenter.State presentersState = null;
         if (savedInstanceState != null) {
             presentersState = (SurveyPresenter.State) savedInstanceState.getSerializable(KEY_PRESENTER_STATE);
-            viewState = savedInstanceState.getParcelable(QUESTION_VIEW_STATE);
+            viewState = savedInstanceState.getParcelable(RESTORABLE_VIEW_STATE);
         }
         surveyPresenter.init(presentersState);
     }
 
     @Override public void onSaveInstanceState(Bundle outState) {
-        if (questionView != null) {
-            outState.putParcelable(QUESTION_VIEW_STATE, questionView.getCurrentState());
+        if (restorableView != null) {
+            outState.putParcelable(RESTORABLE_VIEW_STATE, restorableView.getCurrentState());
         }
         outState.putSerializable(KEY_PRESENTER_STATE, surveyPresenter.getSavedState());
         super.onSaveInstanceState(outState);
@@ -112,6 +112,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void onDestroyView() {
+        restorableView = null;
         KeyboardUtil.hideKeyboard(surveyContainer);
         surveyPresenter.dropView();
         super.onDestroyView();
@@ -166,7 +167,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(question.title());
-        questionView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
+        restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
             @Override public void onAnswered(Answer answer) {
                 surveyPresenter.onAnswered(answer);
             }
@@ -179,14 +180,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 surveyPresenter.onAnsweredWithText(answer);
             }
         });
-        questionsContent.addView(questionView.view());
+        questionsContent.addView(restorableView.view());
         if (viewState != null) {
-            questionView.restoreState(viewState);
+            restorableView.restoreState(viewState);
         }
     }
 
     @Override public void showMessage(Message message, boolean withAnimation) {
-        questionView = null;
+        restorableView = null;
         transformToMessageStyle(withAnimation);
         questionsContent.removeAllViews();
         questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
@@ -197,7 +198,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
-        questionView = null;
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
@@ -228,7 +228,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 View child = ((ViewGroup) view).getChildAt(i);
                 EditText result = findEditText(child);
                 if (result != null) {
-                    return (EditText) result;
+                    return result;
                 }
             }
         }

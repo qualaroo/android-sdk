@@ -20,12 +20,12 @@ final class UnknownQuestionTypeRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, Question question, OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, Question question, OnAnsweredListener onAnsweredListener) {
         TextView view = new AppCompatTextView(context);
         view.setText(String.format(Locale.ROOT,"We're sorry! Question with id %d is not supported yet", question.id()));
         view.setTextColor(Color.RED);
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
+        return RestorableView.withId(question.id())
+                .view(view)
                 .build();
     }
 }

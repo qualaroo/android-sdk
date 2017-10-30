@@ -31,7 +31,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         final View view = View.inflate(context, R.layout.qualaroo__view_question_radio, null);
         final Button button = view.findViewById(R.id.qualaroo__question_radio_confirm);
         button.setText(question.sendText());
@@ -73,14 +73,14 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 onAnsweredListener.onAnswered(selectedAnswer);
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         into.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedRadioButtonId());
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
                         if (checkedId != NOTHING_SELECTED) {

@@ -42,7 +42,7 @@ public class Renderer {
         return messageRenderer.render(context, message, onMessageConfirmedListener);
     }
 
-    public QuestionView renderQuestion(Context context, Question question, OnAnsweredListener onAnsweredListener) {
+    public RestorableView renderQuestion(Context context, Question question, OnAnsweredListener onAnsweredListener) {
         return questionRenderers.get(question.type()).render(context, question, onAnsweredListener);
     }
 
