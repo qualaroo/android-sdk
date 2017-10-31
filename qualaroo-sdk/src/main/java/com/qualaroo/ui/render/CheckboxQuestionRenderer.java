@@ -32,7 +32,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, Question question, final OnAnsweredListener onAnsweredListener) {
         ViewGroup view = (ViewGroup) View.inflate(context, R.layout.qualaroo__view_question_checkbox, null);
         final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
@@ -80,9 +80,9 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 onAnsweredListener.onAnswered(selectedAnswers);
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         ArrayList<Integer> checkedElements = new ArrayList<>();
                         for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
@@ -94,7 +94,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                         into.putIntegerArrayList(KEY_CHECKED_ELEMENTS, checkedElements);
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         ArrayList<Integer> checkedElements = from.getIntegerArrayList(KEY_CHECKED_ELEMENTS);
                         if (checkedElements != null) {

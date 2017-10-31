@@ -1,24 +1,15 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.v7.widget.AppCompatCheckedTextView;
-import android.support.v7.widget.AppCompatRadioButton;
-import android.support.v7.widget.AppCompatSpinner;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,7 +31,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_question_dropdown, null);
         final Button confirmButton = view.findViewById(R.id.qualaroo__view_question_dropdown_confirm);
         final Spinner spinner = view.findViewById(R.id.qualaroo__view_question_dropdown_spinner);
@@ -70,8 +61,8 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         });
         ThemeUtils.applyTheme(confirmButton, getTheme());
         ThemeUtils.applyTheme(spinner, getTheme());
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
+        return RestorableView.withId(question.id())
+                .view(view)
                 .build();
     }
 

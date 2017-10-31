@@ -1,6 +1,7 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -42,7 +43,7 @@ public class LeadGenRenderer {
         this.theme = theme;
     }
 
-    public View render(Context context, QScreen qScreen, final List<Question> questions, final OnLeadGenAnswerListener onLeadGenAnswerListener) {
+    public RestorableView render(Context context, QScreen qScreen, final List<Question> questions, final OnLeadGenAnswerListener onLeadGenAnswerListener) {
         final View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_question_lead_gen, null);
 
         final Button button = view.findViewById(R.id.qualaroo__view_question_lead_gen_confirm);
@@ -89,7 +90,26 @@ public class LeadGenRenderer {
                 }, 600);
             }
         });
-        return view;
+        return RestorableView.withId(qScreen.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
+                    @Override public void onSaveState(Bundle into) {
+                        for (Question question : questions) {
+                            into.putString(
+                                    String.valueOf(question.id()),
+                                    fields.get(question.id()).getEditText().getText().toString()
+                            );
+                        }
+                    }
+                })
+                .onRestoreState(new RestorableView.OnRestoreState() {
+                    @Override public void onRestoreState(Bundle from) {
+                        for (Question question : questions) {
+                            String text = from.getString(String.valueOf(question.id()), "");
+                            fields.get(question.id()).getEditText().setText(text);
+                        }
+                    }
+                }).build();
     }
 
     private TextInputLayout buildTextInput(Context context, Question question) {

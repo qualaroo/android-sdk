@@ -27,7 +27,7 @@ final class TextQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = View.inflate(context, R.layout.qualaroo__view_question_text, null);
         final EditText editText = view.findViewById(R.id.qualaroo__view_question_text_input);
         editText.setTextColor(getTheme().accentColor());
@@ -71,14 +71,14 @@ final class TextQuestionRenderer extends QuestionRenderer {
                 }
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         into.putString(KEY_TEXT, editText.getText().toString());
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         String text = from.getString(KEY_TEXT);
                         editText.setText(text);

@@ -7,11 +7,11 @@ import android.view.View;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
-public class QuestionView {
+public class RestorableView {
 
-    static Builder forQuestionId(long questionId) {
+    static Builder withId(long viewUniqueId) {
         return new Builder()
-                .setQuestionId(questionId);
+                .viewId(viewUniqueId);
     }
 
     interface OnRestoreState {
@@ -21,14 +21,14 @@ public class QuestionView {
         void onSaveState(Bundle into);
     }
 
-    private final long questionId;
+    private final long viewUniqueId;
     private final View view;
 
     private final OnRestoreState onRestoreState;
     private final OnSaveState onSaveState;
 
-    QuestionView(long questionId, View view, OnSaveState onSaveState, OnRestoreState onRestoreState) {
-        this.questionId = questionId;
+    RestorableView(long viewUniqueId, View view, OnSaveState onSaveState, OnRestoreState onRestoreState) {
+        this.viewUniqueId = viewUniqueId;
         this.view = view;
         this.onRestoreState = onRestoreState;
         this.onSaveState = onSaveState;
@@ -38,33 +38,33 @@ public class QuestionView {
         return view;
     }
 
-    public void restoreState(QuestionViewState questionViewState) {
-        if (questionId == questionViewState.questionId() && onRestoreState != null) {
-            onRestoreState.onRestoreState(questionViewState.bundle());
+    public void restoreState(ViewState viewState) {
+        if (viewUniqueId == viewState.viewUniqueId() && onRestoreState != null) {
+            onRestoreState.onRestoreState(viewState.bundle());
         }
     }
 
-    public QuestionViewState getCurrentState() {
+    public ViewState getCurrentState() {
         Bundle bundle = new Bundle();
         if (onSaveState != null) {
             onSaveState.onSaveState(bundle);
         }
-        return new QuestionViewState(questionId, bundle);
+        return new ViewState(viewUniqueId, bundle);
     }
 
     static class Builder {
 
-        private long questionId;
+        private long viewId;
         private View view;
         private OnSaveState onSaveState;
         private OnRestoreState onRestoreState;
 
-        Builder setQuestionId(long questionId) {
-            this.questionId = questionId;
+        Builder viewId(long viewId) {
+            this.viewId = viewId;
             return this;
         }
 
-        Builder setView(View view) {
+        Builder view(View view) {
             this.view = view;
             return this;
         }
@@ -79,8 +79,8 @@ public class QuestionView {
             return this;
         }
 
-        QuestionView build() {
-            return new QuestionView(questionId, view, onSaveState, onRestoreState);
+        RestorableView build() {
+            return new RestorableView(viewId, view, onSaveState, onRestoreState);
         }
     }
 
