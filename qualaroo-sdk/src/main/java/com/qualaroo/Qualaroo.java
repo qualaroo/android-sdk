@@ -10,9 +10,11 @@ import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ReportManager;
+import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.TimeMatcher;
+import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
@@ -34,6 +36,7 @@ import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -116,7 +119,9 @@ public class Qualaroo implements QualarooSdk {
         DeviceTypeMatcher deviceTypeMatcher = new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context));
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
         TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
-        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher);
+        UserGroupPercentageProvider userGroupPercentageProvider = new UserGroupPercentageProvider(localStorage, new SecureRandom());
+        SamplePercentMatcher samplePercentMatcher = new SamplePercentMatcher(userGroupPercentageProvider);
+        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher, samplePercentMatcher);
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
