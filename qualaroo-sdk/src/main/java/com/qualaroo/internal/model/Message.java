@@ -58,19 +58,19 @@ public final class Message implements Serializable {
 
     public static class CtaMap implements Serializable{
         private String text;
-        private String url;
+        private String uri;
 
         @Nullable public String text() {
             return text;
         }
 
-        @Nullable public String url() {
-            return url;
+        public String uri() {
+            return uri;
         }
 
-        @VisibleForTesting CtaMap(String text, String url) {
+        @VisibleForTesting CtaMap(String text, String uri) {
             this.text = text;
-            this.url = url;
+            this.uri = uri;
         }
 
         CtaMap() {
