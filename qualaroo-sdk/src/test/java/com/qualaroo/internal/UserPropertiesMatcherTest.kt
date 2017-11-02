@@ -1,5 +1,8 @@
 package com.qualaroo.internal
 
+import com.qualaroo.internal.model.TestModels.requireMap
+import com.qualaroo.internal.model.TestModels.spec
+import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.InMemorySettings
 import org.junit.Assert.assertFalse
@@ -62,6 +65,22 @@ class UserPropertiesMatcherTest {
 
         userInfo.setUserProperty("job", "ceo")
         assertTrue(matcher.doesUserPropertiesMatch("((premium==true && age > 18) && name==\"Joe\") || job == \"ceo\""))
+    }
+
+    @Test
+    fun `uses customMap field to extract required properties`() {
+        val survey = survey(
+                id = 10,
+                spec = spec(
+                        requireMap = requireMap(
+                                customMap = "premium==true"
+                        )
+                )
+        )
+        assertFalse(matcher.matches(survey))
+
+        userInfo.setUserProperty("premium", "true")
+        assertTrue(matcher.matches(survey))
     }
 
 }
