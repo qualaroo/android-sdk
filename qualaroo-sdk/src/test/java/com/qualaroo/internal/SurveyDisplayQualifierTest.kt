@@ -23,11 +23,14 @@ class SurveyDisplayQualifierTest {
     private val userIdentityMatcher = UserIdentityMatcher(userInfo)
     private val timeMatcher = mock<TimeMatcher>()
     private val deviceTypeMatcher = DeviceTypeMatcher(PhoneDeviceTypeProvider())
+    private val userPercentageProvider = mock<UserGroupPercentageProvider>()
+    private val samplePercentMatcher = SamplePercentMatcher(userPercentageProvider)
 
-    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher)
+    private val qualifier = SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher, samplePercentMatcher)
 
     @Before
     fun setup() {
+        whenever(userPercentageProvider.userGroupPercent(any())).thenReturn(99)
         whenever(timeMatcher.enoughTimePassedFrom(any())).thenReturn(true)
     }
 
@@ -103,7 +106,7 @@ class SurveyDisplayQualifierTest {
     @Test
     fun `should show only if custom matching is satisfied`() {
         val userInfo = UserInfo(InMemorySettings(), localStorage)
-        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher, userIdentityMatcher, deviceTypeMatcher)
+        val qualifier = SurveyDisplayQualifier(localStorage, UserPropertiesMatcher(userInfo), timeMatcher, userIdentityMatcher, deviceTypeMatcher, samplePercentMatcher)
         var survey = survey(
                 id = 1,
                 spec = spec(
@@ -144,6 +147,8 @@ class SurveyDisplayQualifierTest {
         userInfo.userId = "some_id"
         assertTrue(qualifier.shouldShowSurvey(survey))
     }
+
+    @Test
     fun `matches users device type`() {
         val survey = survey(
                 id = 1,

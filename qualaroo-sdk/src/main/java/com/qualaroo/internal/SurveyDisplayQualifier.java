@@ -17,13 +17,15 @@ public final class SurveyDisplayQualifier {
     private final TimeMatcher timeMatcher;
     private final UserIdentityMatcher userIdentityMatcher;
     private final DeviceTypeMatcher deviceTypeMatcher;
+    private final SamplePercentMatcher samplePercentMatcher;
 
-    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher, DeviceTypeMatcher deviceTypeMatcher) {
+    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher, DeviceTypeMatcher deviceTypeMatcher, SamplePercentMatcher samplePercentMatcher) {
         this.localStorage = localStorage;
         this.propertiesMatcher = propertiesMatcher;
         this.timeMatcher = timeMatcher;
         this.userIdentityMatcher = userIdentityMatcher;
         this.deviceTypeMatcher = deviceTypeMatcher;
+        this.samplePercentMatcher = samplePercentMatcher;
     }
 
     public boolean shouldShowSurvey(Survey survey) {
@@ -56,6 +58,11 @@ public final class SurveyDisplayQualifier {
 
         if (!deviceTypeMatcher.doesDeviceMatch(survey)) {
             QualarooLogger.debug("User device type does not match survey %1$s`s requirements", survey.canonicalName());
+            return false;
+        }
+
+        if (!samplePercentMatcher.matches(survey)) {
+            QualarooLogger.debug("User is not in target percentage group", survey.canonicalName());
             return false;
         }
 
