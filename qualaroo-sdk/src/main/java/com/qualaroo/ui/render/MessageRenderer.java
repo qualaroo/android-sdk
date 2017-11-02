@@ -47,9 +47,9 @@ public class MessageRenderer {
             callToAction.setText(message.ctaMap().text());
             callToAction.setOnClickListener(new DebouncingOnClickListener() {
                 @Override public void doClick(View v) {
-                    if (message.ctaMap().url() != null) {
+                    if (message.ctaMap().uri() != null) {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(message.ctaMap().url()));
+                        intent.setData(Uri.parse(message.ctaMap().uri()));
                         context.startActivity(intent);
                     }
                     onMessageConfirmedListener.onMessageConfirmed(message);

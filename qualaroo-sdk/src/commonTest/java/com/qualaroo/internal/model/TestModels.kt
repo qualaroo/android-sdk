@@ -42,7 +42,7 @@ object TestModels {
         return Message(id, type, description, ctaMap)
     }
 
-    fun ctaMap(text: String = "Go!", url: String = "http://qualaroo.com"): Message.CtaMap {
-        return Message.CtaMap(text, url)
+    fun ctaMap(text: String = "Go!", uri: String = "http://qualaroo.com"): Message.CtaMap {
+        return Message.CtaMap(text, uri)
     }
 }
