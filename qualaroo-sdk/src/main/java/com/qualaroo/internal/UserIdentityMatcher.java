@@ -2,7 +2,7 @@ package com.qualaroo.internal;
 
 import com.qualaroo.internal.model.Survey;
 
-public class UserIdentityMatcher {
+public class UserIdentityMatcher extends SurveySpecMatcher {
 
     private static final String TARGET_TYPE_KNOWN = "yes";
     private static final String TARGET_TYPE_UNKNOWN = "no";
@@ -14,7 +14,7 @@ public class UserIdentityMatcher {
         this.userInfo = userInfo;
     }
 
-    public boolean shouldShow(Survey survey) {
+    @Override boolean matches(Survey survey) {
         String targetType = survey.spec().requireMap().wantUserStr();
         if (targetType == null || targetType.equals(TARGET_TYPE_ANY)) {
             return true;

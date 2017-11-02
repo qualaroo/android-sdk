@@ -27,10 +27,10 @@ class UserIdentityMatcherTest {
         )
 
         whenever(userInfo.userId).thenReturn(null)
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
 
         whenever(userInfo.userId).thenReturn("some_id")
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
     }
 
     @Test
@@ -45,10 +45,10 @@ class UserIdentityMatcherTest {
         )
 
         whenever(userInfo.userId).thenReturn(null)
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
 
         whenever(userInfo.userId).thenReturn("some_id")
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
     }
 
     @Test
@@ -63,10 +63,10 @@ class UserIdentityMatcherTest {
         )
 
         whenever(userInfo.userId).thenReturn(null)
-        assertFalse(matcher.shouldShow(survey))
+        assertFalse(matcher.matches(survey))
 
         whenever(userInfo.userId).thenReturn("some_id")
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
     }
 
     @Test
@@ -81,10 +81,10 @@ class UserIdentityMatcherTest {
         )
 
         whenever(userInfo.userId).thenReturn(null)
-        assertTrue(matcher.shouldShow(survey))
+        assertTrue(matcher.matches(survey))
 
         whenever(userInfo.userId).thenReturn("some_id")
-        assertFalse(matcher.shouldShow(survey))
+        assertFalse(matcher.matches(survey))
     }
 
 }

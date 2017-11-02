@@ -4,68 +4,45 @@ import android.support.annotation.RestrictTo;
 
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.model.Survey;
-import com.qualaroo.internal.model.SurveyStatus;
-import com.qualaroo.internal.storage.LocalStorage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class SurveyDisplayQualifier {
 
-    private final LocalStorage localStorage;
-    private final UserPropertiesMatcher propertiesMatcher;
-    private final TimeMatcher timeMatcher;
-    private final UserIdentityMatcher userIdentityMatcher;
-    private final DeviceTypeMatcher deviceTypeMatcher;
-    private final SamplePercentMatcher samplePercentMatcher;
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    public SurveyDisplayQualifier(LocalStorage localStorage, UserPropertiesMatcher propertiesMatcher, TimeMatcher timeMatcher, UserIdentityMatcher userIdentityMatcher, DeviceTypeMatcher deviceTypeMatcher, SamplePercentMatcher samplePercentMatcher) {
-        this.localStorage = localStorage;
-        this.propertiesMatcher = propertiesMatcher;
-        this.timeMatcher = timeMatcher;
-        this.userIdentityMatcher = userIdentityMatcher;
-        this.deviceTypeMatcher = deviceTypeMatcher;
-        this.samplePercentMatcher = samplePercentMatcher;
+    private List<SurveySpecMatcher> surveySpecMatchers = new ArrayList<>();
+
+    private SurveyDisplayQualifier(List<SurveySpecMatcher> matchers) {
+        this.surveySpecMatchers.addAll(matchers);
     }
 
     public boolean shouldShowSurvey(Survey survey) {
-        SurveyStatus status = localStorage.getSurveyStatus(survey);
-
-        if (status.hasBeenFinished() && !survey.spec().requireMap().isPersistent()) {
-            QualarooLogger.debug("Survey %1$s has already been finished.", survey.canonicalName());
-            return false;
+        for (SurveySpecMatcher surveySpecMatcher : surveySpecMatchers) {
+            if (!surveySpecMatcher.matches(survey)) {
+                QualarooLogger.debug("User properties do not match survey %1$s's requirements", survey.canonicalName());
+                return false;
+            }
         }
-
-        if (survey.spec().requireMap().isOneShot() && status.hasBeenSeen()) {
-            QualarooLogger.debug("Survey %1$s has already been seen", survey.canonicalName());
-            return false;
-        }
-
-        if (!timeMatcher.enoughTimePassedFrom(status.seenAtInMillis())) {
-            QualarooLogger.debug("Survey %1$s cannot be shown yet.", survey.canonicalName());
-            return false;
-        }
-
-        if (!propertiesMatcher.match(survey.spec().requireMap().customMap())) {
-            QualarooLogger.debug("User properties do not match survey %1$s's requirements", survey.canonicalName());
-            return false;
-        }
-
-        if (!userIdentityMatcher.shouldShow(survey)) {
-            QualarooLogger.debug("User identity type does not match survey %1$s`s requirements", survey.canonicalName());
-            return false;
-        }
-
-        if (!deviceTypeMatcher.doesDeviceMatch(survey)) {
-            QualarooLogger.debug("User device type does not match survey %1$s`s requirements", survey.canonicalName());
-            return false;
-        }
-
-        if (!samplePercentMatcher.matches(survey)) {
-            QualarooLogger.debug("User is not in target percentage group", survey.canonicalName());
-            return false;
-        }
-
         return true;
+    }
+
+    public static class Builder {
+        private List<SurveySpecMatcher> matchers = new ArrayList<>();
+
+        public Builder register(SurveySpecMatcher surveySpecMatcher) {
+            matchers.add(surveySpecMatcher);
+            return this;
+        }
+
+        public SurveyDisplayQualifier build() {
+            return new SurveyDisplayQualifier(matchers);
+        }
     }
 }

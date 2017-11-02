@@ -13,6 +13,7 @@ import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
+import com.qualaroo.internal.SurveyStatusMatcher;
 import com.qualaroo.internal.TimeMatcher;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
@@ -114,14 +115,15 @@ public class Qualaroo implements QualarooSdk {
         Settings settings = new Settings(sharedPreferences);
         userInfo = new UserInfo(settings, localStorage);
 
-        UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
-        UserIdentityMatcher userIdentityMatcher = new UserIdentityMatcher(userInfo);
-        DeviceTypeMatcher deviceTypeMatcher = new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context));
+
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
-        TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
-        UserGroupPercentageProvider userGroupPercentageProvider = new UserGroupPercentageProvider(localStorage, new SecureRandom());
-        SamplePercentMatcher samplePercentMatcher = new SamplePercentMatcher(userGroupPercentageProvider);
-        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher, userIdentityMatcher, deviceTypeMatcher, samplePercentMatcher);
+        this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                .register(new SurveyStatusMatcher(localStorage, new TimeMatcher(pauseBetweenSurveysInMillis)))
+                .register(new UserPropertiesMatcher(userInfo))
+                .register(new UserIdentityMatcher(userInfo))
+                .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
+                .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
+                .build();
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));

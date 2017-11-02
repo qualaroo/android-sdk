@@ -2,7 +2,7 @@ package com.qualaroo.internal;
 
 import com.qualaroo.internal.model.Survey;
 
-public class SamplePercentMatcher {
+public class SamplePercentMatcher extends SurveySpecMatcher {
 
     private final UserGroupPercentageProvider percentageProvider;
 
@@ -10,7 +10,7 @@ public class SamplePercentMatcher {
         this.percentageProvider = percentageProvider;
     }
 
-    public boolean matches(Survey survey) {
+    @Override boolean matches(Survey survey) {
         Integer samplePercent = survey.spec().requireMap().samplePercent();
         if (samplePercent == null) {
             return true;

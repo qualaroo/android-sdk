@@ -25,7 +25,7 @@ class DeviceTypeMatcherTest {
                         )
                 )
         )
-        assertFalse(matcher.doesDeviceMatch(survey))
+        assertFalse(matcher.matches(survey))
     }
 
     @Test
@@ -43,13 +43,13 @@ class DeviceTypeMatcherTest {
         )
 
         whenever(deviceTypeProvider.deviceType()).thenReturn("phone")
-        assertTrue(matcher.doesDeviceMatch(survey))
+        assertTrue(matcher.matches(survey))
 
         whenever(deviceTypeProvider.deviceType()).thenReturn("tablet")
-        assertTrue(matcher.doesDeviceMatch(survey))
+        assertTrue(matcher.matches(survey))
 
         whenever(deviceTypeProvider.deviceType()).thenReturn("desktop")
-        assertFalse(matcher.doesDeviceMatch(survey))
+        assertFalse(matcher.matches(survey))
     }
 
 }

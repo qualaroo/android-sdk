@@ -15,53 +15,53 @@ class UserPropertiesMatcherTest {
 
     @Test
     fun `matches basic cases`() {
-        assertTrue(matcher.match(null))
-        assertTrue(matcher.match(""))
-        assertTrue(matcher.match(" "))
-        assertTrue(matcher.match("\"something\""))
-        assertTrue(matcher.match("2"))
-        assertTrue(matcher.match("2==2"))
-        assertFalse(matcher.match("2 > 2"))
-        assertFalse(matcher.match("2 != 2"))
-        assertTrue(matcher.match("\"something\" || 2 == 2"))
-        assertTrue(matcher.match("\"something\" && 2 == 2"))
+        assertTrue(matcher.doesUserPropertiesMatch(null))
+        assertTrue(matcher.doesUserPropertiesMatch(""))
+        assertTrue(matcher.doesUserPropertiesMatch(" "))
+        assertTrue(matcher.doesUserPropertiesMatch("\"something\""))
+        assertTrue(matcher.doesUserPropertiesMatch("2"))
+        assertTrue(matcher.doesUserPropertiesMatch("2==2"))
+        assertFalse(matcher.doesUserPropertiesMatch("2 > 2"))
+        assertFalse(matcher.doesUserPropertiesMatch("2 != 2"))
+        assertTrue(matcher.doesUserPropertiesMatch("\"something\" || 2 == 2"))
+        assertTrue(matcher.doesUserPropertiesMatch("\"something\" && 2 == 2"))
     }
 
     @Test
     fun `returns false when param is missing`() {
-        assertFalse(matcher.match("something"))
+        assertFalse(matcher.doesUserPropertiesMatch("something"))
     }
 
     @Test
     fun `ignore empty spaces`() {
-        assertTrue(matcher.match("1==1"))
-        assertTrue(matcher.match("1 == 1"))
-        assertTrue(matcher.match("  1==     1"))
+        assertTrue(matcher.doesUserPropertiesMatch("1==1"))
+        assertTrue(matcher.doesUserPropertiesMatch("1 == 1"))
+        assertTrue(matcher.doesUserPropertiesMatch("  1==     1"))
     }
 
     @Test
     fun `matches based on user properties`() {
-        assertFalse(matcher.match("premium==true"))
+        assertFalse(matcher.doesUserPropertiesMatch("premium==true"))
 
         userInfo.setUserProperty("premium", "true")
-        assertTrue(matcher.match("premium==true"))
+        assertTrue(matcher.doesUserPropertiesMatch("premium==true"))
 
-        assertFalse(matcher.match("premium == true && age > 18"))
+        assertFalse(matcher.doesUserPropertiesMatch("premium == true && age > 18"))
         userInfo.setUserProperty("age", "18")
-        assertFalse(matcher.match("premium == true && age > 18"))
+        assertFalse(matcher.doesUserPropertiesMatch("premium == true && age > 18"))
         userInfo.setUserProperty("age", "19")
-        assertTrue(matcher.match("premium == true && age > 18"))
+        assertTrue(matcher.doesUserPropertiesMatch("premium == true && age > 18"))
 
-        assertFalse(matcher.match("(premium==true && age > 18) && name=\"Joe\""))
+        assertFalse(matcher.doesUserPropertiesMatch("(premium==true && age > 18) && name=\"Joe\""))
 
         userInfo.setUserProperty("name", "Joe")
-        assertTrue(matcher.match("(premium==true && age > 18) && name==\"Joe\""))
+        assertTrue(matcher.doesUserPropertiesMatch("(premium==true && age > 18) && name==\"Joe\""))
 
         userInfo.setUserProperty("age", "16")
-        assertFalse(matcher.match("((premium==true && age > 18) && name==\"Joe\") || job == \"ceo\""))
+        assertFalse(matcher.doesUserPropertiesMatch("((premium==true && age > 18) && name==\"Joe\") || job == \"ceo\""))
 
         userInfo.setUserProperty("job", "ceo")
-        assertTrue(matcher.match("((premium==true && age > 18) && name==\"Joe\") || job == \"ceo\""))
+        assertTrue(matcher.doesUserPropertiesMatch("((premium==true && age > 18) && name==\"Joe\") || job == \"ceo\""))
     }
 
 }

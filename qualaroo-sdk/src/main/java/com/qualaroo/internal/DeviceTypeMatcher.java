@@ -6,7 +6,7 @@ import com.qualaroo.internal.model.Survey;
 
 import java.util.List;
 
-public class DeviceTypeMatcher {
+public class DeviceTypeMatcher extends SurveySpecMatcher {
 
     private static final String TYPE_PHONE = "phone";
     private static final String TYPE_TABLET = "tablet";
@@ -18,7 +18,7 @@ public class DeviceTypeMatcher {
         this.deviceTypeProvider = deviceTypeProvider;
     }
 
-    public boolean doesDeviceMatch(Survey survey) {
+    @Override boolean matches(Survey survey) {
         List<String> deviceTypes = survey.spec().requireMap().deviceTypeList();
         if (deviceTypes == null || deviceTypes.isEmpty()) {
             return false;
