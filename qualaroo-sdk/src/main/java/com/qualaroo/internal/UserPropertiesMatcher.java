@@ -1,6 +1,9 @@
 package com.qualaroo.internal;
 
 import android.support.annotation.RestrictTo;
+import android.support.annotation.VisibleForTesting;
+
+import com.qualaroo.internal.model.Survey;
 
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
@@ -16,7 +19,7 @@ import java.util.Set;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
-public final class UserPropertiesMatcher {
+public final class UserPropertiesMatcher extends SurveySpecMatcher {
 
     private final UserInfo userInfo;
     private final JexlEngine jexlEngine;
@@ -26,7 +29,12 @@ public final class UserPropertiesMatcher {
         this.jexlEngine = new JexlBuilder().create();
     }
 
-    public boolean match(String customMap) {
+    @Override boolean matches(Survey survey) {
+        String customMap = survey.spec().requireMap().customMap();
+        return doesUserPropertiesMatch(customMap);
+    }
+
+    @SuppressWarnings("WeakerAccess") @VisibleForTesting boolean doesUserPropertiesMatch(String customMap) {
         if (customMap == null || customMap.trim().length() == 0) {
             return true;
         }
