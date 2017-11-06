@@ -46,11 +46,12 @@ class SurveysRepositoryTest {
         assertEquals("abc123", url.queryParameter("site_id"))
         assertEquals("1", url.queryParameter("spec"))
         assertEquals("1", url.queryParameter("no_superpack"))
-        assertEquals("1.0.0", url.queryParameter("SDK_version"))
-        assertEquals("27", url.queryParameter("android_version"))
+        assertEquals("1.0.0", url.queryParameter("sdk_version"))
+        assertEquals("27", url.queryParameter("os_version"))
         assertEquals("GF3210", url.queryParameter("device_type"))
-        assertEquals("abcd1", url.queryParameter("device_ID"))
+        assertEquals("abcd1", url.queryParameter("device_id"))
         assertEquals("com.qualaroo.test", url.queryParameter("client_app"))
+        assertEquals("Android", url.queryParameter("os"))
     }
 
     @Test
