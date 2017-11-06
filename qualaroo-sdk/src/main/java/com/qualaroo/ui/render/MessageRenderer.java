@@ -2,6 +2,7 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.RestrictTo;
 import android.text.method.ScrollingMovementMethod;
@@ -50,13 +51,20 @@ public class MessageRenderer {
                     if (message.ctaMap().uri() != null) {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(message.ctaMap().uri()));
-                        context.startActivity(intent);
+                        if (canIntentBeHandled(v.getContext(), intent)) {
+                            context.startActivity(intent);
+                        }
                     }
                     onMessageConfirmedListener.onMessageConfirmed(message);
                 }
             });
         }
         return view;
+    }
+
+    private boolean canIntentBeHandled(Context context, Intent intent) {
+        PackageManager packageManager = context.getPackageManager();
+        return intent.resolveActivity(packageManager) != null;
     }
 
 
