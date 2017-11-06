@@ -108,13 +108,13 @@ public class Qualaroo implements QualarooSdk {
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
         this.localStorage = new DatabaseLocalStorage(this.context);
         this.restClient = buildRestClient(credentials);
-        ApiConfig apiConfig = new ApiConfig();
-        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
-        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
-        userInfo = new UserInfo(settings, localStorage);
-
+        this.userInfo = new UserInfo(settings, localStorage);
+        ApiConfig apiConfig = new ApiConfig();
+        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo);
+        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
 
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
         this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()

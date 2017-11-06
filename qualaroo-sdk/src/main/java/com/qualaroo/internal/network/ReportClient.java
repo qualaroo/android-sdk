@@ -2,6 +2,7 @@ package com.qualaroo.internal.network;
 
 import android.support.annotation.RestrictTo;
 
+import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -22,11 +23,13 @@ public class ReportClient {
     private final RestClient restClient;
     private final ApiConfig apiConfig;
     private final LocalStorage localStorage;
+    private final UserInfo userInfo;
 
-    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage) {
+    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo) {
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.localStorage = localStorage;
+        this.userInfo = userInfo;
     }
 
     public void recordImpression(Survey survey) {
@@ -47,6 +50,7 @@ public class ReportClient {
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
         injectAnswers(builder, question, answerList);
+        injectAnalyticsParams(builder);
         final HttpUrl url = builder.build();
         try {
             Response response = restClient.get(url);
@@ -61,6 +65,7 @@ public class ReportClient {
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
         builder.addQueryParameter(String.format(Locale.ROOT,"r[%d][text]", question.id()), answer);
+        injectAnalyticsParams(builder);
         final HttpUrl url = builder.build();
         try {
             Response response = restClient.get(url);
@@ -74,6 +79,7 @@ public class ReportClient {
         HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
+        injectAnalyticsParams(builder);
         for (Map.Entry<Long, String> entry : questionIdToAnswer.entrySet()) {
             String key = String.format(Locale.ROOT, "r[%d][text]", entry.getKey());
             String value = entry.getValue();
@@ -126,5 +132,13 @@ public class ReportClient {
         for (Answer answer : answers) {
             builder.addQueryParameter(String.format(Locale.ROOT,"r[%d]", question.id()), String.valueOf(answer.id()));
         }
+    }
+
+    private void injectAnalyticsParams(HttpUrl.Builder httpUrlBuilder) {
+        String userId = userInfo.getUserId();
+        if (userId != null) {
+            httpUrlBuilder.addQueryParameter("i", userInfo.getUserId());
+        }
+        httpUrlBuilder.addQueryParameter("au", userInfo.getDeviceId());
     }
 }

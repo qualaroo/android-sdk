@@ -19,8 +19,7 @@ public class Settings {
         sharedPreferences.edit().putString(key, value).apply();
     }
 
-    @Nullable
-    public String get(String key) {
+    @Nullable public String get(String key) {
         return sharedPreferences.getString(key, null);
     }
 }
