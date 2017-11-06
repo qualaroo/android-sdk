@@ -110,11 +110,12 @@ public class SurveysRepository {
 
     private void injectAnalyticsParams(HttpUrl.Builder httpUrlBuilder) {
         httpUrlBuilder
-                .addQueryParameter("SDK_version", sessionInfo.sdkVersion())
+                .addQueryParameter("sdk_version", sessionInfo.sdkVersion())
                 .addQueryParameter("client_app", sessionInfo.appName())
-                .addEncodedQueryParameter("device_type", sessionInfo.deviceType())
-                .addQueryParameter("android_version", sessionInfo.androidVersion())
-                .addQueryParameter("device_ID", userInfo.getDeviceId());
+                .addQueryParameter("device_type", sessionInfo.deviceType())
+                .addQueryParameter("os_version", sessionInfo.androidVersion())
+                .addQueryParameter("os", "Android")
+                .addQueryParameter("device_id", userInfo.getDeviceId());
     }
 
     private boolean isStale(CachedResult cachedResult) {
