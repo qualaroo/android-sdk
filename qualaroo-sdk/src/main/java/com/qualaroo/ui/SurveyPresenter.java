@@ -100,8 +100,12 @@ class SurveyPresenter {
         interactor.questionAnsweredWithText(payload);
     }
 
-    public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+    void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
         interactor.leadGenAnswered(questionIdsWithAnswers);
+    }
+
+    void onMessageConfirmed(Message message) {
+        interactor.messageConfirmed(message);
     }
 
     static class State implements Serializable {

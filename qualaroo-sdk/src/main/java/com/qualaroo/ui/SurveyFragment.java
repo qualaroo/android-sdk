@@ -197,7 +197,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.removeAllViews();
         questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
             @Override public void onMessageConfirmed(Message message) {
-                surveyPresenter.onCloseClicked();
+                surveyPresenter.onMessageConfirmed(message);
             }
         }));
     }
