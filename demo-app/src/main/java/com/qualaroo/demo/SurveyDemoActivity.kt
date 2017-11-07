@@ -24,7 +24,7 @@ class SurveyDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_survey)
         val settings = Settings(this)
 
-        val apiKey = settings.apiKey() ?: "API_KEY_HERE"
+        val apiKey = settings.apiKey()
         val apiKeyEditText = findViewById<EditText>(R.id.qualaroo__demo_api_key_edit_text)
         apiKeyEditText.setText(apiKey)
 
