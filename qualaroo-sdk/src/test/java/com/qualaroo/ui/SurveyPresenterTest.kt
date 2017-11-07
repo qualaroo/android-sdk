@@ -9,6 +9,7 @@ import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.ui.render.ThemeUtil.Companion.theme
+import com.qualaroo.util.UriOpener
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -18,8 +19,9 @@ import org.mockito.ArgumentCaptor
 class SurveyPresenterTest {
 
 
+    private val uriOpener = mock<UriOpener>()
     private val interactor = mock<SurveyInteractor>()
-    private val presenter = SurveyPresenter(interactor, survey(id = 10), theme())
+    private val presenter = SurveyPresenter(interactor, survey(id = 10), theme(), uriOpener)
 
     val view = mock<SurveyView>()
 
@@ -50,7 +52,7 @@ class SurveyPresenterTest {
                         )
                 )
         )
-        val presenter = SurveyPresenter(interactor, survey, theme)
+        val presenter = SurveyPresenter(interactor, survey, theme, uriOpener)
 
         presenter.setView(view)
 
@@ -170,6 +172,13 @@ class SurveyPresenterTest {
 
         val savedState = presenter.savedState
         assertTrue(savedState.isDisplayingQuestion)
+    }
+
+    @Test
+    fun `opens uri with UriOpener instance`() {
+        capturedEventsObserver.openUri("someFancyUri")
+
+        verify(uriOpener, times(1)).openUri("someFancyUri")
     }
 
 }

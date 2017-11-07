@@ -2,6 +2,10 @@
  * Copyright © 2017 Qualaroo. All rights reserved.
  */
 
+int major = 1
+int minor = 0
+int patch = 0
+
 apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -16,7 +20,8 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        versionCode 10000 * major + 100 * minor + patch
+        versionName "$major.$minor.$patch"
     }
     buildTypes {
         release {
@@ -41,6 +46,10 @@ android {
         androidTest {
             java.srcDirs += commonTestClasses
         }
+    }
+
+    testOptions {
+        animationsDisabled = true
     }
 }
 
@@ -67,8 +76,11 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.9.0'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    }
 
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
@@ -116,7 +128,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version '1.0.1-SNAPSHOT'
+            version "$major.$minor.$patch-SNAPSHOT"
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar

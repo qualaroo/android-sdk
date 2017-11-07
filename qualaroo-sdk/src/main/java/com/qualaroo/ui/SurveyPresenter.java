@@ -1,5 +1,6 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
@@ -10,6 +11,7 @@ import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.ui.render.Theme;
+import com.qualaroo.util.UriOpener;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -24,14 +26,16 @@ class SurveyPresenter {
     private final SurveyInteractor interactor;
     private final Survey survey;
     private final Theme theme;
+    private final UriOpener uriOpener;
 
     private SurveyView surveyView;
     private boolean isDisplayingQuestion;
 
-    SurveyPresenter(SurveyInteractor interactor, Survey survey, Theme theme) {
+    SurveyPresenter(SurveyInteractor interactor, Survey survey, Theme theme, UriOpener uriOpener) {
         this.interactor = interactor;
         this.survey = survey;
         this.theme = theme;
+        this.uriOpener = uriOpener;
     }
 
     void setView(SurveyView view) {
@@ -79,6 +83,10 @@ class SurveyPresenter {
             isDisplayingQuestion = true;
         }
 
+        @Override public void openUri(@NonNull String stringUri) {
+            uriOpener.openUri(stringUri);
+        }
+
         @Override public void closeSurvey() {
             surveyView.closeSurvey();
         }
@@ -100,8 +108,12 @@ class SurveyPresenter {
         interactor.questionAnsweredWithText(payload);
     }
 
-    public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+    void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
         interactor.leadGenAnswered(questionIdsWithAnswers);
+    }
+
+    void onMessageConfirmed(Message message) {
+        interactor.messageConfirmed(message);
     }
 
     static class State implements Serializable {

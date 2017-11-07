@@ -35,6 +35,7 @@ import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
+import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -92,6 +93,7 @@ public class Qualaroo implements QualarooSdk {
     private final SurveysRepository surveysRepository;
     private final Executor dataExecutor;
     private final ReportManager reportManager;
+    private final UriOpener uriOpener;
     final LocalStorage localStorage;
     final RestClient restClient;
     private final Executor uiExecutor;
@@ -108,7 +110,7 @@ public class Qualaroo implements QualarooSdk {
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
         this.localStorage = new DatabaseLocalStorage(this.context);
         this.restClient = buildRestClient(credentials);
-
+        this.uriOpener = new UriOpener(context);
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
         this.userInfo = new UserInfo(settings, localStorage);
@@ -208,7 +210,7 @@ public class Qualaroo implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener);
     }
 
     private RestClient buildRestClient(Credentials credentials) {

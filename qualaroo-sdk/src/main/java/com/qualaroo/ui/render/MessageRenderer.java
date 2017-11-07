@@ -1,8 +1,6 @@
 package com.qualaroo.ui.render;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.RestrictTo;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -38,26 +36,15 @@ public class MessageRenderer {
         ThemeUtils.applyTheme(callToAction, theme);
         if (message.type() == MessageType.REGULAR || message.type() == MessageType.UNKNOWN) {
             callToAction.setText(android.R.string.ok);
-            callToAction.setOnClickListener(new DebouncingOnClickListener() {
-                @Override public void doClick(View v) {
-                    onMessageConfirmedListener.onMessageConfirmed(message);
-                }
-            });
         } else if (message.type() == MessageType.CALL_TO_ACTION) {
             callToAction.setText(message.ctaMap().text());
-            callToAction.setOnClickListener(new DebouncingOnClickListener() {
-                @Override public void doClick(View v) {
-                    if (message.ctaMap().uri() != null) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(message.ctaMap().uri()));
-                        context.startActivity(intent);
-                    }
-                    onMessageConfirmedListener.onMessageConfirmed(message);
-                }
-            });
         }
+        callToAction.setOnClickListener(new DebouncingOnClickListener() {
+            @Override public void doClick(View v) {
+                onMessageConfirmedListener.onMessageConfirmed(message);
+            }
+        });
         return view;
     }
-
 
 }

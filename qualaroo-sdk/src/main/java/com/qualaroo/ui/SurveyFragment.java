@@ -1,12 +1,15 @@
 package com.qualaroo.ui;
 
+import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +24,9 @@ import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.ui.render.RestorableView;
 import com.qualaroo.ui.render.ViewState;
-import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
@@ -43,7 +46,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     Renderer renderer;
 
     private View backgroundView;
-    private View surveyContainer;
+    private LinearLayout surveyContainer;
     private TextView questionsTitle;
     private FrameLayout questionsContent;
     private ImageView closeButton;
@@ -126,14 +129,16 @@ public class SurveyFragment extends Fragment implements SurveyView {
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
         isFullScreen = viewModel.isFullscreen();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            surveyContainer.getLayoutTransition()
+                    .enableTransitionType(LayoutTransition.CHANGING);
+        }
         if (isFullScreen) {
             ViewGroup.LayoutParams surveyLayoutParams = surveyContainer.getLayoutParams();
             surveyLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
             surveyContainer.setLayoutParams(surveyLayoutParams);
+            surveyContainer.setGravity(Gravity.CENTER);
 
-            LinearLayout.LayoutParams questionLayoutParams = (LinearLayout.LayoutParams) questionsContent.getLayoutParams();
-            questionLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            questionsContent.setLayoutParams(questionLayoutParams);
         }
     }
 
@@ -192,7 +197,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.removeAllViews();
         questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
             @Override public void onMessageConfirmed(Message message) {
-                surveyPresenter.onCloseClicked();
+                surveyPresenter.onMessageConfirmed(message);
             }
         }));
     }

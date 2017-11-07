@@ -82,7 +82,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
                 convertView = inflater.inflate(R.layout.qualaroo__view_question_dropdown_selected_item, parent, false);
             }
             AnswerItem item = getItem(position);
-            TextView text= convertView.findViewById(R.id.qualaroo__view_question_dropdown_item_text);
+            TextView text = convertView.findViewById(R.id.qualaroo__view_question_dropdown_item_text);
             text.setText(item.answer.title());
             text.setTextColor(theme.textColor());
             return convertView;

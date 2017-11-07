@@ -2,8 +2,10 @@ package com.qualaroo.ui
 
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ReportManager
+import com.qualaroo.internal.model.MessageType
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.TestModels.answer
+import com.qualaroo.internal.model.TestModels.ctaMap
 import com.qualaroo.internal.model.TestModels.language
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.node
@@ -726,6 +728,26 @@ class SurveyInteractorTest {
         interactor.stopSurvey()
 
         verifyZeroInteractions(observer)
+    }
+
+    @Test
+    fun `opens uri for CTA messages`() {
+        interactor.messageConfirmed(message(id = 1, type = MessageType.REGULAR))
+        verify(observer, never()).openUri(any())
+
+        interactor.messageConfirmed(
+                message(
+                        id = 1,
+                        type = MessageType.CALL_TO_ACTION,
+                        description = "text",
+                        ctaMap = ctaMap(
+                                text = "buttonText",
+                                uri = "http://qualaroo.com"
+                        )
+                )
+        )
+
+        verify(observer, times(1)).openUri("http://qualaroo.com")
     }
 
 }
