@@ -12,7 +12,6 @@ import com.qualaroo.internal.model.Survey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
@@ -29,29 +28,27 @@ public class SurveysRepository {
     private final ApiConfig apiConfig;
     private final UserInfo userInfo;
     private final SessionInfo sessionInfo;
-    private final long staleDataTimeLimitInMillis;
+    private final Cache<List<Survey>> cache;
 
     private final Object lock = new Object();
 
-    private CachedResult cachedResult = new CachedResult(null, 0);
-
-    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SessionInfo sessionInfo, UserInfo userInfo, long staleDataTimeLimitInMillis) {
+    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SessionInfo sessionInfo, UserInfo userInfo, Cache<List<Survey>> cache) {
         this.siteId = siteId;
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.sessionInfo = sessionInfo;
         this.userInfo = userInfo;
-        this.staleDataTimeLimitInMillis = staleDataTimeLimitInMillis;
+        this.cache = cache;
     }
 
     public @NonNull List<Survey> getSurveys() {
         synchronized (lock) {
-            if (isInvalid(cachedResult)) {
+            if (cache.isInvalid()) {
                 refreshData();
-            } else if (isStale(cachedResult)) {
+            } else if (cache.isStale()) {
                 refreshDataAsync();
             }
-            return returnSafely(cachedResult.surveys);
+            return returnSafely(cache.get());
         }
     }
 
@@ -59,14 +56,13 @@ public class SurveysRepository {
         List<Survey> surveys = fetchSurveys();
         if (surveys != null) {
             synchronized (lock) {
-                cachedResult = new CachedResult(surveys, System.currentTimeMillis());
+                cache.put(surveys);
             }
         }
     }
 
     private void refreshDataAsync() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override public void run() {
                 refreshData();
             }
@@ -117,24 +113,5 @@ public class SurveysRepository {
                 .addQueryParameter("os", "Android")
                 .addQueryParameter("device_id", userInfo.getDeviceId());
     }
-
-    private boolean isStale(CachedResult cachedResult) {
-        return System.currentTimeMillis() - cachedResult.timestamp > staleDataTimeLimitInMillis;
-    }
-
-    private boolean isInvalid(CachedResult cachedResult) {
-        return cachedResult.surveys == null;
-    }
-
-    private static final class CachedResult {
-        private final List<Survey> surveys;
-        private final long timestamp;
-
-        CachedResult(List<Survey> surveys, long timestamp) {
-            this.surveys = surveys;
-            this.timestamp = timestamp;
-        }
-    }
-
 
 }

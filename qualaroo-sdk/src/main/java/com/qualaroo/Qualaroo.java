@@ -28,6 +28,7 @@ import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
+import com.qualaroo.internal.network.Cache;
 import com.qualaroo.internal.network.ReportClient;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
@@ -35,6 +36,7 @@ import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
+import com.qualaroo.util.TimeProvider;
 import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
@@ -128,7 +130,12 @@ public class Qualaroo implements QualarooSdk {
                 .build();
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
-        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
+
+        Cache<List<Survey>> cache = BuildConfig.DEBUG ?
+                new NonWorkingCache<List<Survey>>() :
+                new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
+
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
 
         QualarooLogger.info("Initialized QualarooSdk");
         QualarooJobIntentService.start(this.context);
@@ -277,6 +284,20 @@ public class Qualaroo implements QualarooSdk {
             if (INSTANCE == null) {
                 INSTANCE = new Qualaroo(context, credentials, debugMode);
             }
+        }
+    }
+
+    private static class NonWorkingCache<T> extends Cache<T> {
+        NonWorkingCache() {
+            super(TimeProvider.DEFAULT, 0);
+        }
+
+        @Override public boolean isStale() {
+            return true;
+        }
+
+        @Override public boolean isInvalid() {
+            return true;
         }
     }
 

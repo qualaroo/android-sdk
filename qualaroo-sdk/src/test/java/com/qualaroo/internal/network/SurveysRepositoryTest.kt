@@ -5,11 +5,11 @@ import com.qualaroo.internal.SessionInfo
 import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.util.TimeProvider
 import okhttp3.HttpUrl
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 class SurveysRepositoryTest {
@@ -29,7 +29,12 @@ class SurveysRepositoryTest {
         on { deviceId } doReturn "abcd1"
     }
 
-    val surveysRepository = SurveysRepository("abc123", restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1))
+    val timeProvider = mock<TimeProvider> {
+        on { currentTimeMillis() } doReturn 0L
+    }
+    val timeLimit = 1000L
+
+    val surveysRepository = SurveysRepository("abc123", restClient, apiConfig, sessionInfo, userInfo, Cache(timeProvider, timeLimit))
 
     @Test
     fun `calls proper request`() {
