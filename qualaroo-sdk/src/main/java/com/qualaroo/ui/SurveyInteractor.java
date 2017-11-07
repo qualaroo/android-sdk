@@ -1,5 +1,6 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.util.LongSparseArray;
@@ -8,6 +9,7 @@ import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.MessageType;
 import com.qualaroo.internal.model.Node;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
@@ -30,6 +32,7 @@ public class SurveyInteractor {
         void showQuestion(Question question);
         void showMessage(Message message);
         void showLeadGen(QScreen qscreen, List<Question> questions);
+        void openUri(@NonNull String stringUri);
         void closeSurvey();
     }
 
@@ -138,6 +141,9 @@ public class SurveyInteractor {
     }
 
     public void messageConfirmed(Message message) {
+        if (message.type() == MessageType.CALL_TO_ACTION) {
+            eventsObserver.openUri(message.ctaMap().uri());
+        }
         eventsObserver.closeSurvey();
     }
 
@@ -209,6 +215,14 @@ public class SurveyInteractor {
             });
         }
 
+        @Override public void openUri(@NonNull final String stringUri) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.openUri(stringUri);
+                }
+            });
+        }
+
         @Override public void closeSurvey() {
             executor.execute(new Runnable() {
                 @Override public void run() {
@@ -222,6 +236,7 @@ public class SurveyInteractor {
         @Override public void showQuestion(Question question) {}
         @Override public void showMessage(Message message) {}
         @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {}
+        @Override public void openUri(@NonNull String stringUri) {}
         @Override public void closeSurvey() {}
     }
 

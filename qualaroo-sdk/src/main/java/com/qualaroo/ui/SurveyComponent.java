@@ -8,6 +8,7 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.ui.render.Theme;
+import com.qualaroo.util.UriOpener;
 
 import java.util.concurrent.Executor;
 
@@ -20,14 +21,14 @@ public class SurveyComponent {
     private final SurveyPresenter surveyPresenter;
     private final Renderer renderer;
 
-    public static SurveyComponent from(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
-        return new SurveyComponent(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
+    public static SurveyComponent from(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener) {
+        return new SurveyComponent(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener);
     }
 
-    private SurveyComponent(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
+    private SurveyComponent(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener) {
         Theme theme = Theme.from(survey.spec().optionMap().colorThemeMap());
         this.surveyInteractor = new SurveyInteractor(survey, localStorage,  reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
-        this.surveyPresenter = new SurveyPresenter(surveyInteractor, survey, theme);
+        this.surveyPresenter = new SurveyPresenter(surveyInteractor, survey, theme, uriOpener);
         this.renderer = new Renderer(theme);
     }
 
