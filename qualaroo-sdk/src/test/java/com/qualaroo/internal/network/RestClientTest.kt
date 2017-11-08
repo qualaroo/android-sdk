@@ -3,6 +3,7 @@ package com.qualaroo.internal.network
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParseException
 import com.qualaroo.internal.model.*
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -53,7 +54,6 @@ class RestClientTest {
         assertEquals(400, (result.exception as HttpException).httpCode())
     }
 
-
     @Test
     fun `works for survey requests`() {
         mockWebServer.enqueue(mockResponseWithFile("api_responses/surveys.json"))
@@ -66,6 +66,16 @@ class RestClientTest {
         assertEquals(177158, data[0].id())
         assertEquals(10, data[0].spec().requireMap().samplePercent())
         assertNull(data[1].spec().requireMap().samplePercent())
+    }
+
+    @Test
+    fun `handles json parse errors`() {
+        mockWebServer.enqueue(mockResponseWithText("-1508855936375"))
+
+        val result = restClient.get(mockWebServer.url("/"), Integer::class.java)
+
+        assertFalse(result.isSuccessful)
+        assertTrue(result.exception is JsonParseException)
     }
 
     @After
