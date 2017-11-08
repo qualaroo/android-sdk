@@ -125,7 +125,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsTitle.setTextColor(viewModel.textColor());
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
         closeButton.setColorFilter(viewModel.buttonDisabledColor());
-        closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
+        closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
         isFullScreen = viewModel.isFullscreen();
@@ -138,7 +138,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
             surveyContainer.setLayoutParams(surveyLayoutParams);
             surveyContainer.setGravity(Gravity.CENTER);
-
         }
     }
 
