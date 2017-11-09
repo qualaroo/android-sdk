@@ -56,12 +56,16 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(RadioGroup radioGroup, int answerId) {
+            @Override public void onCheckedChanged(RadioGroup radioGroup, final int answerId) {
                 if (question.alwaysShowSend()) {
                     button.setEnabled(true);
                 } else {
-                    Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                    onAnsweredListener.onAnswered(selectedAnswer);
+                    radioGroup.postDelayed(new Runnable() {
+                        @Override public void run() {
+                            Answer selectedAnswer = getAnswerById(answerId, question.answerList());
+                            onAnsweredListener.onAnswered(selectedAnswer);
+                        }
+                    }, 300);
                 }
             }
         });
