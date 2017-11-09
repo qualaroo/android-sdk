@@ -88,6 +88,7 @@ Qualaroo.initializeWith(context)
         .setDebugMode(true)
         .init();
 ```
+You can find more info at our [wiki pages](https://github.com/qualaroo/AndroidSDK/wiki)
 ## License
 
 Copyright (c) 2017 Qualaroo
