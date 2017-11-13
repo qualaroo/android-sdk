@@ -4,7 +4,7 @@
 
 int major = 1
 int minor = 4
-int patch = 0
+int patch = 1
 
 apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
