@@ -8,19 +8,27 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
+import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ReportManager;
+import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
+import com.qualaroo.internal.SurveyStatusMatcher;
 import com.qualaroo.internal.TimeMatcher;
+import com.qualaroo.internal.UserGroupPercentageProvider;
+import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
 import com.qualaroo.internal.executor.UiThreadExecutor;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.LanguageJsonDeserializer;
+import com.qualaroo.internal.model.MessageType;
+import com.qualaroo.internal.model.MessageTypeDeserializer;
 import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
+import com.qualaroo.internal.network.Cache;
 import com.qualaroo.internal.network.ReportClient;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
@@ -28,8 +36,11 @@ import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
+import com.qualaroo.util.TimeProvider;
+import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -84,6 +95,7 @@ public class Qualaroo implements QualarooSdk {
     private final SurveysRepository surveysRepository;
     private final Executor dataExecutor;
     private final ReportManager reportManager;
+    private final UriOpener uriOpener;
     final LocalStorage localStorage;
     final RestClient restClient;
     private final Executor uiExecutor;
@@ -100,20 +112,30 @@ public class Qualaroo implements QualarooSdk {
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
         this.localStorage = new DatabaseLocalStorage(this.context);
         this.restClient = buildRestClient(credentials);
-        ApiConfig apiConfig = new ApiConfig();
-        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage);
-        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
+        this.uriOpener = new UriOpener(context);
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
-        userInfo = new UserInfo(settings, localStorage);
+        this.userInfo = new UserInfo(settings, localStorage);
+        ApiConfig apiConfig = new ApiConfig();
+        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo);
+        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
 
-        UserPropertiesMatcher userPropertiesMatcher = new UserPropertiesMatcher(userInfo);
         long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
-        TimeMatcher timeMatcher = new TimeMatcher(pauseBetweenSurveysInMillis);
-        this.surveyDisplayQualifier = new SurveyDisplayQualifier(localStorage, userPropertiesMatcher, timeMatcher);
+        this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                .register(new SurveyStatusMatcher(localStorage, new TimeMatcher(pauseBetweenSurveysInMillis)))
+                .register(new UserPropertiesMatcher(userInfo))
+                .register(new UserIdentityMatcher(userInfo))
+                .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
+                .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
+                .build();
 
         SessionInfo sessionInfo = new SessionInfo(this.context);
-        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1));
+
+        Cache<List<Survey>> cache = BuildConfig.DEBUG ?
+                new NonWorkingCache<List<Survey>>() :
+                new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
+
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
 
         QualarooLogger.info("Initialized QualarooSdk");
         QualarooJobIntentService.start(this.context);
@@ -195,7 +217,7 @@ public class Qualaroo implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor);
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener);
     }
 
     private RestClient buildRestClient(Credentials credentials) {
@@ -231,6 +253,7 @@ public class Qualaroo implements QualarooSdk {
         return new GsonBuilder()
                 .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
                 .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
+                .registerTypeAdapter(MessageType.class, new MessageTypeDeserializer())
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
     }
@@ -261,6 +284,20 @@ public class Qualaroo implements QualarooSdk {
             if (INSTANCE == null) {
                 INSTANCE = new Qualaroo(context, credentials, debugMode);
             }
+        }
+    }
+
+    private static class NonWorkingCache<T> extends Cache<T> {
+        NonWorkingCache() {
+            super(TimeProvider.DEFAULT, 0);
+        }
+
+        @Override public boolean isStale() {
+            return true;
+        }
+
+        @Override public boolean isInvalid() {
+            return true;
         }
     }
 

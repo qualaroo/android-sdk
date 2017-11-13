@@ -11,7 +11,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Question implements Serializable {
-    private int id;
+    private long id;
     private QuestionType type;
     private String title;
     private String description;
@@ -20,12 +20,13 @@ public final class Question implements Serializable {
     private Node nextMap;
     private String npsMinLabel;
     private String npsMaxLabel;
+    private String cname;
     private boolean disableRandom;
     private boolean anchorLast;
     private boolean alwaysShowSend;
     private boolean isRequired;
 
-    @VisibleForTesting Question(int id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -39,13 +40,14 @@ public final class Question implements Serializable {
         this.anchorLast = anchorLast;
         this.alwaysShowSend = alwaysShowSend;
         this.isRequired = isRequired;
+        this.cname = cname;
     }
 
     Question() {
         //deserializing with gson requires a default constructor
     }
 
-    public int id() {
+    public long id() {
         return id;
     }
 
@@ -79,6 +81,10 @@ public final class Question implements Serializable {
 
     public String npsMaxLabel() {
         return npsMaxLabel;
+    }
+
+    public String cname() {
+        return cname;
     }
 
     //made this flag a lot more readable in code
@@ -126,7 +132,7 @@ public final class Question implements Serializable {
     }
 
     @Override public int hashCode() {
-        return id;
+        return (int) (id ^ (id >>> 32));
     }
 
     @Override public String toString() {

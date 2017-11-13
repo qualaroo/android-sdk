@@ -1,5 +1,6 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -17,16 +18,18 @@ public final class Survey implements Serializable {
     private String canonicalName;
     private boolean active;
     private Spec spec;
+    private String type;
 
-    @VisibleForTesting Survey(int id, String name, String canonicalName, boolean active, Spec spec) {
+    @VisibleForTesting Survey(int id, String name, String canonicalName, boolean active, Spec spec, String type) {
         this.id = id;
         this.name = name;
         this.canonicalName = canonicalName;
         this.active = active;
         this.spec = spec;
+        this.type = type;
     }
 
-    Survey() {
+    @SuppressWarnings("unused") Survey() {
         //deserializing with gson requires a default constructor
     }
 
@@ -48,6 +51,10 @@ public final class Survey implements Serializable {
 
     public Spec spec() {
         return spec;
+    }
+
+    public String type() {
+        return type;
     }
 
     @Override public String toString() {
@@ -72,6 +79,7 @@ public final class Survey implements Serializable {
         private OptionMap optionMap;
         private Map<Language, List<Question>> questionList;
         private Map<Language, List<Message>> msgScreenList;
+        private Map<Language, List<QScreen>> qscreenList;
         private Map<Language, Node> startMap;
         private List<Language> surveyVariations;
 
@@ -87,6 +95,10 @@ public final class Survey implements Serializable {
             return msgScreenList;
         }
 
+        public Map<Language, List<QScreen>> qscreenList() {
+            return qscreenList;
+        }
+
         public Map<Language, Node> startMap() {
             return startMap;
         }
@@ -99,16 +111,17 @@ public final class Survey implements Serializable {
             return optionMap;
         }
 
-        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, Node> startMap, List<Language> surveyVariations) {
+        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, List<QScreen>> qscreenList, Map<Language, Node> startMap, List<Language> surveyVariations) {
             this.requireMap = requireMap;
             this.optionMap = optionMap;
             this.questionList = questionList;
             this.msgScreenList = msgScreenList;
+            this.qscreenList = qscreenList;
             this.startMap = startMap;
             this.surveyVariations = surveyVariations;
         }
 
-        Spec() {
+        @SuppressWarnings("unused") Spec() {
             //deserializing with gson requires a default constructor
         }
     }
@@ -118,6 +131,13 @@ public final class Survey implements Serializable {
         private boolean isPersistent;
         private boolean isOneShot;
         private String customMap;
+        //whether identity of the user should be known or not
+        private String wantUserStr;
+        private Integer samplePercent;
+
+        public String wantUserStr() {
+            return wantUserStr;
+        }
 
         public List<String> deviceTypeList() {
             return deviceTypeList;
@@ -135,11 +155,17 @@ public final class Survey implements Serializable {
             return customMap;
         }
 
-        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap) {
+        @Nullable public Integer samplePercent() {
+            return samplePercent;
+        }
+
+        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap, String wantUserStr, Integer samplePercent) {
             this.deviceTypeList = deviceTypeList;
             this.isPersistent = isPersistent;
             this.isOneShot = isOneShot;
             this.customMap = customMap;
+            this.wantUserStr = wantUserStr;
+            this.samplePercent = samplePercent;
         }
 
         RequireMap() {

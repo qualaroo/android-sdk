@@ -1,27 +1,40 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.qualaroo.sdkdemo"
+        applicationId "com.qualaroo.demo"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
+    signingConfigs {
+        release {
+            storeFile file("$projectDir/qualaroo_demo.keystore")
+            storePassword 'qualaroo1234'
+            keyAlias 'qualarootest'
+            keyPassword 'qualaroo1234'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
+
     lintOptions {
         abortOnError false
     }
+
 }
 
 repositories {
@@ -32,9 +45,14 @@ repositories {
 }
 
 dependencies {
-    releaseImplementation 'com.qualaroo:qualaroo-sdk:1.0.0-SNAPSHOT'
     debugImplementation project(':qualaroo-sdk')
+    releaseImplementation 'com.qualaroo:qualaroo-sdk:1.0.0'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "com.android.support:design:26.1.0"
+    implementation 'com.jakewharton:process-phoenix:2.0.0'
     implementation 'com.android.support:appcompat-v7:26.1.0'
+    
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

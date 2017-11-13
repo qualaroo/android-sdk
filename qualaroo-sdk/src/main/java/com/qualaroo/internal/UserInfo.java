@@ -1,5 +1,6 @@
 package com.qualaroo.internal;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.storage.LocalStorage;
@@ -28,7 +29,8 @@ public class UserInfo {
         settings.store(KEY_USER_ID, userId);
     }
 
-    public synchronized String getUserId() {
+
+    @Nullable public synchronized String getUserId() {
         return settings.get(KEY_USER_ID);
     }
 

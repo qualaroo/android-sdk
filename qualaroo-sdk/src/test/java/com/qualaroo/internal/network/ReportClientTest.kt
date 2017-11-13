@@ -1,12 +1,15 @@
 package com.qualaroo.internal.network
 
 import com.nhaarman.mockito_kotlin.*
+import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.internal.storage.LocalStorage
+import com.qualaroo.util.InMemorySettings
 import com.qualaroo.util.MockRestClient
 import okhttp3.HttpUrl
 import org.junit.Assert.assertEquals
@@ -25,7 +28,9 @@ class ReportClientTest {
 
     val localStorage = mock<LocalStorage>()
 
-    val client = ReportClient(restClient, apiConfig, localStorage)
+    val userInfo = spy(UserInfo(InMemorySettings(), InMemoryLocalStorage()))
+
+    val client = ReportClient(restClient, apiConfig, localStorage, userInfo)
 
     @Test
     fun `builds proper url for impressions`() {
@@ -118,6 +123,27 @@ class ReportClientTest {
     }
 
     @Test
+    fun `builds proper url for lead gen answers`() {
+        client.recordLeadGenAnswer(survey, mapOf(
+                1L to "John",
+                2L to "Doe",
+                3L to "mail@mail.com",
+                4L to "+1 123 123 123"
+        ))
+
+        val url = restClient.recentHttpUrl!!
+
+        assertEquals("https", url.scheme())
+        assertEquals("turbo.qualaroo.com", url.host())
+        assertEquals("/r.js", url.encodedPath())
+        assertEquals(survey.id().toString(), url.queryParameter("id"))
+        assertEquals("John", url.queryParameter("r[1][text]"))
+        assertEquals("Doe", url.queryParameter("r[2][text]"))
+        assertEquals("mail@mail.com", url.queryParameter("r[3][text]"))
+        assertEquals("+1 123 123 123", url.queryParameter("r[4][text]"))
+    }
+
+    @Test
     fun `stores requests on network errors`() {
         restClient.throwsIoException = true
 
@@ -161,6 +187,37 @@ class ReportClientTest {
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
     }
 
+    @Test
+    fun `injects user id and anonymous user id params in response events`() {
+        val urls = mutableListOf<HttpUrl>()
 
+        whenever(userInfo.deviceId).thenReturn("abcd1234")
+
+        client.recordLeadGenAnswer(survey(id = 1), mapOf(1L to "answer", 2L to "another_answer"))
+        urls.add(restClient.recentHttpUrl!!)
+        client.recordTextAnswer(survey(id = 1), question(id = 1), "text_answer")
+        urls.add(restClient.recentHttpUrl!!)
+        client.recordAnswer(survey(id = 1), question(id = 1), listOf(answer(id = 1), answer(id = 2)))
+        urls.add(restClient.recentHttpUrl!!)
+
+        urls.forEach {
+            assertEquals(null, it.queryParameter("i"))
+            assertEquals("abcd1234", it.queryParameter("au"))
+        }
+        urls.clear()
+
+        userInfo.userId = "lala"
+
+        client.recordLeadGenAnswer(survey(id = 1), mapOf(1L to "answer", 2L to "another_answer"))
+        urls.add(restClient.recentHttpUrl!!)
+        client.recordTextAnswer(survey(id = 1), question(id = 1), "text_answer")
+        urls.add(restClient.recentHttpUrl!!)
+        client.recordAnswer(survey(id = 1), question(id = 1), listOf(answer(id = 1), answer(id = 2)))
+        urls.add(restClient.recentHttpUrl!!)
+
+        urls.forEach {
+            assertEquals("lala", it.queryParameter("i"))
+        }
+    }
 
 }

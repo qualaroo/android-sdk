@@ -1,16 +1,17 @@
 package com.qualaroo.internal.storage
 
 import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
+import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
-import com.qualaroo.internal.model.UiTestModels.survey
+import com.qualaroo.internal.model.TestModels.survey
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Suppress("MemberVisibilityCanPrivate")
+@SmallTest
 @RunWith(AndroidJUnit4::class)
-@LargeTest
 class DatabaseLocalStorageTest {
 
     lateinit var localStorage: LocalStorage
@@ -139,4 +140,16 @@ class DatabaseLocalStorageTest {
         assertFalse(localStorage.userProperties.containsKey("someKey"))
     }
 
+    @Test
+    fun storesUsersGroupSurveyPercent() {
+        localStorage.storeUserGroupPercent(survey(id = 1), 25)
+        localStorage.storeUserGroupPercent(survey(id = 2), 40)
+        localStorage.storeUserGroupPercent(survey(id = 3), 100)
+
+        assertEquals(25, localStorage.getUserGroupPercent(survey(id = 1)))
+        assertEquals(40, localStorage.getUserGroupPercent(survey(id = 2)))
+        assertEquals(100, localStorage.getUserGroupPercent(survey(id = 3)))
+
+        assertNull(localStorage.getUserGroupPercent(survey(id = 4)))
+    }
 }

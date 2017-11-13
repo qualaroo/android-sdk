@@ -17,10 +17,7 @@ public final class ResponseHelper {
         if (httpCode >= 500) {
             return true;
         }
-        if (httpCode >= 400) {
-            return false;
-        }
-        return true;
+        return httpCode < 400;
     }
 
     private ResponseHelper() {

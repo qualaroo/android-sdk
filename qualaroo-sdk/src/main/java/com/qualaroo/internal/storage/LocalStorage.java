@@ -23,4 +23,11 @@ public interface LocalStorage {
     SurveyStatus getSurveyStatus(Survey survey);
     void updateUserProperty(@NonNull String key, @Nullable String value);
     Map<String, String> getUserProperties();
+    void storeUserGroupPercent(Survey survey, int percent);
+    /**
+     * Returns stored user group percentage for provided survey.
+     * @param survey
+     * @return stored value - null if there is no value stored for survey
+     */
+    @Nullable Integer getUserGroupPercent(Survey survey);
 }

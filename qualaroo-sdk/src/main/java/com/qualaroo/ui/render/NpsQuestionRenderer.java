@@ -25,7 +25,7 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         final View view = View.inflate(context, R.layout.qualaroo__view_question_nps, null);
         final NpsView npsView = view.findViewById(R.id.qualaroo__nps_scores);
         npsView.applyTheme(getTheme());
@@ -37,7 +37,7 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 Answer answer = question.answerList().get(npsView.getCurrentlySelectedScore());
-                onAnsweredListener.onAnswered(question, answer);
+                onAnsweredListener.onAnswered(answer);
             }
         });
         TextView minLabel = view.findViewById(R.id.qualaroo__nps_view_min_label);
@@ -51,14 +51,14 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
                 button.setEnabled(true);
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         into.putInt(KEY_NPS_SCORE, npsView.getCurrentlySelectedScore());
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         int score = from.getInt(KEY_NPS_SCORE, -1);
                         npsView.setScore(score);

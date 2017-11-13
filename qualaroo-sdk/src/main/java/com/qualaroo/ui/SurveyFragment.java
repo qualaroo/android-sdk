@@ -1,30 +1,38 @@
 package com.qualaroo.ui;
 
-import android.content.Context;
+import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
-import com.qualaroo.ui.render.QuestionView;
-import com.qualaroo.ui.render.QuestionViewState;
 import com.qualaroo.ui.render.Renderer;
+import com.qualaroo.ui.render.RestorableView;
+import com.qualaroo.ui.render.ViewState;
+import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
+import java.util.Map;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -32,22 +40,21 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 public class SurveyFragment extends Fragment implements SurveyView {
 
     private static final String KEY_PRESENTER_STATE = "pstate";
-    private static final String QUESTION_VIEW_STATE = "qviewstate";
+    private static final String RESTORABLE_VIEW_STATE = "qviewstate";
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
 
     private View backgroundView;
-    private View surveyContainer;
+    private LinearLayout surveyContainer;
     private TextView questionsTitle;
     private FrameLayout questionsContent;
     private ImageView closeButton;
     private ImageView surveyLogo;
-    private View emptySpace;
 
-    private boolean mandatory;
-    private QuestionView questionView;
-    private QuestionViewState viewState;
+    private boolean isFullScreen;
+    private RestorableView restorableView;
+    private ViewState viewState;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qualaroo__fragment_survey, container, false);
@@ -60,7 +67,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
         surveyLogo = view.findViewById(R.id.qualaroo__survey_logo);
-        emptySpace = view.findViewById(R.id.qualaroo__survey_empty_space);
         try {
             Drawable applicationIcon = getContext().getPackageManager().getApplicationIcon(getContext().getPackageName());
             surveyLogo.setImageDrawable(applicationIcon);
@@ -82,14 +88,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
         SurveyPresenter.State presentersState = null;
         if (savedInstanceState != null) {
             presentersState = (SurveyPresenter.State) savedInstanceState.getSerializable(KEY_PRESENTER_STATE);
-            viewState = savedInstanceState.getParcelable(QUESTION_VIEW_STATE);
+            viewState = savedInstanceState.getParcelable(RESTORABLE_VIEW_STATE);
         }
         surveyPresenter.init(presentersState);
     }
 
     @Override public void onSaveInstanceState(Bundle outState) {
-        if (questionView != null) {
-            outState.putParcelable(QUESTION_VIEW_STATE, questionView.getCurrentState());
+        if (restorableView != null) {
+            outState.putParcelable(RESTORABLE_VIEW_STATE, restorableView.getCurrentState());
         }
         outState.putSerializable(KEY_PRESENTER_STATE, surveyPresenter.getSavedState());
         super.onSaveInstanceState(outState);
@@ -109,6 +115,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void onDestroyView() {
+        restorableView = null;
+        KeyboardUtil.hideKeyboard(surveyContainer);
         surveyPresenter.dropView();
         super.onDestroyView();
     }
@@ -117,11 +125,20 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsTitle.setTextColor(viewModel.textColor());
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
         closeButton.setColorFilter(viewModel.buttonDisabledColor());
-        closeButton.setVisibility(viewModel.cannotBeClosed() ? View.GONE : View.VISIBLE);
-        emptySpace.setVisibility(viewModel.isFullscreen() ? View.GONE : View.VISIBLE);
-        mandatory = viewModel.cannotBeClosed();
+        closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
+        isFullScreen = viewModel.isFullscreen();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            surveyContainer.getLayoutTransition()
+                    .enableTransitionType(LayoutTransition.CHANGING);
+        }
+        if (isFullScreen) {
+            ViewGroup.LayoutParams surveyLayoutParams = surveyContainer.getLayoutParams();
+            surveyLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            surveyContainer.setLayoutParams(surveyLayoutParams);
+            surveyContainer.setGravity(Gravity.CENTER);
+        }
     }
 
     @Override public void showWithAnimation() {
@@ -154,48 +171,110 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitle.setText(question.title());
-        Context context = getContext();
-        questionView = renderer.renderQuestion(context, question, new OnAnsweredListener() {
-                @Override public void onAnswered(Question question1, Answer answer) {
-                    surveyPresenter.onAnswered(answer);
-                }
+        restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
+            @Override public void onAnswered(Answer answer) {
+                surveyPresenter.onAnswered(answer);
+            }
 
-                @Override public void onAnswered(Question question1, List<Answer> answers) {
-                    surveyPresenter.onAnswered(answers);
-                }
+            @Override public void onAnswered(List<Answer> answers) {
+                surveyPresenter.onAnswered(answers);
+            }
 
-                @Override public void onAnsweredWithText(Question question1, String answer) {
-                    surveyPresenter.onAnsweredWithText(answer);
-                }
-            });
-        questionsContent.addView(questionView.view());
+            @Override public void onAnsweredWithText(String answer) {
+                surveyPresenter.onAnsweredWithText(answer);
+            }
+        });
+        questionsContent.addView(restorableView.view());
         if (viewState != null) {
-            questionView.restoreState(viewState);
+            restorableView.restoreState(viewState);
         }
     }
 
-    @Override public void showMessage(Message message) {
-        transformToMessageStyle();
+    @Override public void showMessage(Message message, boolean withAnimation) {
+        restorableView = null;
+        transformToMessageStyle(withAnimation);
         questionsContent.removeAllViews();
-        Context context = getContext();
-        questionsContent.addView(renderer.renderMessage(context, message, new OnMessageConfirmedListener() {
+        questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
             @Override public void onMessageConfirmed(Message message) {
-                surveyPresenter.onCloseClicked();
+                surveyPresenter.onMessageConfirmed(message);
             }
         }));
     }
 
-    private void transformToMessageStyle() {
-        surveyLogo.animate()
-                .translationX(surveyContainer.getWidth()/2 - surveyLogo.getX() - surveyLogo.getWidth()/2)
-                .translationY(-surveyLogo.getY() - surveyLogo.getHeight()/2)
-                .start();
-        questionsTitle.animate().alpha(0.0f).start();
+    @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
+        transformToQuestionStyle();
+        questionsContent.removeAllViews();
+        questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
+        restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
+            @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+                surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
+            }
+        });
+        questionsContent.addView(restorableView.view());
+        if (viewState != null) {
+            restorableView.restoreState(viewState);
+        }
+
+    }
+
+    @Override public void forceShowKeyboardWithDelay(long delayInMillis) {
+        final EditText editText = findEditText(questionsContent);
+        if (editText != null) {
+            editText.postDelayed(new Runnable() {
+                @Override public void run() {
+                    KeyboardUtil.showKeyboard(editText);
+                }
+            }, delayInMillis);
+        }
+    }
+
+    @Nullable private EditText findEditText(View view) {
+        if (view instanceof EditText) {
+            return (EditText) view;
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View child = ((ViewGroup) view).getChildAt(i);
+                EditText result = findEditText(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void transformToMessageStyle(final boolean withAnimation) {
+        questionsTitle.setText(null);
+        surveyContainer.post(new Runnable() {
+            @Override public void run() {
+                float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
+                float translationY = isFullScreen ? 0 : -surveyLogo.getY() - surveyLogo.getHeight() / 2;
+                float alpha = 0.0f;
+                if (withAnimation) {
+                    surveyLogo.animate()
+                            .translationX(translationX)
+                            .translationY(translationY)
+                            .start();
+                    questionsTitle.animate().alpha(alpha).start();
+                    surveyLogo.animate().scaleX(1.5f);
+                    surveyLogo.animate().scaleY(1.5f);
+                } else {
+                    surveyLogo.setTranslationX(translationX);
+                    surveyLogo.setTranslationY(translationY);
+                    surveyLogo.setScaleX(1.5f);
+                    surveyLogo.setScaleY(1.5f);
+                    questionsTitle.setAlpha(alpha);
+                }
+            }
+        });
     }
 
     private void transformToQuestionStyle() {
         surveyLogo.animate().translationY(0).translationX(0).start();
         questionsTitle.animate().alpha(1.0f).start();
+        surveyLogo.animate().scaleX(1.0f);
+        surveyLogo.animate().scaleY(1.0f);
     }
 
     @Override public void closeSurvey() {
@@ -208,12 +287,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }, 600);
     }
 
-    /**
-     * Callback for onBackPressed event happening in containing Activity.
-     * @return true if SurveyFragment consumed the event, false if Activity should handle the event by itself
-     */
-    public boolean onBackPressed() {
-        boolean shouldBlockClosing = mandatory;
-        return shouldBlockClosing;
+    public void onBackPressed() {
+        surveyPresenter.onCloseClicked();
     }
 }

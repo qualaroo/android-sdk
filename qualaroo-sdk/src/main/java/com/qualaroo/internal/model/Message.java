@@ -1,5 +1,6 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -9,19 +10,23 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Message implements Serializable {
-    private int id;
+    private long id;
+    private MessageType type;
     private String description;
+    private CtaMap ctaMap;
 
-    @VisibleForTesting Message(int id, String description) {
+    @VisibleForTesting Message(long id, MessageType type, String description, CtaMap ctaMap) {
         this.id = id;
+        this.type = type;
         this.description = description;
+        this.ctaMap = ctaMap;
     }
 
     Message() {
 
     }
 
-    public int id() {
+    public long id() {
         return id;
     }
 
@@ -29,6 +34,13 @@ public final class Message implements Serializable {
         return description;
     }
 
+    public MessageType type() {
+        return type;
+    }
+
+    public CtaMap ctaMap() {
+        return ctaMap;
+    }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,7 +51,30 @@ public final class Message implements Serializable {
         return id == message.id;
     }
 
+
     @Override public int hashCode() {
-        return id;
+        return (int) (id ^ (id >>> 32));
+    }
+
+    public static class CtaMap implements Serializable{
+        private String text;
+        private String uri;
+
+        @Nullable public String text() {
+            return text;
+        }
+
+        public String uri() {
+            return uri;
+        }
+
+        @VisibleForTesting CtaMap(String text, String uri) {
+            this.text = text;
+            this.uri = uri;
+        }
+
+        CtaMap() {
+
+        }
     }
 }

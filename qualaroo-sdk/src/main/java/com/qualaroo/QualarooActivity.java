@@ -63,8 +63,9 @@ public class QualarooActivity extends AppCompatActivity {
 
     @Override public void onBackPressed() {
         SurveyFragment surveyFragment = (SurveyFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
-        boolean handledByFragment = surveyFragment.onBackPressed();
-        if (!handledByFragment) {
+        if (surveyFragment != null) {
+            surveyFragment.onBackPressed();
+        } else {
             super.onBackPressed();
         }
     }

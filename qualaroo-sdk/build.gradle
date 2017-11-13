@@ -2,6 +2,10 @@
  * Copyright © 2017 Qualaroo. All rights reserved.
  */
 
+int major = 1
+int minor = 4
+int patch = 0
+
 apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
@@ -9,14 +13,15 @@ apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        versionCode 10000 * major + 100 * minor + patch
+        versionName "$major.$minor.$patch"
     }
     buildTypes {
         release {
@@ -32,6 +37,20 @@ android {
             minifyEnabled false
         }
     }
+
+    sourceSets {
+        String commonTestClasses = 'src/commonTest/java'
+        test {
+            java.srcDirs += commonTestClasses
+        }
+        androidTest {
+            java.srcDirs += commonTestClasses
+        }
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 repositories {
@@ -42,7 +61,6 @@ repositories {
 dependencies {
     implementation "com.android.support:appcompat-v7:26.1.0"
     implementation "com.android.support:design:26.1.0"
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.google.code.gson:gson:2.8.0'
@@ -55,10 +73,14 @@ dependencies {
     testImplementation 'com.nhaarman:mockito-kotlin-kt1.1:1.5.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'commons-logging:commons-logging:1.2'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.9.0'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    }
 
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
@@ -106,7 +128,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version '1.0.0'
+            version "$major.$minor.$patch"
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar

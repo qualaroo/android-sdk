@@ -1,54 +1,61 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.support.annotation.VisibleForTesting;
 
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.ui.render.Theme;
+import com.qualaroo.util.UriOpener;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
-public class SurveyPresenter implements SurveyInteractor.EventsObserver {
+class SurveyPresenter {
 
     private final SurveyInteractor interactor;
     private final Survey survey;
     private final Theme theme;
+    private final UriOpener uriOpener;
 
     private SurveyView surveyView;
-    private Question currentlyDisplayedQuestion;
+    private boolean isDisplayingQuestion;
 
-    SurveyPresenter(SurveyInteractor interactor, Survey survey, Theme theme) {
+    SurveyPresenter(SurveyInteractor interactor, Survey survey, Theme theme, UriOpener uriOpener) {
         this.interactor = interactor;
         this.survey = survey;
         this.theme = theme;
+        this.uriOpener = uriOpener;
     }
 
-    public void setView(SurveyView view) {
+    void setView(SurveyView view) {
         surveyView = view;
         surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
-        interactor.registerObserver(this);
+        interactor.registerObserver(eventsObserver);
     }
 
     void init(@Nullable State state) {
         if (state == null) {
             surveyView.showWithAnimation();
         } else {
-            currentlyDisplayedQuestion = state.question();
+            isDisplayingQuestion = state.isDisplayingQuestion();
             surveyView.showImmediately();
         }
         interactor.displaySurvey();
     }
 
     State getSavedState() {
-        return new State(currentlyDisplayedQuestion);
+        return new State(isDisplayingQuestion);
     }
 
     void dropView() {
@@ -56,45 +63,69 @@ public class SurveyPresenter implements SurveyInteractor.EventsObserver {
         surveyView = null;
     }
 
-    @Override public void showQuestion(Question question) {
-        surveyView.showQuestion(question);
-        currentlyDisplayedQuestion = question;
-    }
+    private SurveyInteractor.EventsObserver eventsObserver = new SurveyInteractor.EventsObserver() {
+        @Override public void showQuestion(Question question) {
+            surveyView.showQuestion(question);
+            isDisplayingQuestion = true;
+        }
 
-    @Override public void showMessage(Message message) {
-        surveyView.showMessage(message);
-    }
+        @Override public void showMessage(Message message) {
+            boolean shouldAnimate = isDisplayingQuestion;
+            surveyView.showMessage(message, shouldAnimate);
+            isDisplayingQuestion = false;
+        }
 
-    @Override public void closeSurvey() {
-        surveyView.closeSurvey();
-    }
+        @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
+            surveyView.showLeadGen(qscreen, questions);
+            if (isDisplayingQuestion) {
+                surveyView.forceShowKeyboardWithDelay(600);
+            }
+            isDisplayingQuestion = true;
+        }
+
+        @Override public void openUri(@NonNull String stringUri) {
+            uriOpener.openUri(stringUri);
+        }
+
+        @Override public void closeSurvey() {
+            surveyView.closeSurvey();
+        }
+    };
 
     void onCloseClicked() {
         interactor.stopSurvey();
     }
 
     void onAnswered(Answer answer) {
-        interactor.questionAnswered(currentlyDisplayedQuestion, Collections.singletonList(answer));
+        interactor.questionAnswered(Collections.singletonList(answer));
     }
 
     void onAnswered(List<Answer> answers) {
-        interactor.questionAnswered(currentlyDisplayedQuestion, answers);
+        interactor.questionAnswered(answers);
     }
 
     void onAnsweredWithText(String payload) {
-        interactor.questionAnsweredWithText(currentlyDisplayedQuestion, payload);
+        interactor.questionAnsweredWithText(payload);
+    }
+
+    void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+        interactor.leadGenAnswered(questionIdsWithAnswers);
+    }
+
+    void onMessageConfirmed(Message message) {
+        interactor.messageConfirmed(message);
     }
 
     static class State implements Serializable {
 
-        private final Question question;
+        private final boolean isDisplayingQuestion;
 
-        private State(Question question) {
-            this.question = question;
+        @VisibleForTesting State(boolean isDisplayingQuestion) {
+            this.isDisplayingQuestion = isDisplayingQuestion;
         }
 
-        public Question question() {
-            return question;
+        public boolean isDisplayingQuestion() {
+            return isDisplayingQuestion;
         }
     }
 }

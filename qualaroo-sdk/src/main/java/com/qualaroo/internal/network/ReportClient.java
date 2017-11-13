@@ -2,6 +2,7 @@ package com.qualaroo.internal.network;
 
 import android.support.annotation.RestrictTo;
 
+import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -10,6 +11,7 @@ import com.qualaroo.internal.storage.LocalStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.HttpUrl;
 import okhttp3.Response;
@@ -21,11 +23,13 @@ public class ReportClient {
     private final RestClient restClient;
     private final ApiConfig apiConfig;
     private final LocalStorage localStorage;
+    private final UserInfo userInfo;
 
-    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage) {
+    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo) {
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.localStorage = localStorage;
+        this.userInfo = userInfo;
     }
 
     public void recordImpression(Survey survey) {
@@ -46,6 +50,7 @@ public class ReportClient {
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
         injectAnswers(builder, question, answerList);
+        injectAnalyticsParams(builder);
         final HttpUrl url = builder.build();
         try {
             Response response = restClient.get(url);
@@ -59,7 +64,27 @@ public class ReportClient {
         HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
-        builder.addEncodedQueryParameter(String.format(Locale.ROOT,"r[%d][text]", question.id()), answer);
+        builder.addQueryParameter(String.format(Locale.ROOT,"r[%d][text]", question.id()), answer);
+        injectAnalyticsParams(builder);
+        final HttpUrl url = builder.build();
+        try {
+            Response response = restClient.get(url);
+            storeIfFailed(response);
+        } catch (IOException e) {
+            storeFailedRequestForLater(url.toString());
+        }
+    }
+
+    public void recordLeadGenAnswer(Survey survey, Map<Long, String> questionIdToAnswer) {
+        HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
+                .addPathSegment("r.js")
+                .addQueryParameter("id", String.valueOf(survey.id()));
+        injectAnalyticsParams(builder);
+        for (Map.Entry<Long, String> entry : questionIdToAnswer.entrySet()) {
+            String key = String.format(Locale.ROOT, "r[%d][text]", entry.getKey());
+            String value = entry.getValue();
+            builder.addQueryParameter(key, value);
+        }
         final HttpUrl url = builder.build();
         try {
             Response response = restClient.get(url);
@@ -109,4 +134,11 @@ public class ReportClient {
         }
     }
 
+    private void injectAnalyticsParams(HttpUrl.Builder httpUrlBuilder) {
+        String userId = userInfo.getUserId();
+        if (userId != null) {
+            httpUrlBuilder.addQueryParameter("i", userInfo.getUserId());
+        }
+        httpUrlBuilder.addQueryParameter("au", userInfo.getDeviceId());
+    }
 }

@@ -9,10 +9,9 @@ import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Survey;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
@@ -22,34 +21,34 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public class SurveysRepository {
 
+    private static final String SURVEY_SDK_TYPE = "sdk";
+
     private final String siteId;
     private final RestClient restClient;
     private final ApiConfig apiConfig;
     private final UserInfo userInfo;
     private final SessionInfo sessionInfo;
-    private final long staleDataTimeLimitInMillis;
+    private final Cache<List<Survey>> cache;
 
     private final Object lock = new Object();
 
-    private CachedResult cachedResult = new CachedResult(null, 0);
-
-    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SessionInfo sessionInfo, UserInfo userInfo, long staleDataTimeLimitInMillis) {
+    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SessionInfo sessionInfo, UserInfo userInfo, Cache<List<Survey>> cache) {
         this.siteId = siteId;
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.sessionInfo = sessionInfo;
         this.userInfo = userInfo;
-        this.staleDataTimeLimitInMillis = staleDataTimeLimitInMillis;
+        this.cache = cache;
     }
 
     public @NonNull List<Survey> getSurveys() {
         synchronized (lock) {
-            if (isInvalid(cachedResult)) {
+            if (cache.isInvalid()) {
                 refreshData();
-            } else if (isStale(cachedResult)) {
+            } else if (cache.isStale()) {
                 refreshDataAsync();
             }
-            return returnSafely(cachedResult.surveys);
+            return returnSafely(cache.get());
         }
     }
 
@@ -57,14 +56,13 @@ public class SurveysRepository {
         List<Survey> surveys = fetchSurveys();
         if (surveys != null) {
             synchronized (lock) {
-                cachedResult = new CachedResult(surveys, System.currentTimeMillis());
+                cache.put(surveys);
             }
         }
     }
 
     private void refreshDataAsync() {
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override public void run() {
                 refreshData();
             }
@@ -83,7 +81,13 @@ public class SurveysRepository {
         Result<Survey[]> result = restClient.get(requestUrl, Survey[].class);
         if (result.isSuccessful()) {
             QualarooLogger.debug("Acquired %1$d surveys", result.getData().length);
-            return Arrays.asList(result.getData());
+            List<Survey> surveys = new ArrayList<>();
+            for (Survey survey : result.getData()) {
+                if (SURVEY_SDK_TYPE.equals(survey.type())) {
+                    surveys.add(survey);
+                }
+            }
+            return surveys;
         } else {
             QualarooLogger.debug("Could not acquire surveys");
             return null;
@@ -102,30 +106,12 @@ public class SurveysRepository {
 
     private void injectAnalyticsParams(HttpUrl.Builder httpUrlBuilder) {
         httpUrlBuilder
-                .addQueryParameter("SDK_version", sessionInfo.sdkVersion())
+                .addQueryParameter("sdk_version", sessionInfo.sdkVersion())
                 .addQueryParameter("client_app", sessionInfo.appName())
-                .addEncodedQueryParameter("device_type", sessionInfo.deviceType())
-                .addQueryParameter("android_version", sessionInfo.androidVersion())
-                .addQueryParameter("device_ID", userInfo.getDeviceId());
+                .addQueryParameter("device_type", sessionInfo.deviceType())
+                .addQueryParameter("os_version", sessionInfo.androidVersion())
+                .addQueryParameter("os", "Android")
+                .addQueryParameter("device_id", userInfo.getDeviceId());
     }
-
-    private boolean isStale(CachedResult cachedResult) {
-        return System.currentTimeMillis() - cachedResult.timestamp > staleDataTimeLimitInMillis;
-    }
-
-    private boolean isInvalid(CachedResult cachedResult) {
-        return cachedResult.surveys == null;
-    }
-
-    private static final class CachedResult {
-        private final List<Survey> surveys;
-        private final long timestamp;
-
-        CachedResult(List<Survey> surveys, long timestamp) {
-            this.surveys = surveys;
-            this.timestamp = timestamp;
-        }
-    }
-
 
 }

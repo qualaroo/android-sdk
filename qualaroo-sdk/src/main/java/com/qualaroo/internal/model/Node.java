@@ -9,10 +9,10 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Node implements Serializable {
-    private int id;
+    private long id;
     private String nodeType;
 
-    public int id() {
+    public long id() {
         return id;
     }
 
@@ -20,7 +20,7 @@ public final class Node implements Serializable {
         return nodeType;
     }
 
-    @VisibleForTesting Node(int id, String nodeType) {
+    @VisibleForTesting Node(long id, String nodeType) {
         this.id = id;
         this.nodeType = nodeType;
     }

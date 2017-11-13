@@ -42,6 +42,9 @@ public class DatabaseLocalStorage implements LocalStorage {
     private static final String SURVEY_STATUS_HAS_FINISHED = "hasBeenFinished";
     private static final String SURVEY_STATUS_TIMESTAMP = "seenAt";
 
+    private static final String USER_GROUP_PERCENT_SURVEY_TABLE = "userGroupPercentTable";
+    private static final String USER_GROUP_PERCENT_SURVEY_ID = "surveyId";
+    private static final String USER_GROUP_PERCENT_SURVEY_VALUE = "percent";
     private final SQLiteOpenHelper dbHelper;
 
     public DatabaseLocalStorage(Context context) {
@@ -160,6 +163,36 @@ public class DatabaseLocalStorage implements LocalStorage {
         return properties;
     }
 
+    @Override public void storeUserGroupPercent(Survey survey, int percent) {
+        ContentValues values = new ContentValues();
+        values.put(USER_GROUP_PERCENT_SURVEY_ID, survey.id());
+        values.put(USER_GROUP_PERCENT_SURVEY_VALUE, percent);
+        insertOrUpdate(USER_GROUP_PERCENT_SURVEY_TABLE, values, USER_GROUP_PERCENT_SURVEY_ID + "=?", new String[]{String.valueOf(survey.id())});
+    }
+
+    @Nullable @Override public Integer getUserGroupPercent(Survey survey) {
+        Cursor cursor = null;
+        Integer result = null;
+        try {
+            cursor = writeableDb().query(
+                    USER_GROUP_PERCENT_SURVEY_TABLE,
+                    new String[]{USER_GROUP_PERCENT_SURVEY_VALUE},
+                    USER_GROUP_PERCENT_SURVEY_ID + "=?", new String[]{String.valueOf(survey.id())},
+                    null, null, null, String.valueOf(1));
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                result = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            result = null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
+
 
     private void insertOrUpdate(String tableName, ContentValues values, String whereClause, String[] whereArgs) {
         int affectedRows = writeableDb().update(tableName, values, whereClause, whereArgs);
@@ -177,33 +210,38 @@ public class DatabaseLocalStorage implements LocalStorage {
     }
 
     private static class QualarooSQLiteOpenHelper extends SQLiteOpenHelper {
-        private static final int DB_VERSION = 1;
+        private static final int DB_VERSION = 2;
 
         QualarooSQLiteOpenHelper(Context context, String databaseName) {
             super(context, databaseName, null, DB_VERSION);
         }
 
         @Override public void onCreate(SQLiteDatabase db) {
-            String failedReportsTable = format(
-                    "CREATE TABLE %1$s (" +
-                            "%2$s INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "%3$s TEXT NOT NULL);",
-                    FAILED_REPORTS_TABLE,
-                    FAILED_REPORTS_ID,
-                    FAILED_REPORTS_URL
-            );
-            db.execSQL(failedReportsTable);
+            createFailedReportsTable(db);
+            createUserPropertiesTable(db);
+            createSurveyStatusTable(db);
+            createUserPercentGroupTable(db);
+        }
 
-            String userPropertiesTable = format(
-                    "CREATE TABLE %1$s (" +
-                            "%2$s TEXT PRIMARY KEY NOT NULL," +
-                            "%3$s TEXT);",
-                    USER_PROPERTIES_TABLE,
-                    USER_PROPERTIES_KEY,
-                    USER_PROPERTIES_VALUE
-            );
-            db.execSQL(userPropertiesTable);
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion < 2) {
+                createUserPercentGroupTable(db);
+            }
+        }
 
+        private void createUserPercentGroupTable(SQLiteDatabase db) {
+            String userPercentGroupTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s INTEGER PRIMARY KEY," +
+                            "%3$s INTEGER DEFAULT 0);",
+                    USER_GROUP_PERCENT_SURVEY_TABLE,
+                    USER_GROUP_PERCENT_SURVEY_ID,
+                    USER_GROUP_PERCENT_SURVEY_VALUE
+            );
+            db.execSQL(userPercentGroupTable);
+        }
+
+        private void createSurveyStatusTable(SQLiteDatabase db) {
             String surveyStatusTable = format(
                     "CREATE TABLE %1$s (" +
                             "%2$s INTEGER PRIMARY KEY," +
@@ -219,8 +257,28 @@ public class DatabaseLocalStorage implements LocalStorage {
             db.execSQL(surveyStatusTable);
         }
 
-        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            //no upgrade yet
+        private void createUserPropertiesTable(SQLiteDatabase db) {
+            String userPropertiesTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s TEXT PRIMARY KEY NOT NULL," +
+                            "%3$s TEXT);",
+                    USER_PROPERTIES_TABLE,
+                    USER_PROPERTIES_KEY,
+                    USER_PROPERTIES_VALUE
+            );
+            db.execSQL(userPropertiesTable);
+        }
+
+        private void createFailedReportsTable(SQLiteDatabase db) {
+            String failedReportsTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "%3$s TEXT NOT NULL);",
+                    FAILED_REPORTS_TABLE,
+                    FAILED_REPORTS_ID,
+                    FAILED_REPORTS_URL
+            );
+            db.execSQL(failedReportsTable);
         }
 
         private static String format(String string, Object... args) {

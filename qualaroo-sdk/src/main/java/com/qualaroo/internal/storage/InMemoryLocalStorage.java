@@ -20,6 +20,7 @@ public class InMemoryLocalStorage implements LocalStorage {
     private final List<String> failedRequests = new ArrayList<>();
     private final Map<Integer, SurveyStatus> surveyStatusMap = new HashMap<>();
     private final Map<String, String> userProperties = new HashMap<>();
+    private final Map<Integer, Integer> surveyUserGroupPercents = new HashMap<>();
 
     @Override public synchronized void storeFailedReportRequest(String reportRequestUrl) {
         failedRequests.add(reportRequestUrl);
@@ -89,5 +90,13 @@ public class InMemoryLocalStorage implements LocalStorage {
         } else {
             userProperties.put(key, value);
         }
+    }
+
+    @Override public void storeUserGroupPercent(Survey survey, int percent) {
+        surveyUserGroupPercents.put(survey.id(), percent);
+    }
+
+    @Nullable @Override public Integer getUserGroupPercent(Survey survey) {
+        return surveyUserGroupPercents.get(survey.id());
     }
 }

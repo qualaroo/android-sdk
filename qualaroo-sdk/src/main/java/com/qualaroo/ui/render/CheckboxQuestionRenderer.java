@@ -16,6 +16,7 @@ import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.DimenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, Question question, final OnAnsweredListener onAnsweredListener) {
         ViewGroup view = (ViewGroup) View.inflate(context, R.layout.qualaroo__view_question_checkbox, null);
         final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
@@ -53,6 +54,8 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 button.setEnabled(anyChecked);
             }
         };
+        int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__checkbox_drawable_padding);
+        int padding = DimenUtils.px(context, R.dimen.qualaroo__checkbox_padding);
         for (Answer answer : question.answerList()) {
             AppCompatCheckBox checkBox = new AppCompatCheckBox(context);
             ThemeUtils.applyTheme(checkBox, getTheme());
@@ -62,24 +65,24 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
             checkBox.setOnCheckedChangeListener(listener);
             checkBox.setTag(answer);
             checkBox.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__checkbox_text_size));
+            checkBox.setPadding(drawablePadding, padding, padding, padding);
             checkboxesContainer.addView(checkBox);
         }
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                ViewGroup parent = (ViewGroup) v.getParent();
                 List<Answer> selectedAnswers = new ArrayList<>();
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    View child = parent.getChildAt(i);
+                for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
+                    View child = checkboxesContainer.getChildAt(i);
                     if (child instanceof CheckBox && ((CheckBox) child).isChecked()) {
                         selectedAnswers.add((Answer) child.getTag());
                     }
                 }
-                onAnsweredListener.onAnswered(question, selectedAnswers);
+                onAnsweredListener.onAnswered(selectedAnswers);
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         ArrayList<Integer> checkedElements = new ArrayList<>();
                         for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
@@ -91,7 +94,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                         into.putIntegerArrayList(KEY_CHECKED_ELEMENTS, checkedElements);
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         ArrayList<Integer> checkedElements = from.getIntegerArrayList(KEY_CHECKED_ELEMENTS);
                         if (checkedElements != null) {

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.RestrictTo;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -13,6 +13,8 @@ import com.qualaroo.R;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.KeyboardUtil;
+import com.qualaroo.util.TextWatcherAdapter;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -25,11 +27,24 @@ final class TextQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = View.inflate(context, R.layout.qualaroo__view_question_text, null);
         final EditText editText = view.findViewById(R.id.qualaroo__view_question_text_input);
         editText.setTextColor(getTheme().accentColor());
-        editText.setHint("...");
+        editText.setSelection(0);
+        editText.requestFocus();
+        editText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override public void onGlobalLayout() {
+                if (editText != null) {
+                    editText.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    editText.postDelayed(new Runnable() {
+                        @Override public void run() {
+                            KeyboardUtil.showKeyboard(editText);
+                        }
+                    }, 300);
+                }
+            }
+        });
         ThemeUtils.applyTheme(editText, getTheme());
         final Button button = view.findViewById(R.id.qualaroo__view_question_text_confirm);
         ThemeUtils.applyTheme(button, getTheme());
@@ -37,34 +52,33 @@ final class TextQuestionRenderer extends QuestionRenderer {
         button.setTextColor(getTheme().buttonTextColor());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                if (editText.getText() != null) {
-                    onAnsweredListener.onAnsweredWithText(question, editText.getText().toString());
-                }
+                KeyboardUtil.hideKeyboard(editText);
+                button.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        if (editText.getText() != null) {
+                            onAnsweredListener.onAnsweredWithText(editText.getText().toString());
+                        }
+                    }
+                }, 300);
             }
         });
         ThemeUtils.applyTheme(editText, getTheme());
         button.setEnabled(!question.isRequired());
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+        editText.addTextChangedListener(new TextWatcherAdapter() {
             @Override public void afterTextChanged(Editable s) {
                 if (question.isRequired()) {
                     button.setEnabled(s.length() > 0);
                 }
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         into.putString(KEY_TEXT, editText.getText().toString());
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         String text = from.getString(KEY_TEXT);
                         editText.setText(text);

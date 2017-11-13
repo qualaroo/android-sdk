@@ -1,18 +1,22 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
-import android.support.v4.util.SparseArrayCompat;
+import android.support.v4.util.LongSparseArray;
 
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.MessageType;
 import com.qualaroo.internal.model.Node;
+import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.storage.LocalStorage;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +31,8 @@ public class SurveyInteractor {
     public interface EventsObserver {
         void showQuestion(Question question);
         void showMessage(Message message);
+        void showLeadGen(QScreen qscreen, List<Question> questions);
+        void openUri(@NonNull String stringUri);
         void closeSurvey();
     }
 
@@ -36,11 +42,13 @@ public class SurveyInteractor {
     private final Language preferredLanguage;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
-    private final SparseArrayCompat<Question> questions;
-    private final SparseArrayCompat<Message> messages;
+    private final LongSparseArray<Question> questions;
+    private final LongSparseArray<Message> messages;
+    private final LongSparseArray<QScreen> qscreens;
 
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
+    private Question currentQuestion;
 
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
@@ -50,8 +58,16 @@ public class SurveyInteractor {
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
-        List<Message> messages = preferredLanguageOrDefault(survey.spec().msgScreenList());
-        this.messages = convertMessagesToSparseArray(messages);
+        this.messages = prepareData(survey.spec().msgScreenList(), new IdExtractor<Message>() {
+            @Override public long getId(Message message) {
+                return message.id();
+            }
+        });
+        this.qscreens = prepareData(survey.spec().qscreenList(), new IdExtractor<QScreen>() {
+            @Override public long getId(QScreen qScreen) {
+                return qScreen.id();
+            }
+        });
     }
 
     public void displaySurvey() {
@@ -65,19 +81,25 @@ public class SurveyInteractor {
         }
     }
 
-    public void questionAnsweredWithText(Question question, String answer) {
-        reportManager.recordTextAnswer(survey, question, answer);
-        Node nextNode = findNextNode(question.id(), Collections.<Answer>emptyList());
+    public void questionAnsweredWithText(String answer) {
+        reportManager.recordTextAnswer(survey, currentQuestion, answer);
+        Node nextNode = findNextNode(currentQuestion.id(), Collections.<Answer>emptyList());
         followNode(nextNode);
     }
 
-    public void questionAnswered(Question question, List<Answer> selectedAnswers) {
-        reportManager.recordAnswer(survey, question, selectedAnswers);
-        Node nextNode = findNextNode(question.id(), selectedAnswers);
+    public void questionAnswered(List<Answer> selectedAnswers) {
+        reportManager.recordAnswer(survey, currentQuestion, selectedAnswers);
+        Node nextNode = findNextNode(currentQuestion.id(), selectedAnswers);
         followNode(nextNode);
     }
 
-    private Node findNextNode(int questionId, List<Answer> selectedAnswers) {
+    public void leadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
+        reportManager.recordLeadGenAnswer(survey, questionIdsWithAnswers);
+        Node nextNode = qscreens.get(currentNode.id()).nextMap();
+        followNode(nextNode);
+    }
+
+    private Node findNextNode(long questionId, List<Answer> selectedAnswers) {
         Node nextNode = null;
         //TODO: Question and Answer objects provided by a presenter are not trusted and local copies are used instead.
         //This was done to avoid having to pass fully built objects in tests. Could be fixed by either passing simple int ids
@@ -99,17 +121,29 @@ public class SurveyInteractor {
 
     private void followNode(@Nullable Node node) {
         this.currentNode = node;
+        this.currentQuestion = null;
         if (node == null) {
             markSurveyAsFinished();
             eventsObserver.closeSurvey();
         } else if (node.nodeType().equals("message")) {
             eventsObserver.showMessage(messages.get(node.id()));
         } else if (node.nodeType().equals("question")) {
-            eventsObserver.showQuestion(questions.get(node.id()));
+            currentQuestion = questions.get(node.id());
+            eventsObserver.showQuestion(currentQuestion);
+        } else if (node.nodeType().equals("qscreen")) {
+            QScreen leadGen = qscreens.get(node.id());
+            List<Question> leadGenQuestions = new ArrayList<>(leadGen.questionList().size());
+            for (Long questionId : leadGen.questionList()) {
+                leadGenQuestions.add(questions.get(questionId));
+            }
+            eventsObserver.showLeadGen(leadGen, leadGenQuestions);
         }
     }
 
     public void messageConfirmed(Message message) {
+        if (message.type() == MessageType.CALL_TO_ACTION) {
+            eventsObserver.openUri(message.ctaMap().uri());
+        }
         eventsObserver.closeSurvey();
     }
 
@@ -122,7 +156,9 @@ public class SurveyInteractor {
     }
 
     void stopSurvey() {
-        this.eventsObserver.closeSurvey();
+        if (!survey.spec().optionMap().isMandatory()) {
+            this.eventsObserver.closeSurvey();
+        }
     }
 
     private void markSurveyAsSeen() {
@@ -171,6 +207,22 @@ public class SurveyInteractor {
             });
         }
 
+        @Override public void showLeadGen(final QScreen qScreen, final List<Question> questionList) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.showLeadGen(qScreen, questionList);
+                }
+            });
+        }
+
+        @Override public void openUri(@NonNull final String stringUri) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.openUri(stringUri);
+                }
+            });
+        }
+
         @Override public void closeSurvey() {
             executor.execute(new Runnable() {
                 @Override public void run() {
@@ -183,12 +235,14 @@ public class SurveyInteractor {
     private static class StubEventsObserver implements EventsObserver {
         @Override public void showQuestion(Question question) {}
         @Override public void showMessage(Message message) {}
+        @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {}
+        @Override public void openUri(@NonNull String stringUri) {}
         @Override public void closeSurvey() {}
     }
 
-    private SparseArrayCompat<Question> prepareQuestions() {
+    private LongSparseArray<Question> prepareQuestions() {
         List<Question> originalQuestions = preferredLanguageOrDefault(survey.spec().questionList());
-        SparseArrayCompat<Question> result = new SparseArrayCompat<>();
+        LongSparseArray<Question> result = new LongSparseArray<>();
         for (Question originalQuestion : originalQuestions) {
             if (originalQuestion.enableRandom()) {
                 final LinkedList<Answer> answerList = new LinkedList<>(originalQuestion.answerList());
@@ -208,18 +262,16 @@ public class SurveyInteractor {
         return result;
     }
 
-    private SparseArrayCompat<Message> convertMessagesToSparseArray(List<Message> messages) {
-        final SparseArrayCompat<Message> result = new SparseArrayCompat<>(messages.size());
-        for (Message message : messages) {
-            result.append(message.id(), message);
-        }
-        return result;
+    private <T> LongSparseArray<T> prepareData(Map<Language, List<T>> data, IdExtractor<T> extractor) {
+        final List<T> dataList = preferredLanguageOrDefault(data);
+        return convertToLongSparseArray(dataList, extractor);
     }
 
-    private SparseArrayCompat<Question> prepareQuestions(List<Question> questions) {
-        final SparseArrayCompat<Question> result = new SparseArrayCompat<>(questions.size());
-        for (Question question : questions) {
-            result.append(question.id(), question);
+    private <T> LongSparseArray<T> convertToLongSparseArray(List<T> objects, IdExtractor<T> extractor) {
+        final LongSparseArray<T> result = new LongSparseArray<>(objects.size());
+        for (T object : objects) {
+            long id = extractor.getId(object);
+            result.append(id, object);
         }
         return result;
     }
@@ -252,6 +304,10 @@ public class SurveyInteractor {
         }
         Language firstLanguage = survey.spec().surveyVariations().get(0);
         return map.get(firstLanguage);
+    }
+
+    private interface IdExtractor<T> {
+        long getId(T t);
     }
 
 }

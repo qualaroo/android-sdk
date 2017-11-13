@@ -21,6 +21,6 @@ abstract class QuestionRenderer {
         return theme;
     }
 
-    abstract QuestionView render(Context context, Question question, OnAnsweredListener onAnsweredListener);
+    abstract RestorableView render(Context context, Question question, OnAnsweredListener onAnsweredListener);
 
 }

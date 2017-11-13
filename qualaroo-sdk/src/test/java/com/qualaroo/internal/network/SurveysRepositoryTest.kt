@@ -5,11 +5,11 @@ import com.qualaroo.internal.SessionInfo
 import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.util.TimeProvider
 import okhttp3.HttpUrl
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 class SurveysRepositoryTest {
@@ -29,7 +29,12 @@ class SurveysRepositoryTest {
         on { deviceId } doReturn "abcd1"
     }
 
-    val surveysRepository = SurveysRepository("abc123", restClient, apiConfig, sessionInfo, userInfo, TimeUnit.HOURS.toMillis(1))
+    val timeProvider = mock<TimeProvider> {
+        on { currentTimeMillis() } doReturn 0L
+    }
+    val timeLimit = 1000L
+
+    val surveysRepository = SurveysRepository("abc123", restClient, apiConfig, sessionInfo, userInfo, Cache(timeProvider, timeLimit))
 
     @Test
     fun `calls proper request`() {
@@ -46,11 +51,12 @@ class SurveysRepositoryTest {
         assertEquals("abc123", url.queryParameter("site_id"))
         assertEquals("1", url.queryParameter("spec"))
         assertEquals("1", url.queryParameter("no_superpack"))
-        assertEquals("1.0.0", url.queryParameter("SDK_version"))
-        assertEquals("27", url.queryParameter("android_version"))
+        assertEquals("1.0.0", url.queryParameter("sdk_version"))
+        assertEquals("27", url.queryParameter("os_version"))
         assertEquals("GF3210", url.queryParameter("device_type"))
-        assertEquals("abcd1", url.queryParameter("device_ID"))
+        assertEquals("abcd1", url.queryParameter("device_id"))
         assertEquals("com.qualaroo.test", url.queryParameter("client_app"))
+        assertEquals("Android", url.queryParameter("os"))
     }
 
     @Test
@@ -91,6 +97,24 @@ class SurveysRepositoryTest {
 
         verify(restClient, times(1)).get(any(), eq(Array<Survey>::class.java))
     }
+
+    @Test
+    fun `filters out surveys that are not of "sdk" type`() {
+        val surveys = arrayOf(
+                survey(id = 1, type = "sdk"),
+                survey(id = 2, type = "nps"),
+                survey(id = 3, type = "definitely_not_sdk"),
+                survey(id = 4, type = "sdk")
+        )
+        resetClientReturns(surveys)
+
+        val filteredSurveys = surveysRepository.surveys
+
+        assertEquals(2, filteredSurveys.size)
+        assertTrue(filteredSurveys.contains(survey(id = 1)))
+        assertTrue(filteredSurveys.contains(survey(id = 4)))
+    }
+
 
     private fun resetClientReturns(surveys: Array<Survey>) {
         whenever(restClient.get(any(), eq(Array<Survey>::class.java))).thenReturn(Result.of(surveys))

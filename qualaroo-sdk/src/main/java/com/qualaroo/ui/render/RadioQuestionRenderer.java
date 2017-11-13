@@ -31,15 +31,16 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override QuestionView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         final View view = View.inflate(context, R.layout.qualaroo__view_question_radio, null);
         final Button button = view.findViewById(R.id.qualaroo__question_radio_confirm);
         button.setText(question.sendText());
         button.setTextColor(getTheme().buttonTextColor());
         ThemeUtils.applyTheme(button, getTheme());
         final RadioGroup radioGroup = view.findViewById(R.id.qualaroo__question_radio_options);
-        RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.topMargin = DimenUtils.px(context, R.dimen.qualaroo__radio_button_top_margin);
+        int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_drawable_padding);
+        int padding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_padding);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (int i = 0; i < question.answerList().size(); i++) {
             Answer answer = question.answerList().get(i);
             AppCompatRadioButton radioButton = new AppCompatRadioButton(context);
@@ -48,20 +49,23 @@ final class RadioQuestionRenderer extends QuestionRenderer {
             radioButton.setTextColor(getTheme().textColor());
             ThemeUtils.applyTheme(radioButton, getTheme());
             radioButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__radio_text_size));
-            radioButton.setCompoundDrawablePadding(context.getResources().getDimensionPixelSize(R.dimen.qualaroo__radio_button_top_margin));
+            radioButton.setPadding(drawablePadding, padding, padding, padding);
             radioButton.setLayoutParams(layoutParams);
             radioGroup.addView(radioButton);
         }
-
         button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(RadioGroup radioGroup, int answerId) {
+            @Override public void onCheckedChanged(RadioGroup radioGroup, final int answerId) {
                 if (question.alwaysShowSend()) {
                     button.setEnabled(true);
                 } else {
-                    Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                    onAnsweredListener.onAnswered(question, selectedAnswer);
+                    radioGroup.postDelayed(new Runnable() {
+                        @Override public void run() {
+                            Answer selectedAnswer = getAnswerById(answerId, question.answerList());
+                            onAnsweredListener.onAnswered(selectedAnswer);
+                        }
+                    }, 300);
                 }
             }
         });
@@ -70,17 +74,17 @@ final class RadioQuestionRenderer extends QuestionRenderer {
             @Override public void doClick(View v) {
                 int answerId = radioGroup.getCheckedRadioButtonId();
                 Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                onAnsweredListener.onAnswered(question, selectedAnswer);
+                onAnsweredListener.onAnswered(selectedAnswer);
             }
         });
-        return QuestionView.forQuestionId(question.id())
-                .setView(view)
-                .onSaveState(new QuestionView.OnSaveState() {
+        return RestorableView.withId(question.id())
+                .view(view)
+                .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
                         into.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedRadioButtonId());
                     }
                 })
-                .onRestoreState(new QuestionView.OnRestoreState() {
+                .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
                         int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
                         if (checkedId != NOTHING_SELECTED) {

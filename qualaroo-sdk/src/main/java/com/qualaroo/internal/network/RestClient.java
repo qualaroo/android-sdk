@@ -3,6 +3,8 @@ package com.qualaroo.internal.network;
 import android.support.annotation.RestrictTo;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.qualaroo.QualarooLogger;
 
 import java.io.IOException;
 
@@ -30,7 +32,7 @@ public class RestClient {
                     .url(httpUrl)
                     .build();
             Response response = okHttpClient.newCall(request).execute();
-            if(!response.isSuccessful()) {
+            if (!response.isSuccessful()) {
                 return Result.error(new HttpException(response.code()));
             }
             if (response.body() != null) {
@@ -39,6 +41,10 @@ public class RestClient {
                 return Result.of(gson.fromJson("", resultClass));
             }
         } catch (IOException e) {
+            return Result.error(e);
+        } catch (JsonParseException e) {
+            QualarooLogger.error("An unexpected error occurred while parsing server's response. Please get in touch with our customer support to help us solve the issue.");
+            QualarooLogger.error(e);
             return Result.error(e);
         }
     }

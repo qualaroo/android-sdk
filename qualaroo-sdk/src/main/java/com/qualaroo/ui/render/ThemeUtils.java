@@ -45,6 +45,7 @@ class ThemeUtils {
             int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
             ((TintableBackgroundView) editText).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
+        editText.setTextColor(theme.textColor());
     }
 
     static void applyTheme(Button button, Theme theme) {
@@ -66,7 +67,7 @@ class ThemeUtils {
     static void applyTheme(Spinner spinner, Theme theme) {
         if (spinner instanceof TintableBackgroundView) {
             int[][] states = new int[][]{
-                    new int[] {-android.R.attr.state_enabled},
+                    new int[] {android.R.attr.state_enabled},
                     new int[] {android.R.attr.state_enabled, android.R.attr.state_pressed}
             };
             int[] colors = new int[] {
