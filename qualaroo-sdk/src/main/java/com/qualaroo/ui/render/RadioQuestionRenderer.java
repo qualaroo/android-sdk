@@ -60,6 +60,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 if (question.alwaysShowSend()) {
                     button.setEnabled(true);
                 } else {
+                    radioGroup.setOnCheckedChangeListener(null);
                     radioGroup.postDelayed(new Runnable() {
                         @Override public void run() {
                             Answer selectedAnswer = getAnswerById(answerId, question.answerList());
