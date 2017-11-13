@@ -3,7 +3,7 @@
  */
 
 int major = 1
-int minor = 0
+int minor = 4
 int patch = 0
 
 apply from: 'quality.gradle'
@@ -128,7 +128,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version "$major.$minor.$patch-SNAPSHOT"
+            version "$major.$minor.$patch"
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar
