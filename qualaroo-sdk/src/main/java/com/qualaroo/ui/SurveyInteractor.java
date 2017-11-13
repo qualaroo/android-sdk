@@ -1,5 +1,6 @@
 package com.qualaroo.ui;
 
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -22,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -49,6 +51,7 @@ public class SurveyInteractor {
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
     private Question currentQuestion;
+    private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
@@ -140,23 +143,33 @@ public class SurveyInteractor {
         }
     }
 
+    @MainThread
     public void messageConfirmed(Message message) {
         if (message.type() == MessageType.CALL_TO_ACTION) {
             eventsObserver.openUri(message.ctaMap().uri());
         }
-        eventsObserver.closeSurvey();
+        closeSurvey();
     }
 
+    @MainThread
     void registerObserver(EventsObserver eventsObserver) {
         this.eventsObserver = UiThreadEventsObserverDelegate.wrap(eventsObserver, uiExecutor);
     }
 
+    @MainThread
     void unregisterObserver() {
         this.eventsObserver = new StubEventsObserver();
     }
 
+    @MainThread
     void stopSurvey() {
         if (!survey.spec().optionMap().isMandatory()) {
+            closeSurvey();
+        }
+    }
+
+    private void closeSurvey() {
+        if (isStoppingSurvey.compareAndSet(false, true)) {
             this.eventsObserver.closeSurvey();
         }
     }
