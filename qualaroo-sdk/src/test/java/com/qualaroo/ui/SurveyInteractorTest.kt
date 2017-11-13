@@ -731,6 +731,18 @@ class SurveyInteractorTest {
     }
 
     @Test
+    fun `accepts only first stopSurvey request`() {
+        interactor.stopSurvey()
+        interactor.stopSurvey()
+        interactor.stopSurvey()
+        interactor.messageConfirmed(message(id = 1))
+        interactor.messageConfirmed(message(id = 1))
+        interactor.stopSurvey()
+
+        verify(observer, times(1)).closeSurvey()
+    }
+
+    @Test
     fun `opens uri for CTA messages`() {
         interactor.messageConfirmed(message(id = 1, type = MessageType.REGULAR))
         verify(observer, never()).openUri(any())
