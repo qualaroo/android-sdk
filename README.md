@@ -16,7 +16,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:1.0.0` dependency to your app's `build.gradle` file:
+Simply add the `com.qualaroo:qualaroo-sdk:1.4.1` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -25,23 +25,10 @@ repositories {
     }
 }
 dependencies {
-    compile 'com.qualaroo:qualaroo-sdk:1.0.0'
+    compile 'com.qualaroo:qualaroo-sdk:1.4.1'
 }
 ```
-## Step 2. Add Permissions
-
-Ensure that the necessary permissions are declared in your application's `AndroidManifest.xml`.
-
-```xml
-<!-- Required for Internet connection . -->
-<uses-permission android:name"android.permission.INTERNET"/>
-
-<!-- IMPORTANT! For pre-Oreo devices -->
-<!-- will no longer be neccessary in the next release -->
-<uses-permission android:name="android.permission.WAKE_LOCK"/> 
-```
-
-## Step 3. Code Integration
+## Step 2. Code Integration
 #### Initialize the Client
 In order to be able to use Qualaroo SDK you need to to initialize it first.
 This procedure needs to be done only once and because of this, we recommended initializing the SDK in your `Application` subclass.

@@ -1,3 +1,6 @@
+## 1.4.1
+- fix for https://github.com/qualaroo/AndroidSDK/issues/2
+
 ## 1.4.0
 **New features:**
 - support for Lead Generation Form
