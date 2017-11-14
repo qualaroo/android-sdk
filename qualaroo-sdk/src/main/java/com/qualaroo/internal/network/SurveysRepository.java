@@ -80,13 +80,13 @@ public class SurveysRepository {
         final HttpUrl requestUrl = buildSurveyRequestUrl();
         Result<Survey[]> result = restClient.get(requestUrl, Survey[].class);
         if (result.isSuccessful()) {
-            QualarooLogger.debug("Acquired %1$d surveys", result.getData().length);
             List<Survey> surveys = new ArrayList<>();
             for (Survey survey : result.getData()) {
                 if (SURVEY_SDK_TYPE.equals(survey.type()) && survey.isActive()) {
                     surveys.add(survey);
                 }
             }
+            QualarooLogger.debug("Acquired %1$d surveys", surveys.size());
             return surveys;
         } else {
             QualarooLogger.debug("Could not acquire surveys");
