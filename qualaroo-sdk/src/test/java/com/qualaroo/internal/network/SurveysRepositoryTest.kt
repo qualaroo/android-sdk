@@ -115,6 +115,22 @@ class SurveysRepositoryTest {
         assertTrue(filteredSurveys.contains(survey(id = 4)))
     }
 
+    @Test
+    fun `filters out surveys that are not active`() {
+        val surveys = arrayOf(
+                survey(id = 1, active = true),
+                survey(id = 2, active = true),
+                survey(id = 3, active = false),
+                survey(id = 4, active = true)
+        )
+        resetClientReturns(surveys)
+
+        val result = surveysRepository.surveys
+
+        assertEquals(3, result.size)
+        assertFalse(result.contains(survey(id = 3)))
+    }
+
 
     private fun resetClientReturns(surveys: Array<Survey>) {
         whenever(restClient.get(any(), eq(Array<Survey>::class.java))).thenReturn(Result.of(surveys))

@@ -83,7 +83,7 @@ public class SurveysRepository {
             QualarooLogger.debug("Acquired %1$d surveys", result.getData().length);
             List<Survey> surveys = new ArrayList<>();
             for (Survey survey : result.getData()) {
-                if (SURVEY_SDK_TYPE.equals(survey.type())) {
+                if (SURVEY_SDK_TYPE.equals(survey.type()) && survey.isActive()) {
                     surveys.add(survey);
                 }
             }
