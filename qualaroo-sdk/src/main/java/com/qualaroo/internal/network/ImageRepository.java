@@ -2,6 +2,7 @@ package com.qualaroo.internal.network;
 
 import android.os.Build;
 import android.os.StatFs;
+import android.support.annotation.RestrictTo;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ImageRepository {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class ImageRepository {
 
     private static final int MIN_DISK_CACHE_SIZE = 1 * 1024 * 1024; // 1MB
     private static final int MAX_DISK_CACHE_SIZE = 2 * 1024 * 1024; // 2MB

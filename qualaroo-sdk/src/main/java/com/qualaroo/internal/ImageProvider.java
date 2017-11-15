@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.util.LruCache;
 
 import com.qualaroo.internal.network.ImageRepository;
@@ -23,7 +24,8 @@ import okio.Okio;
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
 
-public class ImageProvider {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public final class ImageProvider {
 
     public interface OnBitmapLoadedListener {
         void onBitmapReady(Bitmap bitmap);
