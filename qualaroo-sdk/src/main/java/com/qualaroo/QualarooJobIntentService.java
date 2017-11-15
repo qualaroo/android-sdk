@@ -7,8 +7,11 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.JobIntentService;
 
+import com.qualaroo.internal.ImageProvider;
+import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ResponseHelper;
 import com.qualaroo.internal.network.RestClient;
+import com.qualaroo.internal.network.SurveysRepository;
 import com.qualaroo.internal.storage.LocalStorage;
 
 import java.io.IOException;
@@ -37,13 +40,27 @@ public class QualarooJobIntentService extends JobIntentService {
             QualarooLogger.error("Invalid Qualaroo's Service action.");
             return;
         }
-        Qualaroo qualaroo = provideQualarooInstance();
+        QualarooBase qualaroo = getQualarooInstance();
         if (qualaroo == null) {
             QualarooLogger.error("Qualaroo instance is not available to Qularoo's Service");
             return;
         }
-        final RestClient restClient = provideRestClient(qualaroo);
-        final LocalStorage localStorage = provideLocalStorage(qualaroo);
+        prefetchSurveyWithImages(qualaroo);
+        uploadFailedRequests(qualaroo);
+    }
+    
+    private void prefetchSurveyWithImages(QualarooBase qualarooBase) {
+        ImageProvider imageProvider = qualarooBase.imageProvider();
+        SurveysRepository surveysRepository = qualarooBase.surveysRepository();
+        List<Survey> surveys = surveysRepository.getSurveys();
+        for (Survey survey : surveys) {
+            imageProvider.getImage(survey.spec().optionMap().logoUrl(), null);
+        }
+    }
+
+    private void uploadFailedRequests(QualarooBase qualarooBase) {
+        final RestClient restClient = qualarooBase.restClient();
+        final LocalStorage localStorage = qualarooBase.localStorage();
         final List<String> failedReportRequests = localStorage.getFailedReportRequests(MAX_UPLOADS_PER_JOB);
 
         if (failedReportRequests.size() == 0) {
@@ -68,16 +85,8 @@ public class QualarooJobIntentService extends JobIntentService {
     @Override public boolean onStopCurrentWork() {
         return false;
     }
-
-    @VisibleForTesting LocalStorage provideLocalStorage(Qualaroo qualaroo) {
-        return qualaroo.localStorage;
-    }
-
-    @VisibleForTesting RestClient provideRestClient(Qualaroo qualaroo) {
-        return qualaroo.restClient;
-    }
-
-    @VisibleForTesting Qualaroo provideQualarooInstance() {
+    
+    @VisibleForTesting QualarooBase getQualarooInstance() {
         return (Qualaroo) Qualaroo.getInstance();
     }
 }
