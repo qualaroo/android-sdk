@@ -3,6 +3,7 @@ package com.qualaroo.ui;
 import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qualaroo.R;
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
@@ -46,6 +48,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
+    ImageProvider imageProvider;
 
     private View backgroundView;
     private LinearLayout surveyContainer;
@@ -142,6 +145,11 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyContainer.setGravity(Gravity.CENTER);
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
+        imageProvider.getImage(viewModel.logoUrl(), new ImageProvider.OnBitmapLoadedListener() {
+            @Override public void onBitmapReady(Bitmap bitmap) {
+                surveyLogo.setImageBitmap(bitmap);
+            }
+        });
     }
 
     @Override public void showWithAnimation() {

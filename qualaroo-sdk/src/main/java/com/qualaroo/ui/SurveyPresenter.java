@@ -40,7 +40,7 @@ class SurveyPresenter {
 
     void setView(SurveyView view) {
         surveyView = view;
-        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen()));
+        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen(), survey.spec().optionMap().logoUrl()));
         interactor.registerObserver(eventsObserver);
     }
 

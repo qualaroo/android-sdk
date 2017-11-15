@@ -1,6 +1,7 @@
 package com.qualaroo.ui;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
@@ -14,14 +15,16 @@ class SurveyViewModel {
     private final @ColorInt int dimColor;
     private final boolean cannotBeClosed;
     private final boolean isFullscreen;
+    private final @Nullable String logoUrl;
 
-    SurveyViewModel(int textColor, int backgroundColor, int buttonDisabledColor, int dimColor, boolean cannotBeClosed, boolean isFullscreen) {
+    SurveyViewModel(int textColor, int backgroundColor, int buttonDisabledColor, int dimColor, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.buttonDisabledColor = buttonDisabledColor;
         this.dimColor = dimColor;
         this.cannotBeClosed = cannotBeClosed;
         this.isFullscreen = isFullscreen;
+        this.logoUrl = logoUrl;
     }
 
     boolean cannotBeClosed() {
@@ -46,6 +49,10 @@ class SurveyViewModel {
 
     int dimColor() {
         return dimColor;
+    }
+
+    @Nullable public String logoUrl() {
+        return logoUrl;
     }
 
     @Override public boolean equals(Object o) {

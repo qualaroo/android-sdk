@@ -177,6 +177,7 @@ public final class Survey implements Serializable {
         private ColorThemeMap colorThemeMap;
         private boolean mandatory;
         private boolean showFullScreen;
+        private String logoUrl;
 
         public ColorThemeMap colorThemeMap() {
             return colorThemeMap;
@@ -190,10 +191,15 @@ public final class Survey implements Serializable {
             return showFullScreen;
         }
 
-        @VisibleForTesting OptionMap(ColorThemeMap colorThemeMap, boolean mandatory, boolean showFullScreen) {
+        @Nullable public String logoUrl() {
+            return logoUrl;
+        }
+
+        @VisibleForTesting OptionMap(ColorThemeMap colorThemeMap, boolean mandatory, boolean showFullScreen, String logoUrl) {
             this.colorThemeMap = colorThemeMap;
             this.mandatory = mandatory;
             this.showFullScreen = showFullScreen;
+            this.logoUrl = logoUrl;
         }
 
         OptionMap() {
