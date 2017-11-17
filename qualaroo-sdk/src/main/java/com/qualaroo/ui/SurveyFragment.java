@@ -2,12 +2,14 @@ package com.qualaroo.ui;
 
 import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -139,6 +141,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyContainer.setLayoutParams(surveyLayoutParams);
             surveyContainer.setGravity(Gravity.CENTER);
         }
+        ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
     }
 
     @Override public void showWithAnimation() {
