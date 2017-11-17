@@ -57,7 +57,7 @@ class SurveyPresenterTest {
         presenter.setView(view)
 
         val expectedSurveyViewModel = SurveyViewModel(
-                100, 400, 300, 200, true, true
+                100, 400, 300, 200, true, true, null
         )
         verify(view, times(1)).setup(expectedSurveyViewModel)
     }

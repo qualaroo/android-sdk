@@ -14,8 +14,8 @@ object TestModels {
         return Survey.RequireMap(deviceTypeList, isPersistent, isOneShot, customMap, wantUserStr, samplePercent)
     }
 
-    fun optionMap(colorThemeMap: ColorThemeMap = colorThemeMap(), mandatory: Boolean = false, showFullScreen: Boolean = false): Survey.OptionMap {
-        return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen)
+    fun optionMap(colorThemeMap: ColorThemeMap = colorThemeMap(), mandatory: Boolean = false, showFullScreen: Boolean = false, logoUrl: String? = null): Survey.OptionMap {
+        return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl)
     }
 
     fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, alwaysShowSend: Boolean = true, isRequired: Boolean = false): Question {
