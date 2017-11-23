@@ -48,10 +48,16 @@ public final class ImageProvider {
             return;
         }
         Bitmap bitmap = bitmapLruCache.get(url);
-        if (bitmap != null && onBitmapLoadedListener != null) {
-            onBitmapLoadedListener.onBitmapReady(bitmap);
+        if (bitmap != null) {
+            callListenerSafely(bitmap, onBitmapLoadedListener);
         } else {
             fetchBitmapAsync(url, onBitmapLoadedListener);
+        }
+    }
+
+    private void callListenerSafely(Bitmap bitmap, @Nullable OnBitmapLoadedListener onBitmapLoadedListener) {
+        if (onBitmapLoadedListener != null) {
+            onBitmapLoadedListener.onBitmapReady(bitmap);
         }
     }
 
