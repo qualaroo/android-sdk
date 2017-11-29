@@ -21,7 +21,7 @@ public class QualarooActivity extends AppCompatActivity {
 
     public static void showSurvey(Context context, Survey survey) {
         Intent starter = new Intent(context, QualarooActivity.class);
-        starter.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        starter.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         starter.putExtra(KEY_SURVEY, survey);
         context.startActivity(starter);
     }

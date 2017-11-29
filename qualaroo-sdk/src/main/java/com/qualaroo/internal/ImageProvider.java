@@ -43,15 +43,21 @@ public final class ImageProvider {
         this.mainThreadExecutor = mainThreadExecutor;
     }
 
-    public void getImage(@Nullable final String url, OnBitmapLoadedListener onBitmapLoadedListener) {
+    public void getImage(@Nullable final String url, @Nullable OnBitmapLoadedListener onBitmapLoadedListener) {
         if (url == null) {
             return;
         }
         Bitmap bitmap = bitmapLruCache.get(url);
         if (bitmap != null) {
-            onBitmapLoadedListener.onBitmapReady(bitmap);
+            callListenerSafely(bitmap, onBitmapLoadedListener);
         } else {
             fetchBitmapAsync(url, onBitmapLoadedListener);
+        }
+    }
+
+    private void callListenerSafely(Bitmap bitmap, @Nullable OnBitmapLoadedListener onBitmapLoadedListener) {
+        if (onBitmapLoadedListener != null) {
+            onBitmapLoadedListener.onBitmapReady(bitmap);
         }
     }
 

@@ -71,6 +71,18 @@ class ImageProviderTest {
         assertEquals(128, bitmapListener.capturedBitmap?.width)
     }
 
+    @Test
+    fun doesNotCrashWhenNoBitmapListenerProvided() {
+        var buffer = Buffer()
+        buffer = buffer.readFrom(getAsset(TEST_FILE))
+        server.enqueue(MockResponse()
+                .addHeader("Content-Type:image/jpeg")
+                .setBody(buffer))
+
+        imageProvider.getImage(server.url("/").toString(), null)
+        imageProvider.getImage(server.url("/").toString(), null)
+    }
+
     private fun getAsset(assetPath: String): InputStream {
         return InstrumentationRegistry.getTargetContext().assets.open(assetPath)
     }
