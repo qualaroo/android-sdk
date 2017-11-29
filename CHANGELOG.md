@@ -1,3 +1,13 @@
+## 1.4.2
+**New features:**
+- support for displaying custom logos
+
+**Various improvements**
+- additional ProGuard rules for non-OkHttp3 apps
+- preventing multiple clicks on radio buttons in answers
+- differentiating active and paused surveys
+- few additional log messages
+
 ## 1.4.1
 - fix for https://github.com/qualaroo/AndroidSDK/issues/2
 
