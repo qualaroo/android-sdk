@@ -2,7 +2,12 @@ package com.qualaroo
 
 import android.content.Intent
 import com.nhaarman.mockito_kotlin.*
+import com.qualaroo.internal.ImageProvider
+import com.qualaroo.internal.model.TestModels.optionMap
+import com.qualaroo.internal.model.TestModels.spec
+import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.network.RestClient
+import com.qualaroo.internal.network.SurveysRepository
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.internal.storage.LocalStorage
 import com.qualaroo.util.MockRestClient
@@ -19,7 +24,9 @@ class QualarooJobIntentServiceTest {
         on { action } doReturn QualarooJobIntentService.ACTION_UPLOAD_REQUESTS
     }
 
-    val service = OverridableQualarooJobIntentService(localStorage, restClient)
+    val imageProvider = mock<ImageProvider>()
+
+    private val service = OverridableQualarooJobIntentService(localStorage, restClient)
 
     @Test
     fun `does nothing on unknown actions`() {
@@ -82,9 +89,31 @@ class QualarooJobIntentServiceTest {
         assertEquals(1, localStorage.failedRequestsCount)
     }
 
-    class OverridableQualarooJobIntentService(val localStorage: LocalStorage, val restClient: RestClient) : QualarooJobIntentService() {
-        override fun provideQualarooInstance() = mock<Qualaroo>()
-        override fun provideLocalStorage(qualaroo: Qualaroo?) = localStorage
-        override fun provideRestClient(qualaroo: Qualaroo?) = restClient
+    @Test
+    fun `prefetches surveys with their images`() {
+        service.onHandleWork(uploadIntent)
+
+        verify(imageProvider, times(1)).getImage(eq("someLogoUrl"), anyOrNull())
+        verify(imageProvider, times(1)).getImage(eq("someOtherLogoUrl"), anyOrNull())
+        verify(imageProvider, times(1)).getImage(eq(null), anyOrNull())
+        verifyNoMoreInteractions(imageProvider)
+    }
+
+    private inner class OverridableQualarooJobIntentService(val localStorage: LocalStorage, val restClient: RestClient) : QualarooJobIntentService() {
+        override fun getQualarooInstance() = object : QualarooBase() {
+            override fun localStorage(): LocalStorage = localStorage
+
+            override fun restClient(): RestClient = restClient
+
+            override fun surveysRepository() = mock<SurveysRepository> {
+                on {surveys} doReturn listOf(
+                        survey(id = 1, spec = spec(optionMap = optionMap(logoUrl = "someLogoUrl"))),
+                        survey(id = 2, spec = spec(optionMap = optionMap(logoUrl = "someOtherLogoUrl"))),
+                        survey(id = 3, spec = spec(optionMap = optionMap(logoUrl = null)))
+                )
+            }
+
+            override fun imageProvider(): ImageProvider = imageProvider
+        }
     }
 }

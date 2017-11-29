@@ -62,6 +62,7 @@ class ThemeUtils {
             };
             ((TintableBackgroundView) button).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
+        button.setTextColor(theme.buttonTextColor());
     }
 
     static void applyTheme(Spinner spinner, Theme theme) {

@@ -86,11 +86,11 @@ public final class Theme {
         return textColor;
     }
 
-    public int buttonTextColor() {
+    int buttonTextColor() {
         return buttonTextColor;
     }
 
-    public int buttonEnabledColor() {
+    int buttonEnabledColor() {
         return buttonEnabledColor;
     }
 

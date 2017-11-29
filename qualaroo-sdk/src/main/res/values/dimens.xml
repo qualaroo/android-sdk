@@ -2,7 +2,7 @@
 <resources>
 
     <dimen name="qualaroo__question_title_size">22dp</dimen>
-    <dimen name="qualaroo__question_logo_size">48dp</dimen>
+    <dimen name="qualaroo__question_logo_size">52dp</dimen>
 
     <dimen name="qualaroo__answer_text_size">20dp</dimen>
 
@@ -20,7 +20,5 @@
     <dimen name="qualaroo__dropdown_item_padding">8dp</dimen>
 
     <dimen name="qualaroo__message_text_size">22dp</dimen>
-
-    <fraction name="qualaroo__survey_empty_space_weight">0.9</fraction>
 
 </resources>

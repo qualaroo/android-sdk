@@ -35,7 +35,6 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         final View view = View.inflate(context, R.layout.qualaroo__view_question_radio, null);
         final Button button = view.findViewById(R.id.qualaroo__question_radio_confirm);
         button.setText(question.sendText());
-        button.setTextColor(getTheme().buttonTextColor());
         ThemeUtils.applyTheme(button, getTheme());
         final RadioGroup radioGroup = view.findViewById(R.id.qualaroo__question_radio_options);
         int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_drawable_padding);
@@ -60,6 +59,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 if (question.alwaysShowSend()) {
                     button.setEnabled(true);
                 } else {
+                    radioGroup.setOnCheckedChangeListener(null);
                     radioGroup.postDelayed(new Runnable() {
                         @Override public void run() {
                             Answer selectedAnswer = getAnswerById(answerId, question.answerList());

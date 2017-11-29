@@ -3,12 +3,15 @@ package com.qualaroo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
+import com.qualaroo.internal.ImageProvider;
+import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
@@ -29,6 +32,7 @@ import com.qualaroo.internal.model.QuestionTypeDeserializer;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
 import com.qualaroo.internal.network.Cache;
+import com.qualaroo.internal.network.ImageRepository;
 import com.qualaroo.internal.network.ReportClient;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
@@ -42,6 +46,7 @@ import com.qualaroo.util.UriOpener;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +58,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
-public class Qualaroo implements QualarooSdk {
+public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
     /**
      * Starts initialization phase of the SDK.
@@ -89,15 +94,17 @@ public class Qualaroo implements QualarooSdk {
 
     private static QualarooSdk INSTANCE;
 
+    private final LocalStorage localStorage;
+    private final RestClient restClient;
+    private final SurveysRepository surveysRepository;
+    private final ImageProvider imageProvider;
+
     private final UserInfo userInfo;
     private final SurveyDisplayQualifier surveyDisplayQualifier;
     private final Context context;
-    private final SurveysRepository surveysRepository;
     private final Executor dataExecutor;
     private final ReportManager reportManager;
     private final UriOpener uriOpener;
-    final LocalStorage localStorage;
-    final RestClient restClient;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
@@ -111,7 +118,10 @@ public class Qualaroo implements QualarooSdk {
         this.dataExecutor = Executors.newSingleThreadExecutor();
         this.backgroundExecutor = Executors.newSingleThreadExecutor();
         this.localStorage = new DatabaseLocalStorage(this.context);
-        this.restClient = buildRestClient(credentials);
+        OkHttpClient okHttpClient = buildOkHttpClient();
+        this.restClient = buildRestClient(okHttpClient, credentials);
+        ImageRepository imageRepository = new ImageRepository(okHttpClient, context.getCacheDir());
+        this.imageProvider = new ImageProvider(context, imageRepository, backgroundExecutor, uiExecutor);
         this.uriOpener = new UriOpener(context);
         SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
         Settings settings = new Settings(sharedPreferences);
@@ -138,7 +148,6 @@ public class Qualaroo implements QualarooSdk {
         this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
 
         QualarooLogger.info("Initialized QualarooSdk");
-        QualarooJobIntentService.start(this.context);
     }
 
     private void initLogging(boolean debugMode) {
@@ -217,19 +226,13 @@ public class Qualaroo implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener);
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener, imageProvider);
     }
 
-    private RestClient buildRestClient(Credentials credentials) {
-        Gson gson = buildGson();
-        OkHttpClient okHttpClient = buildOkHttpClient(credentials);
-        return new RestClient(okHttpClient, gson);
-    }
-
-    private OkHttpClient buildOkHttpClient(Credentials credentials) {
+    private RestClient buildRestClient(OkHttpClient okHttpClient, Credentials credentials) {
         final String authToken = okhttp3.Credentials.basic(credentials.apiKey(), credentials.apiSecret());
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
+        OkHttpClient.Builder builder = okHttpClient.newBuilder();
+        builder.addInterceptor(new Interceptor() {
                     @Override public Response intercept(Chain chain) throws IOException {
                         Request request = chain.request().newBuilder()
                                 .header("Authorization", authToken)
@@ -237,6 +240,12 @@ public class Qualaroo implements QualarooSdk {
                         return chain.proceed(request);
                     }
                 });
+        okHttpClient = builder.build();
+        return new RestClient(okHttpClient, buildGson());
+    }
+
+    private OkHttpClient buildOkHttpClient() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
         if (BuildConfig.DEBUG) {
             final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                 @Override public void log(String message) {
@@ -258,18 +267,37 @@ public class Qualaroo implements QualarooSdk {
                 .create();
     }
 
-    public static class Builder implements QualarooSdk.Builder {
+    @Override LocalStorage localStorage() {
+        return localStorage;
+    }
+
+    @Override RestClient restClient() {
+        return restClient;
+    }
+
+    @Override SurveysRepository surveysRepository() {
+        return surveysRepository;
+    }
+
+    @Override ImageProvider imageProvider() {
+        return imageProvider;
+    }
+
+    public final static class Builder implements QualarooSdk.Builder {
         private final Context context;
-        private Credentials credentials;
+        private String apiKey;
         private boolean debugMode = false;
 
         Builder(Context context) {
             this.context = context;
+            //TODO: figure out a way of avoiding calling enableLogging() method everywhere
+            //(this method has been exposed to avoid using Log.d calls in unit tests)
+            QualarooLogger.enableLogging();
         }
 
         @Override
         public QualarooSdk.Builder setApiKey(String apiKey) {
-            this.credentials = new Credentials(apiKey);
+            this.apiKey = apiKey;
             return this;
         }
 
@@ -281,8 +309,15 @@ public class Qualaroo implements QualarooSdk {
 
         @Override
         public void init() {
-            if (INSTANCE == null) {
+            if (INSTANCE != null) {
+                return;
+            }
+            try {
+                Credentials credentials = new Credentials(apiKey);
                 INSTANCE = new Qualaroo(context, credentials, debugMode);
+                QualarooJobIntentService.start(context);
+            } catch (InvalidCredentialsException e) {
+                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
     }
@@ -298,6 +333,47 @@ public class Qualaroo implements QualarooSdk {
 
         @Override public boolean isInvalid() {
             return true;
+        }
+    }
+
+    private static class InvalidApiKeyQualarooSdk implements QualarooSdk {
+
+        private final String providedApiKey;
+
+        InvalidApiKeyQualarooSdk(String providedApiKey) {
+            this.providedApiKey = providedApiKey;
+            QualarooLogger.enableLogging();
+            logErrorMessage();
+        }
+
+        @Override public void showSurvey(@NonNull String alias) {
+            logErrorMessage();
+        }
+
+        @Override public void setUserId(@NonNull String userId) {
+            logErrorMessage();
+        }
+
+        @Override public void setUserProperty(@NonNull String key, @Nullable String value) {
+            logErrorMessage();
+        }
+
+        @Override public void removeUserProperty(@NonNull String key) {
+            logErrorMessage();
+        }
+
+        @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+            logErrorMessage();
+        }
+
+        private void logErrorMessage() {
+            QualarooLogger.error(
+                    String.format(
+                            Locale.ROOT,
+                            "Qualaroo SDK has not been properly initialized. Key: %1$s seems to be an incorrect one.",
+                            providedApiKey
+                    )
+            );
         }
     }
 
