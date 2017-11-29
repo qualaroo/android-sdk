@@ -19,7 +19,7 @@ class Settings(context: Context) {
     }
 
     fun storeApiKey(apiKey: String) {
-        sharedPreferences.edit().putString(KEY_API_KEY, apiKey).apply()
+        sharedPreferences.edit().putString(KEY_API_KEY, apiKey).commit()
     }
 
     fun apiKey(): String {
