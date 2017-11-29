@@ -14,7 +14,13 @@ public class Credentials {
     private final String siteId;
 
     public Credentials(String apiKey) {
+        if (apiKey == null || apiKey.length() == 0) {
+            throw new InvalidCredentialsException();
+        }
         ByteString byteKey = ByteString.decodeBase64(apiKey);
+        if (byteKey == null) {
+            throw new InvalidCredentialsException();
+        }
         String key = byteKey.utf8();
         String[] keyParts = key.split(":");
         if (keyParts.length != 3) {
