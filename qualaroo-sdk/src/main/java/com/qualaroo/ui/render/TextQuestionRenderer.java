@@ -49,7 +49,6 @@ final class TextQuestionRenderer extends QuestionRenderer {
         final Button button = view.findViewById(R.id.qualaroo__view_question_text_confirm);
         ThemeUtils.applyTheme(button, getTheme());
         button.setText(question.sendText());
-        button.setTextColor(getTheme().buttonTextColor());
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 KeyboardUtil.hideKeyboard(editText);

@@ -36,7 +36,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         final Button confirmButton = view.findViewById(R.id.qualaroo__view_question_dropdown_confirm);
         final Spinner spinner = view.findViewById(R.id.qualaroo__view_question_dropdown_spinner);
         confirmButton.setText(question.sendText());
-        confirmButton.setTextColor(getTheme().buttonTextColor());
+        ThemeUtils.applyTheme(confirmButton, getTheme());
         ArrayAdapter<AnswerItem> adapter = new CustomSpinnerAdapter(context, getTheme());
         List<AnswerItem> spinnerItems = new ArrayList<>();
         for (Answer answer : question.answerList()) {
@@ -59,7 +59,7 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
                 onAnsweredListener.onAnswered(answerItem.answer);
             }
         });
-        ThemeUtils.applyTheme(confirmButton, getTheme());
+
         ThemeUtils.applyTheme(spinner, getTheme());
         return RestorableView.withId(question.id())
                 .view(view)
