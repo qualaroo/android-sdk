@@ -3,6 +3,7 @@ package com.qualaroo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -10,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ImageProvider;
+import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
@@ -44,6 +46,7 @@ import com.qualaroo.util.UriOpener;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -280,18 +283,21 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         return imageProvider;
     }
 
-    public static class Builder implements QualarooSdk.Builder {
+    public final static class Builder implements QualarooSdk.Builder {
         private final Context context;
-        private Credentials credentials;
+        private String apiKey;
         private boolean debugMode = false;
 
         Builder(Context context) {
             this.context = context;
+            //TODO: figure out a way of avoiding calling enableLogging() method everywhere
+            //(this method has been exposed to avoid using Log.d calls in unit tests)
+            QualarooLogger.enableLogging();
         }
 
         @Override
         public QualarooSdk.Builder setApiKey(String apiKey) {
-            this.credentials = new Credentials(apiKey);
+            this.apiKey = apiKey;
             return this;
         }
 
@@ -303,9 +309,15 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
         @Override
         public void init() {
-            if (INSTANCE == null) {
+            if (INSTANCE != null) {
+                return;
+            }
+            try {
+                Credentials credentials = new Credentials(apiKey);
                 INSTANCE = new Qualaroo(context, credentials, debugMode);
                 QualarooJobIntentService.start(context);
+            } catch (InvalidCredentialsException e) {
+                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
     }
@@ -321,6 +333,47 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
         @Override public boolean isInvalid() {
             return true;
+        }
+    }
+
+    private static class InvalidApiKeyQualarooSdk implements QualarooSdk {
+
+        private final String providedApiKey;
+
+        InvalidApiKeyQualarooSdk(String providedApiKey) {
+            this.providedApiKey = providedApiKey;
+            QualarooLogger.enableLogging();
+            logErrorMessage();
+        }
+
+        @Override public void showSurvey(@NonNull String alias) {
+            logErrorMessage();
+        }
+
+        @Override public void setUserId(@NonNull String userId) {
+            logErrorMessage();
+        }
+
+        @Override public void setUserProperty(@NonNull String key, @Nullable String value) {
+            logErrorMessage();
+        }
+
+        @Override public void removeUserProperty(@NonNull String key) {
+            logErrorMessage();
+        }
+
+        @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+            logErrorMessage();
+        }
+
+        private void logErrorMessage() {
+            QualarooLogger.error(
+                    String.format(
+                            Locale.ROOT,
+                            "Qualaroo SDK has not been properly initialized. Key: %1$s seems to be an incorrect one.",
+                            providedApiKey
+                    )
+            );
         }
     }
 

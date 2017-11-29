@@ -41,6 +41,13 @@ class CredentialsTest {
         Credentials(base64("123:abcd:456a"))
     }
 
+    @Test(expected = InvalidCredentialsException::class)
+    fun `throws when null api key`() {
+        Credentials(null)
+    }
 
-
+    @Test(expected = InvalidCredentialsException::class)
+    fun `throws when api key is not base64`() {
+        Credentials("lala")
+    }
 }
