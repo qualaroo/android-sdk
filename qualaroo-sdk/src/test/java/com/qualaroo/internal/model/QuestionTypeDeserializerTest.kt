@@ -27,6 +27,10 @@ class QuestionTypeDeserializerTest {
                 expected = QuestionType.NPS,
                 actual = deserializer.deserialize(JsonPrimitive("nps"), null, null)
         )
+        assertEquals(
+                expected = QuestionType.TEXT_SINGLE,
+                actual = deserializer.deserialize(JsonPrimitive("text_single"), null, null)
+        )
     }
 
     @Test
