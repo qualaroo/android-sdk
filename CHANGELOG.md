@@ -1,3 +1,7 @@
+## 1.4.3
+**Bug fixes:**
+- https://github.com/qualaroo/AndroidSDK/issues/5
+
 ## 1.4.2
 **New features:**
 - support for displaying custom logos
