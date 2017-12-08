@@ -103,6 +103,7 @@ public class SurveysRepository {
                 continue;
             }
             if (surveyContainUnknownQuestionTypes(survey)) {
+                QualarooLogger.error("Survey [%1$d, %2$s] contains unknown question types!", survey.id(), survey.canonicalName());
                 continue;
             }
             result.add(survey);
