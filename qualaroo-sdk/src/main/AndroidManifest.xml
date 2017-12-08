@@ -11,6 +11,7 @@
     <application>
         <activity
             android:name=".QualarooActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Qualaroo.Translucent" />
         <service
