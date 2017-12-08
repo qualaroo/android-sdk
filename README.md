@@ -25,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    compile 'com.qualaroo:qualaroo-sdk:1.4.2'
+    compile 'com.qualaroo:qualaroo-sdk:1.4.3'
 }
 ```
 ## Step 2. Code Integration
