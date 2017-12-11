@@ -16,8 +16,6 @@ import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.SurveyDisplayQualifier;
-import com.qualaroo.internal.SurveyStatusMatcher;
-import com.qualaroo.internal.TimeMatcher;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
@@ -130,9 +128,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo);
         this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
 
-        long pauseBetweenSurveysInMillis = debugMode ? 0 : TimeUnit.DAYS.toMillis(3);
         this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()
-                .register(new SurveyStatusMatcher(localStorage, new TimeMatcher(pauseBetweenSurveysInMillis)))
                 .register(new UserPropertiesMatcher(userInfo))
                 .register(new UserIdentityMatcher(userInfo))
                 .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
