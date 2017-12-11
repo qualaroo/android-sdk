@@ -1,3 +1,10 @@
+## 1.4.4
+**Changes**
+- removed 72h time limit between showing the same survey
+
+**Bug fixes**
+- fixed a rare case in which SDK could display an incompatible survey
+
 ## 1.4.3
 **Bug fixes:**
 - https://github.com/qualaroo/AndroidSDK/issues/5
