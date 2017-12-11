@@ -7,11 +7,15 @@ import android.support.annotation.RestrictTo;
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.SessionInfo;
 import com.qualaroo.internal.UserInfo;
+import com.qualaroo.internal.model.Language;
+import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.QuestionType;
 import com.qualaroo.internal.model.Survey;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import okhttp3.HttpUrl;
@@ -80,18 +84,43 @@ public class SurveysRepository {
         final HttpUrl requestUrl = buildSurveyRequestUrl();
         Result<Survey[]> result = restClient.get(requestUrl, Survey[].class);
         if (result.isSuccessful()) {
-            List<Survey> surveys = new ArrayList<>();
-            for (Survey survey : result.getData()) {
-                if (SURVEY_SDK_TYPE.equals(survey.type()) && survey.isActive()) {
-                    surveys.add(survey);
-                }
-            }
+            List<Survey> surveys = filterOutInvalidSurveys(result.getData());
             QualarooLogger.debug("Acquired %1$d surveys", surveys.size());
             return surveys;
         } else {
             QualarooLogger.debug("Could not acquire surveys");
             return null;
         }
+    }
+
+    private List<Survey> filterOutInvalidSurveys(Survey[] surveys) {
+        List<Survey> result = new ArrayList<>();
+        for (Survey survey : surveys) {
+            if (!SURVEY_SDK_TYPE.equals(survey.type())) {
+                continue;
+            }
+            if (!survey.isActive()) {
+                continue;
+            }
+            if (surveyContainUnknownQuestionTypes(survey)) {
+                QualarooLogger.error("Survey [%1$d, %2$s] contains unknown question types!", survey.id(), survey.canonicalName());
+                continue;
+            }
+            result.add(survey);
+        }
+        return result;
+    }
+
+    private boolean surveyContainUnknownQuestionTypes(Survey survey) {
+        Map<Language, List<Question>> questionMap = survey.spec().questionList();
+        for (Map.Entry<Language, List<Question>> languageListEntry : questionMap.entrySet()) {
+            for (Question question : languageListEntry.getValue()) {
+                if (question.type() == QuestionType.UNKNOWN) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private HttpUrl buildSurveyRequestUrl() {

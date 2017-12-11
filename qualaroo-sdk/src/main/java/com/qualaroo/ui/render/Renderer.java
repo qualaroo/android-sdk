@@ -21,19 +21,18 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public class Renderer {
 
-    private final Theme theme;
     private final Map<QuestionType, QuestionRenderer> questionRenderers = new HashMap<>();
     private final MessageRenderer messageRenderer;
     private final LeadGenRenderer leadGenRenderer;
 
     public Renderer(Theme theme) {
-        this.theme = theme;
         this.messageRenderer = new MessageRenderer(theme);
         this.leadGenRenderer = new LeadGenRenderer(theme);
         this.questionRenderers.put(QuestionType.RADIO, new RadioQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.CHECKBOX, new CheckboxQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.NPS, new NpsQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.TEXT, new TextQuestionRenderer(theme));
+        this.questionRenderers.put(QuestionType.TEXT_SINGLE, new TextQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.UNKNOWN, new UnknownQuestionTypeRenderer(theme));
         this.questionRenderers.put(QuestionType.DROPDOWN, new DropdownQuestionRenderer(theme));
     }
