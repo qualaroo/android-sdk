@@ -10,6 +10,7 @@ public enum QuestionType {
     RADIO("radio"),
     CHECKBOX("checkbox"),
     TEXT("text"),
+    TEXT_SINGLE("text_single"),
     DROPDOWN("dropdown"),
     UNKNOWN("-1");
 

@@ -31,8 +31,12 @@ public final class QualarooLogger {
         }
     }
 
-    public static void error(String message, Throwable throwable) {
+    public static void error(Throwable throwable, String message) {
         logger.e(message, throwable);
+    }
+
+    public static void error(String message, Object... args) {
+        logger.e(String.format(message, args));
     }
 
     public static void error(String message) {

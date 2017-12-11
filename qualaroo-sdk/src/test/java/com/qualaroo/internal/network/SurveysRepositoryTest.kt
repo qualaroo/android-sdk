@@ -3,7 +3,11 @@ package com.qualaroo.internal.network
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.SessionInfo
 import com.qualaroo.internal.UserInfo
+import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.Survey
+import com.qualaroo.internal.model.TestModels.language
+import com.qualaroo.internal.model.TestModels.question
+import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.util.TimeProvider
 import okhttp3.HttpUrl
@@ -38,7 +42,7 @@ class SurveysRepositoryTest {
 
     @Test
     fun `calls proper request`() {
-        resetClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
+        restClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
         surveysRepository.surveys
 
         val captor = argumentCaptor<HttpUrl>()
@@ -70,7 +74,7 @@ class SurveysRepositoryTest {
 
     @Test
     fun `returns surveys from API when there were no previously stored surveys`() {
-        resetClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
+        restClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
         val surveys = surveysRepository.surveys
 
         assertEquals(3, surveys.size)
@@ -81,7 +85,7 @@ class SurveysRepositoryTest {
 
     @Test
     fun `caches results`() {
-        resetClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
+        restClientReturns(arrayOf(survey(id = 1), survey(id = 2), survey(id = 3)))
 
         var surveys = surveysRepository.surveys
         assertEquals(3, surveys.size)
@@ -106,7 +110,7 @@ class SurveysRepositoryTest {
                 survey(id = 3, type = "definitely_not_sdk"),
                 survey(id = 4, type = "sdk")
         )
-        resetClientReturns(surveys)
+        restClientReturns(surveys)
 
         val filteredSurveys = surveysRepository.surveys
 
@@ -123,7 +127,7 @@ class SurveysRepositoryTest {
                 survey(id = 3, active = false),
                 survey(id = 4, active = true)
         )
-        resetClientReturns(surveys)
+        restClientReturns(surveys)
 
         val result = surveysRepository.surveys
 
@@ -131,8 +135,29 @@ class SurveysRepositoryTest {
         assertFalse(result.contains(survey(id = 3)))
     }
 
+    @Test
+    fun `filters out surveys that have questions of unknown type`() {
+        val surveys = arrayOf(
+                survey(id = 1, spec = spec(questionList = mapOf(
+                        language("en") to listOf(
+                                question(id = 1, type = QuestionType.UNKNOWN)
+                        )
+                ))),
+                survey(id = 2, spec = spec(questionList = mapOf(
+                        language("en") to listOf(
+                                question(id = 1, type = QuestionType.RADIO)
+                        )
+                )))
+        )
+        restClientReturns(surveys)
 
-    private fun resetClientReturns(surveys: Array<Survey>) {
+        val result = surveysRepository.surveys
+
+        assertEquals(1, result.size)
+        assertFalse(result.contains(survey(id = 1)))
+    }
+
+    private fun restClientReturns(surveys: Array<Survey>) {
         whenever(restClient.get(any(), eq(Array<Survey>::class.java))).thenReturn(Result.of(surveys))
     }
 
