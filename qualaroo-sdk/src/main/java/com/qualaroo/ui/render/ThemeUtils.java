@@ -9,9 +9,8 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.TintableBackgroundView;
 import android.support.v4.widget.TintableCompoundButton;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,19 +25,11 @@ public class ThemeUtils {
         throw new IllegalStateException("No instances");
     }
 
-    static void applyTheme(RadioButton radioButton, Theme theme) {
-        if (radioButton instanceof TintableCompoundButton) {
+    public static void applyTheme(CompoundButton compoundButton, Theme theme) {
+        if (compoundButton instanceof TintableCompoundButton) {
             int[][] states = new int[][]{new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}};
             int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
-            ((TintableCompoundButton) radioButton).setSupportButtonTintList(new ColorStateList(states, colors));
-        }
-    }
-
-    static void applyTheme(CheckBox checkBox, Theme theme) {
-        if (checkBox instanceof TintableCompoundButton) {
-            int[][] states = new int[][]{new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}};
-            int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
-            ((TintableCompoundButton) checkBox).setSupportButtonTintList(new ColorStateList(states, colors));
+            ((TintableCompoundButton) compoundButton).setSupportButtonTintList(new ColorStateList(states, colors));
         }
     }
 
