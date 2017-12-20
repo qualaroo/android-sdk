@@ -80,6 +80,7 @@ class ReportClientTest {
         assertEquals("10", url.queryParameterValues("r[123456][]")[0])
         assertEquals("20", url.queryParameterValues("r[123456][]")[1])
         assertEquals("30", url.queryParameterValues("r[123456][]")[2])
+
     }
 
     @Test
@@ -96,10 +97,18 @@ class ReportClientTest {
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
+<<<<<<< HEAD
 
         assertEquals("something1", url.queryParameter("re[123456][1]"))
         assertEquals("something2", url.queryParameter("re[123456][2]"))
 
+=======
+        assertEquals(3, url.queryParameterValues("r[123456][]").size)
+
+        assertEquals("10", url.queryParameterValues("r[123456][]")[0])
+        assertEquals("20", url.queryParameterValues("r[123456][]")[1])
+        assertEquals("30", url.queryParameterValues("r[123456][]")[2])
+>>>>>>> 765e64b... Made report client properly report answers to checkbox and radio answers
     }
 
     @Test
