@@ -15,7 +15,7 @@ public final class Answer implements Serializable {
     private Node nextMap;
     private String explainType;
 
-    @VisibleForTesting Answer(int id, String title, Node nextMap, String explainType) {
+    @VisibleForTesting Answer(int id, String title, @Nullable Node nextMap, @Nullable String explainType) {
         this.id = id;
         this.title = title;
         this.nextMap = nextMap;

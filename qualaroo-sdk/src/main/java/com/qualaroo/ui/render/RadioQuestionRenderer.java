@@ -3,18 +3,23 @@ package com.qualaroo.ui.render;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.RestrictTo;
-import android.support.v7.widget.AppCompatRadioButton;
+import android.text.TextUtils;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RadioGroup;
+import android.widget.Checkable;
+import android.widget.CompoundButton;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;
+import com.qualaroo.ui.render.widget.FreeformCommentCompoundButton;
+import com.qualaroo.ui.render.widget.ListeningCheckableGroup;
+import com.qualaroo.ui.render.widget.ListeningCheckableRadioButton;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.DimenUtils;
 
@@ -24,6 +29,7 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 final class RadioQuestionRenderer extends QuestionRenderer {
 
     private final static String KEY_SELECTED_ITEM = "radio.selectedItem";
+    private static final String KEY_FREEFORM_COMMENTS = "question.freeformComments";
     private final static int NOTHING_SELECTED = -1;
 
     RadioQuestionRenderer(Theme theme) {
@@ -35,31 +41,14 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         final Button button = view.findViewById(R.id.qualaroo__question_radio_confirm);
         button.setText(question.sendText());
         ThemeUtils.applyTheme(button, getTheme());
-        final RadioGroup radioGroup = view.findViewById(R.id.qualaroo__question_radio_options);
-        int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_drawable_padding);
-        int padding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_padding);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        for (int i = 0; i < question.answerList().size(); i++) {
-            Answer answer = question.answerList().get(i);
-            AppCompatRadioButton radioButton = new AppCompatRadioButton(context);
-            radioButton.setId(answer.id());
-            radioButton.setText(answer.title());
-            radioButton.setTextColor(getTheme().textColor());
-            ThemeUtils.applyTheme(radioButton, getTheme());
-            radioButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__radio_text_size));
-            radioButton.setPadding(drawablePadding, padding, padding, padding);
-            radioButton.setLayoutParams(layoutParams);
-            radioGroup.addView(radioButton);
-        }
-        button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
-
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(RadioGroup radioGroup, final int answerId) {
+        final ListeningCheckableGroup container = view.findViewById(R.id.qualaroo__question_radio_options);
+        ListeningCheckableGroup.OnCheckedChangeListener listener = new ListeningCheckableGroup.OnCheckedChangeListener() {
+            @Override public void onCheckedChanged(ListeningCheckableGroup group, final int answerId) {
                 if (question.alwaysShowSend()) {
                     button.setEnabled(true);
                 } else {
-                    radioGroup.setOnCheckedChangeListener(null);
-                    radioGroup.postDelayed(new Runnable() {
+                    container.setOnCheckedChangeListener(null);
+                    container.postDelayed(new Runnable() {
                         @Override public void run() {
                             UserResponse userResponse = buildUserResponse(question.id(), answerId);
                             onAnsweredListener.onResponse(userResponse);
@@ -67,11 +56,17 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                     }, 300);
                 }
             }
-        });
-
+        };
+        container.setOnCheckedChangeListener(listener);
+        for (int i = 0; i < question.answerList().size(); i++) {
+            Answer answer = question.answerList().get(i);
+            View radioButton = buildRadioButton(context, answer);
+            container.addView(radioButton);
+        }
+        button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                int answerId = radioGroup.getCheckedRadioButtonId();
+                int answerId = container.getCheckedId();
                 UserResponse userResponse = buildUserResponse(question.id(), answerId);
                 onAnsweredListener.onResponse(userResponse);
             }
@@ -80,20 +75,81 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
                     @Override public void onSaveState(Bundle into) {
-                        into.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedRadioButtonId());
+                        saveState(into, container);
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle from) {
-                        int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
-                        if (checkedId != NOTHING_SELECTED) {
-                            radioGroup.check(checkedId);
-                        }
+                        restoreState(from, container);
                     }
                 }).build();
     }
 
+    private void restoreState(Bundle from, ListeningCheckableGroup listeningCheckableGroup) {
+        int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
+        if (checkedId != NOTHING_SELECTED) {
+            listeningCheckableGroup.check(checkedId);
+        }
+        SparseArray<FreeformCommentCompoundButton.State> stateList = from.getSparseParcelableArray(KEY_FREEFORM_COMMENTS);
+        if (stateList == null) {
+            return;
+        }
+        for (int i = 0; i < listeningCheckableGroup.getChildCount(); i++) {
+            View child = listeningCheckableGroup.getChildAt(i);
+            FreeformCommentCompoundButton.State state = stateList.get(child.getId());
+            if (state != null) {
+                ((FreeformCommentCompoundButton) child).restoreState(state);
+            }
+        }
+    }
+
+    private void saveState(Bundle into, ListeningCheckableGroup radioGroup) {
+        into.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedId());
+
+        SparseArray<FreeformCommentCompoundButton.State> freeformComments = new SparseArray<>();
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            Checkable child = (Checkable) radioGroup.getChildAt(i);
+            if (child instanceof FreeformCommentCompoundButton) {
+                FreeformCommentCompoundButton.State state = ((FreeformCommentCompoundButton) child).getState();
+                freeformComments.put(state.id, state);
+            }
+        }
+        into.putSparseParcelableArray(KEY_FREEFORM_COMMENTS, freeformComments);
+    }
+
     private UserResponse buildUserResponse(long questionId, int answerId) {
         return new UserResponse.Builder(questionId).addChoiceAnswer(answerId).build();
+    }
+
+    private View buildRadioButton(Context context, Answer answer) {
+        final View view;
+        if (hasFreeformComment(answer)) {
+            CompoundButton radioButton = buildRegularRadioButton(context, answer);
+            FreeformCommentCompoundButton wrappedRadioButton = new FreeformCommentCompoundButton(context, radioButton);
+            wrappedRadioButton.acceptTheme(getTheme());
+            view = wrappedRadioButton;
+        } else {
+            view = buildRegularRadioButton(context, answer);
+        }
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        view.setLayoutParams(layoutParams);
+        return view;
+    }
+
+    private CompoundButton buildRegularRadioButton(Context context, Answer answer) {
+        int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_drawable_padding);
+        int padding = DimenUtils.px(context, R.dimen.qualaroo__radio_button_padding);
+        ListeningCheckableRadioButton button = new ListeningCheckableRadioButton(context);
+        button.setId(answer.id());
+        button.setText(answer.title());
+        button.setTextColor(getTheme().textColor());
+        ThemeUtils.applyTheme(button, getTheme());
+        button.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__radio_text_size));
+        button.setPadding(drawablePadding, padding, padding, padding);
+        return button;
+    }
+
+    private boolean hasFreeformComment(Answer answer) {
+        return !TextUtils.isEmpty(answer.explainType());
     }
 }

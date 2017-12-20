@@ -132,11 +132,14 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
     }
 
     private View buildCheckBox(Context context, Answer answer, CompoundButton.OnCheckedChangeListener listener) {
+        final View view;
         if (hasFreeformComment(answer)) {
-            return buildCheckBoxWithFreeformComment(context, answer, listener);
+            view = buildCheckBoxWithFreeformComment(context, answer, listener);
         } else {
-            return buildRegularCheckbox(context, answer, listener);
+            view = buildRegularCheckbox(context, answer, listener);
         }
+        view.setTag(answer);
+        return view;
     }
 
     private View buildCheckBoxWithFreeformComment(Context context, Answer answer, CompoundButton.OnCheckedChangeListener listener) {
@@ -154,7 +157,6 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         ThemeUtils.applyTheme(checkBox, getTheme());
         checkBox.setText(answer.title());
         checkBox.setTextColor(getTheme().textColor());
-        checkBox.setTag(answer);
         checkBox.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimensionPixelSize(R.dimen.qualaroo__checkbox_text_size));
         checkBox.setPadding(drawablePadding, padding, padding, padding);
         checkBox.setOnCheckedChangeListener(listener);

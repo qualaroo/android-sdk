@@ -7,7 +7,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.View;
-import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -15,7 +14,7 @@ import android.widget.LinearLayout;
 import com.qualaroo.ui.render.Theme;
 import com.qualaroo.ui.render.ThemeUtils;
 
-public class FreeformCommentCompoundButton extends LinearLayout implements Checkable {
+public class FreeformCommentCompoundButton extends LinearLayout implements ListeningCheckable {
 
     private final EditText freeformComment;
     private final CompoundButton compoundButton;
@@ -34,6 +33,7 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Check
         addView(freeformComment);
     }
 
+    @Override
     public void setOnCheckedChangeListener(final CompoundButton.OnCheckedChangeListener listener) {
         compoundButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -59,7 +59,7 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Check
     @Override public void toggle() {
         compoundButton.toggle();
     }
-    
+
     public void acceptTheme(Theme theme) {
         ThemeUtils.applyTheme(compoundButton, theme);
         ThemeUtils.applyTheme(freeformComment, theme);
