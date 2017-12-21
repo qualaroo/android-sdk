@@ -45,21 +45,21 @@ public class ThemeUtils {
 
     private static void setCursorDrawableColor(EditText editText, @ColorInt int color) {
         try {
-            Field fCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
-            fCursorDrawableRes.setAccessible(true);
-            int mCursorDrawableRes = fCursorDrawableRes.getInt(editText);
-            Field fEditor = TextView.class.getDeclaredField("mEditor");
-            fEditor.setAccessible(true);
-            Object editor = fEditor.get(editText);
+            Field cursorDrawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
+            cursorDrawableResField.setAccessible(true);
+            int cursorDrawableRes = cursorDrawableResField.getInt(editText);
+            Field editorField = TextView.class.getDeclaredField("mEditor");
+            editorField.setAccessible(true);
+            Object editor = editorField.get(editText);
             Class<?> clazz = editor.getClass();
-            Field fCursorDrawable = clazz.getDeclaredField("mCursorDrawable");
-            fCursorDrawable.setAccessible(true);
+            Field cursorDrawableField = clazz.getDeclaredField("mCursorDrawable");
+            cursorDrawableField.setAccessible(true);
             Drawable[] drawables = new Drawable[2];
-            drawables[0] = editText.getContext().getResources().getDrawable(mCursorDrawableRes);
-            drawables[1] = editText.getContext().getResources().getDrawable(mCursorDrawableRes);
+            drawables[0] = editText.getContext().getResources().getDrawable(cursorDrawableRes);
+            drawables[1] = editText.getContext().getResources().getDrawable(cursorDrawableRes);
             drawables[0].setColorFilter(color, PorterDuff.Mode.SRC_IN);
             drawables[1].setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            fCursorDrawable.set(editor, drawables);
+            cursorDrawableField.set(editor, drawables);
         } catch (Throwable ignored) {
         }
     }
@@ -101,13 +101,13 @@ public class ThemeUtils {
 
     private static void setInputTextLayoutColor(TextInputLayout textInputLayout, @ColorInt int defaultColor, @ColorInt int focusedColor) {
         try {
-            Field fDefaultTextColor = TextInputLayout.class.getDeclaredField("mDefaultTextColor");
-            fDefaultTextColor.setAccessible(true);
-            fDefaultTextColor.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ defaultColor}));
+            Field defaultTextColorField = TextInputLayout.class.getDeclaredField("mDefaultTextColor");
+            defaultTextColorField.setAccessible(true);
+            defaultTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ defaultColor}));
 
-            Field fFocusedTextColor = TextInputLayout.class.getDeclaredField("mFocusedTextColor");
-            fFocusedTextColor.setAccessible(true);
-            fFocusedTextColor.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ focusedColor }));
+            Field focusedTextColorField = TextInputLayout.class.getDeclaredField("mFocusedTextColor");
+            focusedTextColorField.setAccessible(true);
+            focusedTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ focusedColor }));
         } catch (Exception ignored) {
             //ignore
         }
