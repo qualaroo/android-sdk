@@ -11,6 +11,7 @@ import com.qualaroo.internal.storage.LocalStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.HttpUrl;
 import okhttp3.Response;
@@ -68,6 +69,7 @@ public class ReportClient {
         HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
                 .addPathSegment("r.js")
                 .addQueryParameter("id", String.valueOf(survey.id()));
+        injectUserParams(builder);
         injectAnalyticsParams(builder);
         return builder;
     }
@@ -102,6 +104,13 @@ public class ReportClient {
             httpUrlBuilder.addQueryParameter("i", userInfo.getUserId());
         }
         httpUrlBuilder.addQueryParameter("au", userInfo.getDeviceId());
+    }
+
+    private void injectUserParams(HttpUrl.Builder httpUrlBuilder) {
+        Map<String, String> userProperties = userInfo.getUserProperties();
+        for (Map.Entry<String, String> userParam : userProperties.entrySet()) {
+            httpUrlBuilder.addQueryParameter(format("rp[%s]", userParam.getKey()), userParam.getValue());
+        }
     }
 
     private static String format(String format, Object... args) {

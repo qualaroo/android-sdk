@@ -223,4 +223,25 @@ class ReportClientTest {
         }
     }
 
+    @Test
+    fun `injects user properties to answers`() {
+        userInfo.setUserProperty("first_key", "first_value")
+        userInfo.setUserProperty("second_key", "second_value")
+
+        val urls = mutableListOf<HttpUrl>()
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        client.reportUserResponse(survey, UserResponse.Builder(123456).addChoiceAnswerWithComment(1, "something1").build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        urls.forEach {
+            assertEquals("first_value", it.queryParameter("rp[first_key]"))
+            assertEquals("second_value", it.queryParameter("rp[second_key]"))
+        }
+    }
+
 }
