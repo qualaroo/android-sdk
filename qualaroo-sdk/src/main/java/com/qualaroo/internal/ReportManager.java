@@ -2,13 +2,11 @@ package com.qualaroo.internal;
 
 import android.support.annotation.RestrictTo;
 
-import com.qualaroo.internal.model.Answer;
-import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.internal.network.ReportClient;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
@@ -24,35 +22,26 @@ public class ReportManager {
         this.executor = executor;
     }
 
-    public void recordImpression(final Survey survey) {
+    public void reportImpression(final Survey survey) {
         executor.execute(new Runnable() {
             @Override public void run() {
-                reportClient.recordImpression(survey);
+                reportClient.reportImpression(survey);
             }
         });
     }
 
-    public void recordAnswer(final Survey survey, final Question question, final List<Answer> answers) {
+    public void reportUserResponse(final Survey survey, final UserResponse userResponse) {
         executor.execute(new Runnable() {
             @Override public void run() {
-                reportClient.recordAnswer(survey, question, answers);
-
+                reportClient.reportUserResponse(survey, userResponse);
             }
         });
     }
 
-    public void recordTextAnswer(final Survey survey, final Question question, final String answer) {
+    public void reportUserResponse(final Survey survey, final List<UserResponse> userResponse) {
         executor.execute(new Runnable() {
             @Override public void run() {
-                reportClient.recordTextAnswer(survey, question, answer);
-            }
-        });
-    }
-
-    public void recordLeadGenAnswer(final Survey survey, final Map<Long, String> questionIdToAnswer) {
-        executor.execute(new Runnable() {
-            @Override public void run() {
-                reportClient.recordLeadGenAnswer(survey, questionIdToAnswer);
+                reportClient.reportUserResponse(survey, userResponse);
             }
         });
     }
