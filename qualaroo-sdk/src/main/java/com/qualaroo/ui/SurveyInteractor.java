@@ -15,6 +15,7 @@ import com.qualaroo.internal.model.Node;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.internal.storage.LocalStorage;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class SurveyInteractor {
 
     public void displaySurvey() {
         if (currentNode == null) {
-            reportManager.recordImpression(survey);
+            reportManager.reportImpression(survey);
             markSurveyAsSeen();
             Node startNode = selectStartNode(survey.spec().startMap());
             followNode(startNode);
@@ -84,42 +85,30 @@ public class SurveyInteractor {
         }
     }
 
-    public void questionAnsweredWithText(String answer) {
-        reportManager.recordTextAnswer(survey, currentQuestion, answer);
-        Node nextNode = findNextNode(currentQuestion.id(), Collections.<Answer>emptyList());
+    public void onResponse(UserResponse userResponse) {
+        reportManager.reportUserResponse(survey, userResponse);
+        Node nextNode = findNextNode(userResponse);
         followNode(nextNode);
     }
 
-    public void questionAnswered(List<Answer> selectedAnswers) {
-        reportManager.recordAnswer(survey, currentQuestion, selectedAnswers);
-        Node nextNode = findNextNode(currentQuestion.id(), selectedAnswers);
-        followNode(nextNode);
-    }
-
-    public void leadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
-        reportManager.recordLeadGenAnswer(survey, questionIdsWithAnswers);
+    public void onLeadGenResponse(List<UserResponse> userResponse) {
+        reportManager.reportUserResponse(survey, userResponse);
         Node nextNode = qscreens.get(currentNode.id()).nextMap();
         followNode(nextNode);
     }
 
-    private Node findNextNode(long questionId, List<Answer> selectedAnswers) {
-        Node nextNode = null;
-        //TODO: Question and Answer objects provided by a presenter are not trusted and local copies are used instead.
-        //This was done to avoid having to pass fully built objects in tests. Could be fixed by either passing simple int ids
-        //or by changing the way we acquired objects in tests (directly from Survey model instead of creating new ones via TestModel.kt helper class)
-        Question question = questions.get(questionId);
-        for (Answer answer : selectedAnswers) {
-            int index = question.answerList().indexOf(answer);
-            Answer storedAnswer = question.answerList().get(index);
-            if (storedAnswer.nextMap() != null) {
-                nextNode = storedAnswer.nextMap();
-                break;
+    @Nullable private Node findNextNode(UserResponse userResponse) {
+        Question question = questions.get(userResponse.questionId());
+        for (UserResponse.Entry entry : userResponse.entries()) {
+            for (Answer answer : question.answerList()) {
+                if (entry.answerId() != null && answer.id() == entry.answerId()) {
+                    if (answer.nextMap() != null) {
+                        return answer.nextMap();
+                    }
+                }
             }
         }
-        if (nextNode == null) {
-            nextNode = question.nextMap();
-        }
-        return nextNode;
+        return question.nextMap();
     }
 
     private void followNode(@Nullable Node node) {
