@@ -14,12 +14,12 @@ import android.widget.CompoundButton;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.DimenUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -32,7 +32,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         super(theme);
     }
 
-    @Override public RestorableView render(Context context, Question question, final OnAnsweredListener onAnsweredListener) {
+    @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         ViewGroup view = (ViewGroup) View.inflate(context, R.layout.qualaroo__view_question_checkbox, null);
         final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
@@ -69,14 +69,16 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         }
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                List<Answer> selectedAnswers = new ArrayList<>();
+
+                UserResponse.Builder builder = new UserResponse.Builder(question.id());
                 for (int i = 0; i < checkboxesContainer.getChildCount(); i++) {
                     View child = checkboxesContainer.getChildAt(i);
                     if (child instanceof CheckBox && ((CheckBox) child).isChecked()) {
-                        selectedAnswers.add((Answer) child.getTag());
+                        Answer answer = (Answer) child.getTag();
+                        builder.addChoiceAnswer(answer.id());
                     }
                 }
-                onAnsweredListener.onAnswered(selectedAnswers);
+                onAnsweredListener.onResponse(builder.build());
             }
         });
         return RestorableView.withId(question.id())

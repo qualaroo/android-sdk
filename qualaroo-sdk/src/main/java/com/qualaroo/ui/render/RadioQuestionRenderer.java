@@ -13,11 +13,10 @@ import android.widget.RadioGroup;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.DimenUtils;
-
-import java.util.List;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -62,8 +61,8 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                     radioGroup.setOnCheckedChangeListener(null);
                     radioGroup.postDelayed(new Runnable() {
                         @Override public void run() {
-                            Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                            onAnsweredListener.onAnswered(selectedAnswer);
+                            UserResponse userResponse = buildUserResponse(question.id(), answerId);
+                            onAnsweredListener.onResponse(userResponse);
                         }
                     }, 300);
                 }
@@ -73,8 +72,8 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 int answerId = radioGroup.getCheckedRadioButtonId();
-                Answer selectedAnswer = getAnswerById(answerId, question.answerList());
-                onAnsweredListener.onAnswered(selectedAnswer);
+                UserResponse userResponse = buildUserResponse(question.id(), answerId);
+                onAnsweredListener.onResponse(userResponse);
             }
         });
         return RestorableView.withId(question.id())
@@ -92,15 +91,9 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                         }
                     }
                 }).build();
-
     }
 
-    private Answer getAnswerById(int id, List<Answer> answerList) {
-        for (Answer answer : answerList) {
-            if (answer.id() == id) {
-                return answer;
-            }
-        }
-        return null;
+    private UserResponse buildUserResponse(long questionId, int answerId) {
+        return new UserResponse.Builder(questionId).addChoiceAnswer(answerId).build();
     }
 }
