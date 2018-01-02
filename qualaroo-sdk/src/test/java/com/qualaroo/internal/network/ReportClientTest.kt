@@ -43,7 +43,7 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for nps answer`() {
+    fun `builds proper url single choice questions`() {
         val userResponse = UserResponse.Builder(123456)
                 .addChoiceAnswer(10)
                 .build()
@@ -60,24 +60,7 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for radio answer`() {
-        val userResponse = UserResponse.Builder(123456)
-                .addChoiceAnswer(10)
-                .build()
-
-        client.reportUserResponse(survey, userResponse)
-
-        val url = restClient.recentHttpUrl!!
-
-        assertEquals("https", url.scheme())
-        assertEquals("turbo.qualaroo.com", url.host())
-        assertEquals("/r.js", url.encodedPath())
-        assertEquals("123", url.queryParameter("id"))
-        assertEquals("10", url.queryParameter("r[123456][]"))
-    }
-
-    @Test
-    fun `builds proper url for checkbox answer`() {
+    fun `builds proper url for multiple choice questions`() {
         val userResponse = UserResponse.Builder(123456)
                 .addChoiceAnswer(10)
                 .addChoiceAnswer(20)
@@ -100,7 +83,27 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for text answer`() {
+    fun `builds proper url for choice questions with freeform comments`() {
+        val userResponse = UserResponse.Builder(123456)
+                .addChoiceAnswerWithComment(1, "something1")
+                .addChoiceAnswerWithComment(2, "something2")
+                .build()
+
+        client.reportUserResponse(survey, userResponse)
+        val url = restClient.recentHttpUrl!!
+
+        assertEquals("https", url.scheme())
+        assertEquals("turbo.qualaroo.com", url.host())
+        assertEquals("/r.js", url.encodedPath())
+        assertEquals("123", url.queryParameter("id"))
+
+        assertEquals("something1", url.queryParameter("re[123456][1]"))
+        assertEquals("something2", url.queryParameter("re[123456][2]"))
+
+    }
+
+    @Test
+    fun `builds proper url for text questions`() {
         val userResponse = UserResponse.Builder(123456)
                 .addTextAnswer("long answer with spaces")
                 .build()
@@ -117,7 +120,7 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for lead gen answers`() {
+    fun `builds proper url for lead gens`() {
         val leadGenResponse = mutableListOf<UserResponse>()
 
         leadGenResponse.add(UserResponse.Builder(1L).addTextAnswer("John").build())
