@@ -7,4 +7,9 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+        junit 'qualaroo-sdk/build/test-results/**/*.xml'
+    }
+  }
 }
