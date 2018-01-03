@@ -2,8 +2,7 @@ package com.qualaroo.ui
 
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ReportManager
-import com.qualaroo.internal.model.MessageType
-import com.qualaroo.internal.model.QuestionType
+import com.qualaroo.internal.model.*
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.ctaMap
 import com.qualaroo.internal.model.TestModels.language
@@ -767,6 +766,208 @@ class SurveyInteractorTest {
         )
 
         verify(observer, times(1)).openUri("http://qualaroo.com")
+    }
+
+    @Test
+    fun `handles disableRandom flag`() {
+        val observer = CapturingObserver()
+        var survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        var interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+        var question = observer.question!!
+
+        assertEquals(4, question.answerList()[0].id())
+        assertEquals(3, question.answerList()[1].id())
+        assertEquals(2, question.answerList()[2].id())
+        assertEquals(1, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = true,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+        question = observer.question!!
+
+        assertEquals(1, question.answerList()[0].id())
+        assertEquals(2, question.answerList()[1].id())
+        assertEquals(3, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+    }
+
+    @Test
+    fun `handles anchorLast and anchorLastCount flags`() {
+        val observer = CapturingObserver()
+        var survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                    question(
+                                            id = 1,
+                                            disableRandom = false,
+                                            anchorLast = false,
+                                            anchorLastCount = 0,
+                                            answerList = listOf(
+                                                    answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                            )
+                                    )
+                                )
+                        )
+                )
+        )
+        var interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        var question = observer.question!!
+        assertEquals(4, question.answerList()[0].id())
+        assertEquals(3, question.answerList()[1].id())
+        assertEquals(2, question.answerList()[2].id())
+        assertEquals(1, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                anchorLast = true,
+                                                anchorLastCount = 0,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        question = observer.question!!
+        assertEquals(3, question.answerList()[0].id())
+        assertEquals(2, question.answerList()[1].id())
+        assertEquals(1, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                anchorLast = true,
+                                                anchorLastCount = 2,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        question = observer.question!!
+        assertEquals(2, question.answerList()[0].id())
+        assertEquals(1, question.answerList()[1].id())
+        assertEquals(3, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+
+    }
+
+    class JustReverseShuffler : Shuffler() {
+        override fun shuffle(list: MutableList<*>?) {
+            list?.reverse()
+        }
+    }
+
+    class CapturingObserver: SurveyInteractor.EventsObserver {
+        var question: Question? = null
+
+        override fun showQuestion(question: Question?) {
+            this.question = question
+        }
+
+        override fun showMessage(message: Message?) {
+        }
+
+        override fun showLeadGen(qscreen: QScreen?, questions: MutableList<Question>?) {
+        }
+
+        override fun openUri(stringUri: String) {
+        }
+
+        override fun closeSurvey() {
+        }
     }
 
 }

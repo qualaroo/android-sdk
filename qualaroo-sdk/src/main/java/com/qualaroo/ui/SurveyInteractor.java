@@ -248,20 +248,22 @@ public class SurveyInteractor {
     private LongSparseArray<Question> prepareQuestions() {
         List<Question> originalQuestions = preferredLanguageOrDefault(survey.spec().questionList());
         LongSparseArray<Question> result = new LongSparseArray<>();
-        for (Question originalQuestion : originalQuestions) {
-            if (originalQuestion.enableRandom()) {
-                final LinkedList<Answer> answerList = new LinkedList<>(originalQuestion.answerList());
-                Answer anchoredLastAnswer = null;
-                if (originalQuestion.anchorLast()) {
-                    anchoredLastAnswer = answerList.removeLast();
+        for (Question question : originalQuestions) {
+            if (question.enableRandom()) {
+                int legacyLastItemsToAnchor = question.anchorLast() ? 1 : 0;
+                int lastItemsToAnchor = question.anchorLastCount() == 0 ? legacyLastItemsToAnchor : question.anchorLastCount();
+                final LinkedList<Answer> answerList = new LinkedList<>(question.answerList());
+                final LinkedList<Answer> anchoredAnswers = new LinkedList<>();
+                for (int i = 0; i < lastItemsToAnchor; i++) {
+                    anchoredAnswers.addFirst(answerList.removeLast());
                 }
-                Collections.shuffle(answerList);
-                if (anchoredLastAnswer != null) {
-                    answerList.addLast(anchoredLastAnswer);
+                shuffler.shuffle(answerList);
+                if (anchoredAnswers.size() > 0) {
+                    answerList.addAll(anchoredAnswers);
                 }
-                result.append(originalQuestion.id(), originalQuestion.mutateWith(answerList));
+                result.append(question.id(), question.mutateWith(answerList));
             } else {
-                result.append(originalQuestion.id(), originalQuestion);
+                result.append(question.id(), question);
             }
         }
         return result;
