@@ -17,6 +17,7 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.internal.storage.LocalStorage;
+import com.qualaroo.util.Shuffler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,7 @@ public class SurveyInteractor {
     private final LocalStorage localStorage;
     private final ReportManager reportManager;
     private final Language preferredLanguage;
+    private final Shuffler shuffler;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
     private final LongSparseArray<Question> questions;
@@ -54,11 +56,12 @@ public class SurveyInteractor {
     private Question currentQuestion;
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
-    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Executor backgroundExecutor, Executor uiExecutor) {
+    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
         this.localStorage = localStorage;
         this.reportManager = reportManager;
         this.preferredLanguage = preferredLanguage;
+        this.shuffler = shuffler;
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
