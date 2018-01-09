@@ -37,7 +37,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         final ViewGroup checkboxesContainer = view.findViewById(R.id.qualaroo__view_question_checkbox_container);
         final Button button = view.findViewById(R.id.qualaroo__view_question_checkbox_confirm);
         button.setText(question.sendText());
-        button.setEnabled(false);
+        button.setEnabled(!question.isRequired());
         ThemeUtils.applyTheme(button, getTheme());
         CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
             @Override public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -50,7 +50,9 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                         break;
                     }
                 }
-                button.setEnabled(anyChecked);
+                if (question.isRequired()) {
+                    button.setEnabled(anyChecked);
+                }
             }
         };
         int drawablePadding = DimenUtils.px(context, R.dimen.qualaroo__checkbox_drawable_padding);
