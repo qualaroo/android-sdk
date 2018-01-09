@@ -115,7 +115,7 @@ public class LeadGenRenderer {
 
     private TextInputLayout buildTextInput(Context context, Question question) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        int topMargin = (int) DimenUtils.toPx(context, 2);
+        int topMargin = (int) DimenUtils.toPx(context, 8);
         layoutParams.setMargins(0, topMargin, 0, 0);
         TextInputLayout inputLayout = new TextInputLayout(context);
         inputLayout.setLayoutParams(layoutParams);
