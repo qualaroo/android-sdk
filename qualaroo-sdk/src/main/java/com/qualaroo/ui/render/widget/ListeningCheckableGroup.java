@@ -11,11 +11,14 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 
 public class ListeningCheckableGroup extends LinearLayout {
-    private int mCheckedId = -1;
-    private CompoundButton.OnCheckedChangeListener mChildOnCheckedChangeListener;
-    private boolean mProtectFromCheckedChange = false;
-    private OnCheckedChangeListener mOnCheckedChangeListener;
-    private PassThroughHierarchyChangeListener mPassThroughListener;
+
+    public static final int NOTHING_SELECTED = -1;
+
+    private int checkedItemId = NOTHING_SELECTED;
+    private CompoundButton.OnCheckedChangeListener childOnCheckedChangeListener;
+    private boolean protectFromCheckedChange = false;
+    private OnCheckedChangeListener onCheckedChangeListener;
+    private PassThroughHierarchyChangeListener passThroughListener;
 
     public ListeningCheckableGroup(Context context) {
         super(context);
@@ -30,24 +33,24 @@ public class ListeningCheckableGroup extends LinearLayout {
     }
 
     private void init() {
-        mChildOnCheckedChangeListener = new CheckedStateTracker();
-        mPassThroughListener = new PassThroughHierarchyChangeListener();
-        super.setOnHierarchyChangeListener(mPassThroughListener);
+        childOnCheckedChangeListener = new CheckedStateTracker();
+        passThroughListener = new PassThroughHierarchyChangeListener();
+        super.setOnHierarchyChangeListener(passThroughListener);
     }
 
     @Override
     public void setOnHierarchyChangeListener(OnHierarchyChangeListener listener) {
-        mPassThroughListener.mOnHierarchyChangeListener = listener;
+        passThroughListener.onHierarchyChangeListener = listener;
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        if (mCheckedId != -1) {
-            mProtectFromCheckedChange = true;
-            setCheckedStateForView(mCheckedId, true);
-            mProtectFromCheckedChange = false;
-            setCheckedId(mCheckedId);
+        if (checkedItemId != -1) {
+            protectFromCheckedChange = true;
+            setCheckedStateForView(checkedItemId, true);
+            protectFromCheckedChange = false;
+            setCheckedId(checkedItemId);
         }
     }
 
@@ -56,11 +59,11 @@ public class ListeningCheckableGroup extends LinearLayout {
         if (child instanceof ListeningCheckable) {
             final ListeningCheckable checkable = (ListeningCheckable) child;
             if (checkable.isChecked()) {
-                mProtectFromCheckedChange = true;
-                if (mCheckedId != -1) {
-                    setCheckedStateForView(mCheckedId, false);
+                protectFromCheckedChange = true;
+                if (checkedItemId != -1) {
+                    setCheckedStateForView(checkedItemId, false);
                 }
-                mProtectFromCheckedChange = false;
+                protectFromCheckedChange = false;
                 setCheckedId(child.getId());
             }
         }
@@ -70,12 +73,12 @@ public class ListeningCheckableGroup extends LinearLayout {
 
     public void check(@IdRes int id) {
         // don't even bother
-        if (id != -1 && (id == mCheckedId)) {
+        if (id != -1 && (id == checkedItemId)) {
             return;
         }
 
-        if (mCheckedId != -1) {
-            setCheckedStateForView(mCheckedId, false);
+        if (checkedItemId != -1) {
+            setCheckedStateForView(checkedItemId, false);
         }
 
         if (id != -1) {
@@ -86,9 +89,9 @@ public class ListeningCheckableGroup extends LinearLayout {
     }
 
     private void setCheckedId(@IdRes int id) {
-        mCheckedId = id;
-        if (mOnCheckedChangeListener != null) {
-            mOnCheckedChangeListener.onCheckedChanged(this, mCheckedId);
+        checkedItemId = id;
+        if (onCheckedChangeListener != null) {
+            onCheckedChangeListener.onCheckedChanged(this, checkedItemId);
         }
     }
 
@@ -101,7 +104,7 @@ public class ListeningCheckableGroup extends LinearLayout {
 
     @IdRes
     public int getCheckedId() {
-        return mCheckedId;
+        return checkedItemId;
     }
 
     public void clearCheck() {
@@ -109,7 +112,7 @@ public class ListeningCheckableGroup extends LinearLayout {
     }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
-        mOnCheckedChangeListener = listener;
+        onCheckedChangeListener = listener;
     }
 
     @Override
@@ -178,15 +181,15 @@ public class ListeningCheckableGroup extends LinearLayout {
     private class CheckedStateTracker implements CompoundButton.OnCheckedChangeListener {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             // prevents from infinite recursion
-            if (mProtectFromCheckedChange) {
+            if (protectFromCheckedChange) {
                 return;
             }
 
-            mProtectFromCheckedChange = true;
-            if (mCheckedId != -1) {
-                setCheckedStateForView(mCheckedId, false);
+            protectFromCheckedChange = true;
+            if (checkedItemId != -1) {
+                setCheckedStateForView(checkedItemId, false);
             }
-            mProtectFromCheckedChange = false;
+            protectFromCheckedChange = false;
 
             int id = buttonView.getId();
             setCheckedId(id);
@@ -195,14 +198,14 @@ public class ListeningCheckableGroup extends LinearLayout {
 
     private class PassThroughHierarchyChangeListener implements
             ViewGroup.OnHierarchyChangeListener {
-        private ViewGroup.OnHierarchyChangeListener mOnHierarchyChangeListener;
+        private ViewGroup.OnHierarchyChangeListener onHierarchyChangeListener;
 
         public void onChildViewAdded(View parent, View child) {
             if (parent == ListeningCheckableGroup.this && child instanceof ListeningCheckable) {
-                ((ListeningCheckable) child).setOnCheckedChangeListener(mChildOnCheckedChangeListener);
+                ((ListeningCheckable) child).setOnCheckedChangeListener(childOnCheckedChangeListener);
             }
-            if (mOnHierarchyChangeListener != null) {
-                mOnHierarchyChangeListener.onChildViewAdded(parent, child);
+            if (onHierarchyChangeListener != null) {
+                onHierarchyChangeListener.onChildViewAdded(parent, child);
             }
         }
 
@@ -211,8 +214,8 @@ public class ListeningCheckableGroup extends LinearLayout {
                 ((ListeningCheckable) child).setOnCheckedChangeListener(null);
             }
 
-            if (mOnHierarchyChangeListener != null) {
-                mOnHierarchyChangeListener.onChildViewRemoved(parent, child);
+            if (onHierarchyChangeListener != null) {
+                onHierarchyChangeListener.onChildViewRemoved(parent, child);
             }
         }
     }

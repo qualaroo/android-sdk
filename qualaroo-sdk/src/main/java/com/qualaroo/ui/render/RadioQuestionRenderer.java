@@ -28,9 +28,8 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 final class RadioQuestionRenderer extends QuestionRenderer {
 
-    private final static String KEY_SELECTED_ITEM = "radio.selectedItem";
+    private static final String KEY_SELECTED_ITEM = "radio.selectedItem";
     private static final String KEY_FREEFORM_COMMENTS = "question.freeformComments";
-    private final static int NOTHING_SELECTED = -1;
 
     RadioQuestionRenderer(Theme theme) {
         super(theme);
@@ -74,28 +73,26 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         return RestorableView.withId(question.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
-                        saveState(into, container);
+                    @Override public void onSaveState(Bundle outState) {
+                        saveState(outState, container);
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
-                        restoreState(from, container);
+                    @Override public void onRestoreState(Bundle savedState) {
+                        restoreState(savedState, container);
                     }
                 }).build();
     }
 
-    private void restoreState(Bundle from, ListeningCheckableGroup listeningCheckableGroup) {
-        int checkedId = from.getInt(KEY_SELECTED_ITEM, NOTHING_SELECTED);
-        if (checkedId != NOTHING_SELECTED) {
-            listeningCheckableGroup.check(checkedId);
-        }
-        SparseArray<FreeformCommentCompoundButton.State> stateList = from.getSparseParcelableArray(KEY_FREEFORM_COMMENTS);
+    private void restoreState(Bundle savedState, ListeningCheckableGroup radioGroup) {
+        int checkedId = savedState.getInt(KEY_SELECTED_ITEM, ListeningCheckableGroup.NOTHING_SELECTED);
+        radioGroup.check(checkedId);
+        SparseArray<FreeformCommentCompoundButton.State> stateList = savedState.getSparseParcelableArray(KEY_FREEFORM_COMMENTS);
         if (stateList == null) {
             return;
         }
-        for (int i = 0; i < listeningCheckableGroup.getChildCount(); i++) {
-            View child = listeningCheckableGroup.getChildAt(i);
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            View child = radioGroup.getChildAt(i);
             FreeformCommentCompoundButton.State state = stateList.get(child.getId());
             if (state != null) {
                 ((FreeformCommentCompoundButton) child).restoreState(state);
@@ -103,8 +100,8 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         }
     }
 
-    private void saveState(Bundle into, ListeningCheckableGroup radioGroup) {
-        into.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedId());
+    private void saveState(Bundle outState, ListeningCheckableGroup radioGroup) {
+        outState.putInt(KEY_SELECTED_ITEM, radioGroup.getCheckedId());
 
         SparseArray<FreeformCommentCompoundButton.State> freeformComments = new SparseArray<>();
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
@@ -114,7 +111,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 freeformComments.put(state.id, state);
             }
         }
-        into.putSparseParcelableArray(KEY_FREEFORM_COMMENTS, freeformComments);
+        outState.putSparseParcelableArray(KEY_FREEFORM_COMMENTS, freeformComments);
     }
 
     private UserResponse buildUserResponse(long questionId, int answerId) {

@@ -15,10 +15,10 @@ public class RestorableView {
     }
 
     interface OnRestoreState {
-        void onRestoreState(Bundle from);
+        void onRestoreState(Bundle savedState);
     }
     interface OnSaveState {
-        void onSaveState(Bundle into);
+        void onSaveState(Bundle outState);
     }
 
     private final long viewUniqueId;

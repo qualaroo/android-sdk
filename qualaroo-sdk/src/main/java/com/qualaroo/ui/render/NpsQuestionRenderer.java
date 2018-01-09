@@ -58,13 +58,13 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         return RestorableView.withId(question.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
-                        into.putInt(KEY_NPS_SCORE, npsView.getCurrentlySelectedScore());
+                    @Override public void onSaveState(Bundle outState) {
+                        outState.putInt(KEY_NPS_SCORE, npsView.getCurrentlySelectedScore());
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
-                        int score = from.getInt(KEY_NPS_SCORE, -1);
+                    @Override public void onRestoreState(Bundle savedState) {
+                        int score = savedState.getInt(KEY_NPS_SCORE, -1);
                         npsView.setScore(score);
                     }
                 })

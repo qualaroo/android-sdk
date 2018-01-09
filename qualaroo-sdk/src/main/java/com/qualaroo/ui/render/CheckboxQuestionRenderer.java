@@ -79,43 +79,51 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         return RestorableView.withId(question.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
-                        saveState(into, checkablesContainer);
+                    @Override public void onSaveState(Bundle outState) {
+                        saveState(outState, checkablesContainer);
 
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
-                        restoreState(from, checkablesContainer);
+                    @Override public void onRestoreState(Bundle savedState) {
+                        restoreState(savedState, checkablesContainer);
                     }
                 })
                 .build();
     }
 
-    private void restoreState(Bundle from, ViewGroup checkablesContainer) {
-        ArrayList<Integer> checkedElements = from.getIntegerArrayList(KEY_CHECKED_ELEMENTS);
+    private void restoreState(Bundle savedState, ViewGroup checkablesContainer) {
+        ArrayList<Integer> checkedElements = savedState.getIntegerArrayList(KEY_CHECKED_ELEMENTS);
         if (checkedElements != null) {
-            for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
-                View child = checkablesContainer.getChildAt(i);
-                if (checkedElements.contains(child.getId())) {
-                    ((Checkable) child).setChecked(true);
-                }
+            restoreCheckedElementsState(checkablesContainer, checkedElements);
+        }
+        ArrayList<FreeformCommentCompoundButton.State> freeformCommentsData = savedState.getParcelableArrayList(KEY_FREEFORM_COMMENTS);
+        if (freeformCommentsData != null) {
+            restoreFreeformCommentsState(checkablesContainer, freeformCommentsData);
+        }
+    }
+
+    private void restoreCheckedElementsState(ViewGroup checkablesContainer, ArrayList<Integer> checkedElements) {
+        for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
+            View child = checkablesContainer.getChildAt(i);
+            if (checkedElements.contains(child.getId())) {
+                ((Checkable) child).setChecked(true);
             }
         }
-        ArrayList<FreeformCommentCompoundButton.State> freeformCommentsData = from.getParcelableArrayList(KEY_FREEFORM_COMMENTS);
-        if (freeformCommentsData != null) {
-            for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
-                View child = checkablesContainer.getChildAt(i);
-                for (FreeformCommentCompoundButton.State state : freeformCommentsData) {
-                    if (state.id == child.getId()) {
-                        ((FreeformCommentCompoundButton) child).restoreState(state);
-                    }
+    }
+
+    private void restoreFreeformCommentsState(ViewGroup checkablesContainer, ArrayList<FreeformCommentCompoundButton.State> freeformCommentsData) {
+        for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
+            View child = checkablesContainer.getChildAt(i);
+            for (FreeformCommentCompoundButton.State state : freeformCommentsData) {
+                if (state.id == child.getId()) {
+                    ((FreeformCommentCompoundButton) child).restoreState(state);
                 }
             }
         }
     }
 
-    private void saveState(Bundle into, ViewGroup checkablesContainer) {
+    private void saveState(Bundle outState, ViewGroup checkablesContainer) {
         ArrayList<Integer> checkedElements = new ArrayList<>();
         ArrayList<FreeformCommentCompoundButton.State> freeformCommentsData = new ArrayList<>();
         for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
@@ -127,8 +135,8 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 freeformCommentsData.add(((FreeformCommentCompoundButton) child).getState());
             }
         }
-        into.putIntegerArrayList(KEY_CHECKED_ELEMENTS, checkedElements);
-        into.putParcelableArrayList(KEY_FREEFORM_COMMENTS, freeformCommentsData);
+        outState.putIntegerArrayList(KEY_CHECKED_ELEMENTS, checkedElements);
+        outState.putParcelableArrayList(KEY_FREEFORM_COMMENTS, freeformCommentsData);
     }
 
     private View buildCheckBox(Context context, Answer answer, CompoundButton.OnCheckedChangeListener listener) {
