@@ -27,7 +27,7 @@
             tools:src="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/qualaroo__question_title"
+            android:id="@+id/qualaroo__question_title_top"
             android:textStyle="bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,6 +47,16 @@
             android:src="@drawable/qualaroo__ic_close" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/qualaroo__question_title_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="18sp"
+        tools:text="This is a description of an question - I have to tell you that it's a really, really long one!" />
 
     <FrameLayout
         android:id="@+id/qualaroo__question_content"

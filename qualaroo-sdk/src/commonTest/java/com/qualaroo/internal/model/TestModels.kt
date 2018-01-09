@@ -18,8 +18,8 @@ object TestModels {
         return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl)
     }
 
-    fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, anchorLastCount: Int = 0, alwaysShowSend: Boolean = true, isRequired: Boolean = false): Question {
-        return Question(id, type, title, description, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend, isRequired)
+    fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", descriptionPlacement: String = "after", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, anchorLastCount: Int = 0, alwaysShowSend: Boolean = true, isRequired: Boolean = false): Question {
+        return Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend, isRequired)
     }
 
     fun answer(id: Int, title: String = "Answer", nextMap: Node? = null): Answer {

@@ -15,6 +15,7 @@ public final class Question implements Serializable {
     private QuestionType type;
     private String title;
     private String description;
+    private String descriptionPlacement;
     private List<Answer> answerList;
     private String sendText;
     private Node nextMap;
@@ -27,11 +28,12 @@ public final class Question implements Serializable {
     private boolean alwaysShowSend;
     private boolean isRequired;
 
-    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description, String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
         this.description = description;
+        this.descriptionPlacement = descriptionPlacement;
         this.answerList = answerList;
         this.sendText = sendText;
         this.nextMap = nextMap;
@@ -65,6 +67,10 @@ public final class Question implements Serializable {
         return description;
     }
 
+    public String descriptionPlacement() {
+        return descriptionPlacement;
+    }
+
     public List<Answer> answerList() {
         return answerList;
     }
@@ -89,7 +95,6 @@ public final class Question implements Serializable {
         return cname;
     }
 
-    //made this flag a lot more readable in code
     public boolean enableRandom() {
         return !disableRandom;
     }
@@ -116,11 +121,13 @@ public final class Question implements Serializable {
         mutated.type = type;
         mutated.title = title;
         mutated.description = description;
+        mutated.descriptionPlacement = descriptionPlacement;
         mutated.answerList = answerList;
         mutated.sendText = sendText;
         mutated.nextMap = nextMap;
         mutated.npsMinLabel = npsMinLabel;
         mutated.npsMaxLabel = npsMaxLabel;
+        mutated.cname = cname;
         mutated.disableRandom = disableRandom;
         mutated.anchorLast = anchorLast;
         mutated.alwaysShowSend = alwaysShowSend;
