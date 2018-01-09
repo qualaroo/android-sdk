@@ -13,11 +13,13 @@ public final class Answer implements Serializable {
     private int id;
     private String title;
     private Node nextMap;
+    private String explainType;
 
-    @VisibleForTesting Answer(int id, String title, Node nextMap) {
+    @VisibleForTesting Answer(int id, String title, @Nullable Node nextMap, @Nullable String explainType) {
         this.id = id;
         this.title = title;
         this.nextMap = nextMap;
+        this.explainType = explainType;
     }
 
     @SuppressWarnings("unused") Answer() {
@@ -34,6 +36,10 @@ public final class Answer implements Serializable {
 
     @Nullable public Node nextMap() {
         return nextMap;
+    }
+
+    @Nullable public String explainType() {
+        return explainType;
     }
 
     @Override public boolean equals(Object o) {

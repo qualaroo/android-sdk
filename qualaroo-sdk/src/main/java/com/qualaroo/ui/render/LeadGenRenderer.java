@@ -94,9 +94,9 @@ public class LeadGenRenderer {
         return RestorableView.withId(qScreen.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
+                    @Override public void onSaveState(Bundle outState) {
                         for (Question question : questions) {
-                            into.putString(
+                            outState.putString(
                                     String.valueOf(question.id()),
                                     fields.get(question.id()).getEditText().getText().toString()
                             );
@@ -104,9 +104,9 @@ public class LeadGenRenderer {
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
+                    @Override public void onRestoreState(Bundle savedState) {
                         for (Question question : questions) {
-                            String text = from.getString(String.valueOf(question.id()), "");
+                            String text = savedState.getString(String.valueOf(question.id()), "");
                             fields.get(question.id()).getEditText().setText(text);
                         }
                     }

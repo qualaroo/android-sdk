@@ -78,13 +78,13 @@ final class TextQuestionRenderer extends QuestionRenderer {
         return RestorableView.withId(question.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
-                        into.putString(KEY_TEXT, editText.getText().toString());
+                    @Override public void onSaveState(Bundle outState) {
+                        outState.putString(KEY_TEXT, editText.getText().toString());
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
-                        String text = from.getString(KEY_TEXT);
+                    @Override public void onRestoreState(Bundle savedState) {
+                        String text = savedState.getString(KEY_TEXT);
                         editText.setText(text);
                     }
                 })
