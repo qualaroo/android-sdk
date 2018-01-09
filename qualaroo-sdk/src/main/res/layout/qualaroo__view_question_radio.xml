@@ -16,8 +16,9 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <RadioGroup
+        <com.qualaroo.ui.render.widget.ListeningCheckableGroup
             android:id="@+id/qualaroo__question_radio_options"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

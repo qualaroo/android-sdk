@@ -22,8 +22,8 @@ object TestModels {
         return Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend, isRequired)
     }
 
-    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null): Answer {
-        return Answer(id, title, nextMap)
+    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null, explainType: String? = null): Answer {
+        return Answer(id, title, nextMap, explainType)
     }
 
     fun qscreen(id: Long, questionList: List<Long> = emptyList(), description: String = "", sendText: String = "", nextMap: Node? = null): QScreen {
