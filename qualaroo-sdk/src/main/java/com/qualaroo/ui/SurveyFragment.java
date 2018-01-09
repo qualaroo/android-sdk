@@ -4,6 +4,7 @@ import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,13 +46,17 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private static final String KEY_PRESENTER_STATE = "pstate";
     private static final String RESTORABLE_VIEW_STATE = "qviewstate";
 
+    private static final String DESCRIPTION_PLACEMENT_BEFORE = "before";
+    private static final String DESCRIPTION_PLACEMENT_AFTER = "after";
+
     SurveyPresenter surveyPresenter;
     Renderer renderer;
     ImageProvider imageProvider;
 
     private View backgroundView;
     private LinearLayout surveyContainer;
-    private TextView questionsTitle;
+    private TextView questionsTitleTop;
+    private TextView questionsTitleBottom;
     private FrameLayout questionsContent;
     private ImageView closeButton;
     private ImageView surveyLogo;
@@ -67,7 +72,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         backgroundView = view.findViewById(R.id.qualaroo__fragment_survey_container);
-        questionsTitle = view.findViewById(R.id.qualaroo__question_title);
+        questionsTitleTop = view.findViewById(R.id.qualaroo__question_title_top);
+        questionsTitleBottom = view.findViewById(R.id.qualaroo__question_title_bottom);
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
         surveyLogo = view.findViewById(R.id.qualaroo__survey_logo);
@@ -126,7 +132,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void setup(SurveyViewModel viewModel) {
-        questionsTitle.setTextColor(viewModel.textColor());
+        questionsTitleTop.setTextColor(viewModel.textColor());
+        questionsTitleBottom.setTextColor(viewModel.textColor());
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
         closeButton.setColorFilter(viewModel.buttonDisabledColor());
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
@@ -180,7 +187,26 @@ public class SurveyFragment extends Fragment implements SurveyView {
     @Override public void showQuestion(Question question) {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
-        questionsTitle.setText(question.title());
+        String title = ContentUtils.sanitazeText(question.title());
+        String description = ContentUtils.sanitazeText(question.description());
+        if (description != null && description.length() > 0) {
+            if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
+                questionsTitleBottom.setVisibility(View.VISIBLE);
+                questionsTitleBottom.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                questionsTitleBottom.setText(title);
+                questionsTitleTop.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+                questionsTitleTop.setText(description);
+            } else if (DESCRIPTION_PLACEMENT_AFTER.equals(question.descriptionPlacement())) {
+                questionsTitleBottom.setVisibility(View.VISIBLE);
+                questionsTitleBottom.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+                questionsTitleBottom.setText(description);
+                questionsTitleTop.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                questionsTitleTop.setText(title);
+            }
+        } else {
+            questionsTitleBottom.setVisibility(View.GONE);
+            questionsTitleTop.setText(title);
+        }
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
             @Override public void onResponse(UserResponse userResponse) {
                 surveyPresenter.onResponse(userResponse);
@@ -206,7 +232,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
-        questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
+        questionsTitleTop.setText(ContentUtils.sanitazeText(qscreen.description()));
         restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
             @Override public void onResponse(List<UserResponse> userResponses) {
                 surveyPresenter.onLeadGenResponse(userResponses);
@@ -247,7 +273,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     private void transformToMessageStyle(final boolean withAnimation) {
-        questionsTitle.setText(null);
+        questionsTitleTop.setText(null);
+        questionsTitleBottom.setVisibility(View.GONE);
         surveyContainer.post(new Runnable() {
             @Override public void run() {
                 float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
@@ -258,7 +285,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
                             .translationX(translationX)
                             .translationY(translationY)
                             .start();
-                    questionsTitle.animate().alpha(alpha).start();
+                    questionsTitleTop.animate().alpha(alpha).start();
                     surveyLogo.animate().scaleX(1.5f);
                     surveyLogo.animate().scaleY(1.5f);
                 } else {
@@ -266,7 +293,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
                     surveyLogo.setTranslationY(translationY);
                     surveyLogo.setScaleX(1.5f);
                     surveyLogo.setScaleY(1.5f);
-                    questionsTitle.setAlpha(alpha);
+                    questionsTitleTop.setAlpha(alpha);
                 }
             }
         });
@@ -274,7 +301,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     private void transformToQuestionStyle() {
         surveyLogo.animate().translationY(0).translationX(0).start();
-        questionsTitle.animate().alpha(1.0f).start();
+        questionsTitleTop.animate().alpha(1.0f).start();
         surveyLogo.animate().scaleX(1.0f);
         surveyLogo.animate().scaleY(1.0f);
     }
