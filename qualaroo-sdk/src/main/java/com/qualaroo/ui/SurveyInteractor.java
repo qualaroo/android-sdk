@@ -250,23 +250,27 @@ public class SurveyInteractor {
         LongSparseArray<Question> result = new LongSparseArray<>();
         for (Question question : originalQuestions) {
             if (question.enableRandom()) {
-                int legacyLastItemsToAnchor = question.anchorLast() ? 1 : 0;
-                int lastItemsToAnchor = question.anchorLastCount() == 0 ? legacyLastItemsToAnchor : question.anchorLastCount();
-                final LinkedList<Answer> answerList = new LinkedList<>(question.answerList());
-                final LinkedList<Answer> anchoredAnswers = new LinkedList<>();
-                for (int i = 0; i < lastItemsToAnchor; i++) {
-                    anchoredAnswers.addFirst(answerList.removeLast());
-                }
-                shuffler.shuffle(answerList);
-                if (anchoredAnswers.size() > 0) {
-                    answerList.addAll(anchoredAnswers);
-                }
-                result.append(question.id(), question.mutateWith(answerList));
+                result.append(question.id(), shuffleAnswers(question));
             } else {
                 result.append(question.id(), question);
             }
         }
         return result;
+    }
+
+    private Question shuffleAnswers(Question question) {
+        int legacyLastItemsToAnchor = question.anchorLast() ? 1 : 0;
+        int lastItemsToAnchor = question.anchorLastCount() == 0 ? legacyLastItemsToAnchor : question.anchorLastCount();
+        final LinkedList<Answer> answerList = new LinkedList<>(question.answerList());
+        final LinkedList<Answer> anchoredAnswers = new LinkedList<>();
+        for (int i = 0; i < lastItemsToAnchor; i++) {
+            anchoredAnswers.addFirst(answerList.removeLast());
+        }
+        shuffler.shuffle(answerList);
+        if (anchoredAnswers.size() > 0) {
+            answerList.addAll(anchoredAnswers);
+        }
+        return question.mutateWith(answerList);
     }
 
     private <T> LongSparseArray<T> prepareData(Map<Language, List<T>> data, IdExtractor<T> extractor) {
