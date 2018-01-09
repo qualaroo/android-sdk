@@ -26,7 +26,7 @@ class ThemeUtils {
     static void applyTheme(RadioButton radioButton, Theme theme) {
         if (radioButton instanceof TintableCompoundButton) {
             int[][] states = new int[][]{new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}};
-            int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
+            int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableCompoundButton) radioButton).setSupportButtonTintList(new ColorStateList(states, colors));
         }
     }
@@ -34,7 +34,7 @@ class ThemeUtils {
     static void applyTheme(CheckBox checkBox, Theme theme) {
         if (checkBox instanceof TintableCompoundButton) {
             int[][] states = new int[][]{new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}};
-            int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
+            int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableCompoundButton) checkBox).setSupportButtonTintList(new ColorStateList(states, colors));
         }
     }
@@ -42,7 +42,7 @@ class ThemeUtils {
     static void applyTheme(EditText editText, Theme theme) {
         if (editText instanceof TintableBackgroundView) {
             int[][] states = new int[][]{new int[]{-android.R.attr.state_focused}, new int[]{android.R.attr.state_focused}};
-            int[] colors = new int[]{theme.buttonDisabledColor(), theme.accentColor()};
+            int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableBackgroundView) editText).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
         editText.setTextColor(theme.textColor());
@@ -52,17 +52,23 @@ class ThemeUtils {
         if (button instanceof TintableBackgroundView) {
             int[][] states = new int[][]{
                     new int[] {-android.R.attr.state_enabled},
-                    new int[] {android.R.attr.state_enabled},
-                    new int[] {android.R.attr.state_enabled, android.R.attr.state_pressed}
+                    new int[] {android.R.attr.state_enabled}
             };
             int[] colors = new int[] {
                     theme.buttonDisabledColor(),
                     theme.buttonEnabledColor(),
-                    theme.accentColor()
             };
             ((TintableBackgroundView) button).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
-        button.setTextColor(theme.buttonTextColor());
+        int[][] states = new int[][] {
+                new int[] {-android.R.attr.state_enabled},
+                new int[] {android.R.attr.state_enabled}
+        };
+        int[] colors = new int[] {
+                theme.buttonTextDisabled(),
+                theme.buttonTextEnabled()
+        };
+        button.setTextColor(new ColorStateList(states, colors));
     }
 
     static void applyTheme(Spinner spinner, Theme theme) {
@@ -71,16 +77,13 @@ class ThemeUtils {
                     new int[] {android.R.attr.state_enabled},
                     new int[] {android.R.attr.state_enabled, android.R.attr.state_pressed}
             };
-            int[] colors = new int[] {
-                    theme.buttonDisabledColor(),
-                    theme.accentColor()
-            };
+            int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableBackgroundView) spinner).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
     }
 
     static void applyTheme(TextInputLayout textInputLayout, Theme theme) {
-        setInputTextLayoutColor(textInputLayout, theme.buttonDisabledColor(), theme.accentColor());
+        setInputTextLayoutColor(textInputLayout, theme.uiNormal(), theme.uiSelected());
     }
 
     private static void setInputTextLayoutColor(TextInputLayout textInputLayout, @ColorInt int defaultColor, @ColorInt int focusedColor) {

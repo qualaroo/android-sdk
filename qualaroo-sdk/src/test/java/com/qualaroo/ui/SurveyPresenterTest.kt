@@ -40,8 +40,9 @@ class SurveyPresenterTest {
         val theme = theme(
                 textColor = 100,
                 dimColor = 200,
-                buttonDisabledColor = 300,
-                backgroundColor = 400
+                backgroundColor = 400,
+                uiNormal = 300,
+                uiSelected = 200
         )
         val survey = survey(
                 id = 1,
@@ -53,12 +54,12 @@ class SurveyPresenterTest {
                 )
         )
         val presenter = SurveyPresenter(interactor, survey, theme, uriOpener)
-
         presenter.setView(view)
 
         val expectedSurveyViewModel = SurveyViewModel(
-                100, 400, 300, 200, true, true, null
+                100, 400, 300, 200, 200, true, true, null
         )
+
         verify(view, times(1)).setup(expectedSurveyViewModel)
     }
 

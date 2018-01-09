@@ -31,7 +31,6 @@ final class TextQuestionRenderer extends QuestionRenderer {
     @Override public RestorableView render(Context context, final Question question, final OnAnsweredListener onAnsweredListener) {
         View view = View.inflate(context, R.layout.qualaroo__view_question_text, null);
         final EditText editText = view.findViewById(R.id.qualaroo__view_question_text_input);
-        editText.setTextColor(getTheme().accentColor());
         editText.setSelection(0);
         editText.requestFocus();
         editText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -66,7 +65,6 @@ final class TextQuestionRenderer extends QuestionRenderer {
                 }, 300);
             }
         });
-        ThemeUtils.applyTheme(editText, getTheme());
         button.setEnabled(!question.isRequired());
         editText.addTextChangedListener(new TextWatcherAdapter() {
             @Override public void afterTextChanged(Editable s) {

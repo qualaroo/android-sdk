@@ -74,14 +74,14 @@ public class NpsView extends FrameLayout {
     }
 
     public void applyTheme(Theme theme) {
-        inactiveTextColor = theme.textColor();
+        inactiveTextColor = theme.backgroundColor();
         activeTextColor = theme.backgroundColor();
         for (TextView score : scores) {
             score.setTextColor(inactiveTextColor);
             score.setBackgroundDrawable(inactiveDrawable);
         }
-        activeDrawable.setColorFilter(theme.accentColor(), PorterDuff.Mode.SRC_ATOP);
-        inactiveDrawable.setColorFilter(theme.buttonDisabledColor(), PorterDuff.Mode.SRC_ATOP);
+        activeDrawable.setColorFilter(theme.uiSelected(), PorterDuff.Mode.SRC_ATOP);
+        inactiveDrawable.setColorFilter(theme.uiNormal(), PorterDuff.Mode.SRC_ATOP);
 
         hintView.setTextColor(inactiveTextColor);
         hintView.setBackgroundDrawable(inactiveDrawable);

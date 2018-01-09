@@ -12,16 +12,17 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public final class Theme {
 
-    public static Theme from(ColorThemeMap colorThemeMap) {
+    public static Theme from(ColorThemeMap map) {
         Theme theme = new Theme();
-        theme.backgroundColor = parseColorSafely(colorThemeMap.backgroundColor());
-        theme.borderColor = parseColorSafely(colorThemeMap.borderColor());
-        theme.textColor = parseColorSafely(colorThemeMap.textColor());
-        theme.buttonTextColor = parseColorSafely(colorThemeMap.buttonTextColor());
-        theme.buttonEnabledColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
-        theme.buttonDisabledColor = parseColorSafely(colorThemeMap.buttonDisabledColor());
-        theme.accentColor = parseColorSafely(colorThemeMap.buttonEnabledColor());
-        theme.dimColor = parseDimType(colorThemeMap.dimType());
+        theme.backgroundColor = parseColorSafely(map.backgroundColor());
+        theme.dimColor = parseDimType(map.dimType());
+        theme.textColor = parseColorSafely(map.textColor());
+        theme.buttonEnabledColor = parseColorSafely(map.buttonEnabledColor());
+        theme.buttonDisabledColor = parseColorSafely(map.buttonDisabledColor());
+        theme.buttonTextEnabled = parseColorSafely(map.buttonTextEnabled());
+        theme.buttonTextDisabled = parseColorSafely(map.buttonTextDisabled());
+        theme.uiNormal = parseColorSafely(map.uiNormal());
+        theme.uiSelected = parseColorSafely(map.uiSelected());
         return theme;
     }
 
@@ -46,59 +47,65 @@ public final class Theme {
         return Color.parseColor("#D4323433");
     }
 
-    @ColorInt private int dimColor;
-    @ColorInt private int backgroundColor;
-    @ColorInt private int borderColor;
-    @ColorInt private int textColor;
-    @ColorInt private int buttonTextColor;
-    @ColorInt private int buttonEnabledColor;
-    @ColorInt private int buttonDisabledColor;
-    @ColorInt private int accentColor;
-
-    @VisibleForTesting Theme(int dimColor, int backgroundColor, int borderColor, int textColor, int buttonTextColor, int buttonEnabledColor, int buttonDisabledColor, int accentColor) {
-        this.dimColor = dimColor;
-        this.backgroundColor = backgroundColor;
-        this.borderColor = borderColor;
-        this.textColor = textColor;
-        this.buttonTextColor = buttonTextColor;
-        this.buttonEnabledColor = buttonEnabledColor;
-        this.buttonDisabledColor = buttonDisabledColor;
-        this.accentColor = accentColor;
-    }
+    private int backgroundColor;
+    private int dimColor;
+    private int textColor;
+    private int buttonEnabledColor;
+    private int buttonDisabledColor;
+    private int buttonTextEnabled;
+    private int buttonTextDisabled;
+    private int uiNormal;
+    private int uiSelected;
 
     private Theme() {
         //for static factory method
     }
 
-    public int dimColor() {
-        return dimColor;
+    @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected) {
+        this.backgroundColor = backgroundColor;
+        this.dimColor = dimColor;
+        this.textColor = textColor;
+        this.buttonEnabledColor = buttonEnabledColor;
+        this.buttonDisabledColor = buttonDisabledColor;
+        this.buttonTextEnabled = buttonTextEnabled;
+        this.buttonTextDisabled = buttonTextDisabled;
+        this.uiNormal = uiNormal;
+        this.uiSelected = uiSelected;
     }
 
-    public int backgroundColor() {
+    @ColorInt public int backgroundColor() {
         return backgroundColor;
     }
 
-    public int borderColor() {
-        return borderColor;
+    @ColorInt public int dimColor() {
+        return dimColor;
     }
 
-    public int textColor() {
+    @ColorInt public int textColor() {
         return textColor;
     }
 
-    int buttonTextColor() {
-        return buttonTextColor;
-    }
-
-    int buttonEnabledColor() {
+    @ColorInt int buttonEnabledColor() {
         return buttonEnabledColor;
     }
 
-    public int buttonDisabledColor() {
+    @ColorInt int buttonDisabledColor() {
         return buttonDisabledColor;
     }
 
-    public int accentColor() {
-        return buttonEnabledColor();
+    @ColorInt int buttonTextEnabled() {
+        return buttonTextEnabled;
+    }
+
+    @ColorInt int buttonTextDisabled() {
+        return buttonTextDisabled;
+    }
+
+    @ColorInt public int uiNormal() {
+        return uiNormal;
+    }
+
+    @ColorInt public int uiSelected() {
+        return uiSelected;
     }
 }

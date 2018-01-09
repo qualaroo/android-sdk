@@ -10,13 +10,15 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public final class ColorThemeMap implements Serializable {
 
-    private String dimType;
     private String backgroundColor;
-    private String borderColor;
+    private String dimType;
     private String textColor;
-    private String buttonTextColor;
     private String buttonEnabledColor;
     private String buttonDisabledColor;
+    private String buttonTextEnabled;
+    private String buttonTextDisabled;
+    private String uiNormal;
+    private String uiSelected;
 
     public String dimType() {
         return dimType;
@@ -26,16 +28,8 @@ public final class ColorThemeMap implements Serializable {
         return backgroundColor;
     }
 
-    public String borderColor() {
-        return borderColor;
-    }
-
     public String textColor() {
         return textColor;
-    }
-
-    public String buttonTextColor() {
-        return buttonTextColor;
     }
 
     public String buttonEnabledColor() {
@@ -46,14 +40,32 @@ public final class ColorThemeMap implements Serializable {
         return buttonDisabledColor;
     }
 
-    @VisibleForTesting ColorThemeMap(String dimType, String backgroundColor, String borderColor, String textColor, String buttonTextColor, String buttonEnabledColor, String buttonDisabledColor) {
-        this.dimType = dimType;
+    public String buttonTextEnabled() {
+        return buttonTextEnabled;
+    }
+
+    public String buttonTextDisabled() {
+        return buttonTextDisabled;
+    }
+
+    public String uiNormal() {
+        return uiNormal;
+    }
+
+    public String uiSelected() {
+        return uiSelected;
+    }
+
+    @VisibleForTesting ColorThemeMap(String backgroundColor, String dimType, String textColor, String buttonEnabledColor, String buttonDisabledColor, String buttonTextEnabled, String buttonTextDisabled, String uiNormal, String uiSelected) {
         this.backgroundColor = backgroundColor;
-        this.borderColor = borderColor;
+        this.dimType = dimType;
         this.textColor = textColor;
-        this.buttonTextColor = buttonTextColor;
         this.buttonEnabledColor = buttonEnabledColor;
         this.buttonDisabledColor = buttonDisabledColor;
+        this.buttonTextEnabled = buttonTextEnabled;
+        this.buttonTextDisabled = buttonTextDisabled;
+        this.uiNormal = uiNormal;
+        this.uiSelected = uiSelected;
     }
 
     ColorThemeMap() {
