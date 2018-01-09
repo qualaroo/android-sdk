@@ -2,8 +2,7 @@ package com.qualaroo.ui
 
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ReportManager
-import com.qualaroo.internal.model.MessageType
-import com.qualaroo.internal.model.QuestionType
+import com.qualaroo.internal.model.*
 import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.ctaMap
 import com.qualaroo.internal.model.TestModels.language
@@ -16,9 +15,9 @@ import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.model.UserResponse
 import com.qualaroo.internal.storage.InMemoryLocalStorage
+import com.qualaroo.util.Shuffler
 import com.qualaroo.util.TestExecutors
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -71,7 +70,8 @@ class SurveyInteractorTest {
 
     val preferredLanguage = language("en")
     val observer = mock<SurveyInteractor.EventsObserver>()
-    val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+    val shuffler = Shuffler()
+    val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
 
     @Before
     fun setup() {
@@ -83,7 +83,7 @@ class SurveyInteractorTest {
         val survey = survey(
                 id = 123
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -105,7 +105,7 @@ class SurveyInteractorTest {
 
     @Test
     fun `fallbacks to "en" language when preferred one is not available`() {
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("unknown_language"), backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("unknown_language"), shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -147,7 +147,7 @@ class SurveyInteractorTest {
                         surveyVariations = listOf(language("us"), language("pl"))
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("unknown_language"), backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("unknown_language"), shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -195,7 +195,7 @@ class SurveyInteractorTest {
                         msgScreenList = mapOf()
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("en"), backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, language("en"), shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -267,7 +267,7 @@ class SurveyInteractorTest {
                 )
         )
 
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -308,7 +308,7 @@ class SurveyInteractorTest {
                         msgScreenList = mapOf()
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
@@ -377,7 +377,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.displaySurvey()
 
         interactor.onLeadGenResponse(
@@ -434,7 +434,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
@@ -469,7 +469,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
@@ -496,7 +496,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
@@ -534,7 +534,7 @@ class SurveyInteractorTest {
                         )
                 ))
 
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
@@ -564,7 +564,7 @@ class SurveyInteractorTest {
                 )
         )
 
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(10).build())
@@ -594,7 +594,7 @@ class SurveyInteractorTest {
                 )
         )
 
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
         interactor.messageConfirmed(message(id = 100))
@@ -648,7 +648,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
 
         assertFalse(localStorage.getSurveyStatus(survey).hasBeenSeen())
 
@@ -702,7 +702,7 @@ class SurveyInteractorTest {
                 )
         )
 
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
 
         interactor.displaySurvey()
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
@@ -728,7 +728,7 @@ class SurveyInteractorTest {
                         )
                 )
         )
-        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
+        val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
 
         interactor.stopSurvey()
@@ -766,6 +766,208 @@ class SurveyInteractorTest {
         )
 
         verify(observer, times(1)).openUri("http://qualaroo.com")
+    }
+
+    @Test
+    fun `handles disableRandom flag`() {
+        val observer = CapturingObserver()
+        var survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        var interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+        var question = observer.question!!
+
+        assertEquals(4, question.answerList()[0].id())
+        assertEquals(3, question.answerList()[1].id())
+        assertEquals(2, question.answerList()[2].id())
+        assertEquals(1, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = true,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+        question = observer.question!!
+
+        assertEquals(1, question.answerList()[0].id())
+        assertEquals(2, question.answerList()[1].id())
+        assertEquals(3, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+    }
+
+    @Test
+    fun `handles anchorLast and anchorLastCount flags`() {
+        val observer = CapturingObserver()
+        var survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                    question(
+                                            id = 1,
+                                            disableRandom = false,
+                                            anchorLast = false,
+                                            anchorLastCount = 0,
+                                            answerList = listOf(
+                                                    answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                            )
+                                    )
+                                )
+                        )
+                )
+        )
+        var interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        var question = observer.question!!
+        assertEquals(4, question.answerList()[0].id())
+        assertEquals(3, question.answerList()[1].id())
+        assertEquals(2, question.answerList()[2].id())
+        assertEquals(1, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                anchorLast = true,
+                                                anchorLastCount = 0,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        question = observer.question!!
+        assertEquals(3, question.answerList()[0].id())
+        assertEquals(2, question.answerList()[1].id())
+        assertEquals(1, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+
+        survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 1,
+                                                disableRandom = false,
+                                                anchorLast = true,
+                                                anchorLastCount = 2,
+                                                answerList = listOf(
+                                                        answer(id = 1), answer(id = 2), answer(id = 3), answer(id = 4)
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+
+        interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        question = observer.question!!
+        assertEquals(2, question.answerList()[0].id())
+        assertEquals(1, question.answerList()[1].id())
+        assertEquals(3, question.answerList()[2].id())
+        assertEquals(4, question.answerList()[3].id())
+
+    }
+
+    class JustReverseShuffler : Shuffler() {
+        override fun shuffle(list: MutableList<*>?) {
+            list?.reverse()
+        }
+    }
+
+    class CapturingObserver: SurveyInteractor.EventsObserver {
+        var question: Question? = null
+
+        override fun showQuestion(question: Question?) {
+            this.question = question
+        }
+
+        override fun showMessage(message: Message?) {
+        }
+
+        override fun showLeadGen(qscreen: QScreen?, questions: MutableList<Question>?) {
+        }
+
+        override fun openUri(stringUri: String) {
+        }
+
+        override fun closeSurvey() {
+        }
     }
 
 }

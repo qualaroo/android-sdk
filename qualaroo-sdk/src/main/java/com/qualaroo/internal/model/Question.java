@@ -23,10 +23,11 @@ public final class Question implements Serializable {
     private String cname;
     private boolean disableRandom;
     private boolean anchorLast;
+    private int anchorLastCount;
     private boolean alwaysShowSend;
     private boolean isRequired;
 
-    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -38,6 +39,7 @@ public final class Question implements Serializable {
         this.npsMaxLabel = npsMaxLabel;
         this.disableRandom = disableRandom;
         this.anchorLast = anchorLast;
+        this.anchorLastCount = anchorLastCount;
         this.alwaysShowSend = alwaysShowSend;
         this.isRequired = isRequired;
         this.cname = cname;
@@ -96,6 +98,10 @@ public final class Question implements Serializable {
         return anchorLast;
     }
 
+    public int anchorLastCount() {
+        return anchorLastCount;
+    }
+
     public boolean alwaysShowSend() {
         return alwaysShowSend;
     }
@@ -119,6 +125,8 @@ public final class Question implements Serializable {
         mutated.anchorLast = anchorLast;
         mutated.alwaysShowSend = alwaysShowSend;
         mutated.isRequired = isRequired;
+        mutated.cname = cname;
+        mutated.anchorLastCount = anchorLastCount;
         return mutated;
     }
 

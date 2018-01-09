@@ -38,6 +38,7 @@ import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
+import com.qualaroo.util.Shuffler;
 import com.qualaroo.util.TimeProvider;
 import com.qualaroo.util.UriOpener;
 
@@ -222,7 +223,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor, uriOpener, imageProvider);
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, new Shuffler(), backgroundExecutor, uiExecutor, uriOpener, imageProvider);
     }
 
     private RestClient buildRestClient(OkHttpClient okHttpClient, Credentials credentials) {
