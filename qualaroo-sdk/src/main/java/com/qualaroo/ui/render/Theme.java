@@ -12,7 +12,14 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public final class Theme {
 
-    public static Theme from(ColorThemeMap map) {
+    public static Theme create(ColorThemeMap map) {
+        if (isLegacyColorThemeMap(map)) {
+            return parseLegacy(map);
+        }
+        return parse(map);
+    }
+
+    private static Theme parse(ColorThemeMap map) {
         Theme theme = new Theme();
         theme.backgroundColor = parseColorSafely(map.backgroundColor());
         theme.dimColor = parseDimType(map.dimType());
@@ -25,6 +32,21 @@ public final class Theme {
         theme.uiSelected = parseColorSafely(map.uiSelected());
         return theme;
     }
+
+    private static Theme parseLegacy(ColorThemeMap map) {
+        Theme theme = new Theme();
+        theme.backgroundColor = parseColorSafely(map.backgroundColor());
+        theme.dimColor = parseDimType(map.dimType());
+        theme.textColor = parseColorSafely(map.textColor());
+        theme.buttonEnabledColor = parseColorSafely(map.buttonEnabledColor());
+        theme.buttonDisabledColor = parseColorSafely(map.buttonDisabledColor());
+        theme.buttonTextEnabled = parseColorSafely(map.buttonTextColor());
+        theme.buttonTextDisabled = parseColorSafely(map.buttonTextColor());
+        theme.uiNormal = parseColorSafely(map.buttonDisabledColor());
+        theme.uiSelected = parseColorSafely(map.buttonEnabledColor());
+        return theme;
+    }
+
 
     private static @ColorInt int parseColorSafely(String color) {
         try {
@@ -45,6 +67,13 @@ public final class Theme {
                 return Color.parseColor("#D4FAFAFA");
         }
         return Color.parseColor("#D4323433");
+    }
+
+    private static boolean isLegacyColorThemeMap(ColorThemeMap map) {
+        return map.uiNormal() == null ||
+                map.uiSelected() == null ||
+                map.buttonTextEnabled() == null ||
+                map.buttonTextDisabled() == null;
     }
 
     private int backgroundColor;

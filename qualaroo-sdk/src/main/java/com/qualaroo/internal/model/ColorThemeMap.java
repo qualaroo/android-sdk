@@ -13,6 +13,7 @@ public final class ColorThemeMap implements Serializable {
     private String backgroundColor;
     private String dimType;
     private String textColor;
+    @Deprecated private String buttonTextColor;
     private String buttonEnabledColor;
     private String buttonDisabledColor;
     private String buttonTextEnabled;
@@ -54,6 +55,10 @@ public final class ColorThemeMap implements Serializable {
 
     public String uiSelected() {
         return uiSelected;
+    }
+
+    @Deprecated public String buttonTextColor() {
+        return buttonTextColor;
     }
 
     @VisibleForTesting ColorThemeMap(String backgroundColor, String dimType, String textColor, String buttonEnabledColor, String buttonDisabledColor, String buttonTextEnabled, String buttonTextDisabled, String uiNormal, String uiSelected) {

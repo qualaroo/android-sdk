@@ -28,7 +28,7 @@ public class SurveyComponent {
     }
 
     private SurveyComponent(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener, ImageProvider imageProvider) {
-        Theme theme = Theme.from(survey.spec().optionMap().colorThemeMap());
+        Theme theme = Theme.create(survey.spec().optionMap().colorThemeMap());
         SurveyInteractor surveyInteractor = new SurveyInteractor(survey, localStorage,  reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor);
         this.surveyPresenter = new SurveyPresenter(surveyInteractor, survey, theme, uriOpener);
         this.renderer = new Renderer(theme);
