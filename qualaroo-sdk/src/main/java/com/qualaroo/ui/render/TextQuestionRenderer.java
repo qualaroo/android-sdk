@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
@@ -55,7 +56,11 @@ final class TextQuestionRenderer extends QuestionRenderer {
                 button.postDelayed(new Runnable() {
                     @Override public void run() {
                         if (editText.getText() != null) {
-                            onAnsweredListener.onAnsweredWithText(editText.getText().toString());
+                            onAnsweredListener.onResponse(
+                                    new UserResponse.Builder(question.id())
+                                            .addTextAnswer(editText.getText().toString())
+                                            .build()
+                            );
                         }
                     }
                 }, 300);

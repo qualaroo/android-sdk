@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
@@ -56,7 +57,11 @@ public final class DropdownQuestionRenderer extends QuestionRenderer {
         confirmButton.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 AnswerItem answerItem = (AnswerItem) spinner.getSelectedItem();
-                onAnsweredListener.onAnswered(answerItem.answer);
+                onAnsweredListener.onResponse(
+                        new UserResponse.Builder(question.id())
+                                .addChoiceAnswer(answerItem.answer.id())
+                                .build()
+                );
             }
         });
 

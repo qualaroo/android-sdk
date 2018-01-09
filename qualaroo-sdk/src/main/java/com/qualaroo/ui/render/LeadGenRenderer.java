@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnLeadGenAnswerListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.DimenUtils;
@@ -25,9 +26,7 @@ import com.qualaroo.util.KeyboardUtil;
 import com.qualaroo.util.TextWatcherAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class LeadGenRenderer {
@@ -43,7 +42,7 @@ public class LeadGenRenderer {
         this.theme = theme;
     }
 
-    public RestorableView render(Context context, QScreen qScreen, final List<Question> questions, final OnLeadGenAnswerListener onLeadGenAnswerListener) {
+    public RestorableView render(Context context, final QScreen qScreen, final List<Question> questions, final OnLeadGenAnswerListener onLeadGenAnswerListener) {
         final View view = LayoutInflater.from(context).inflate(R.layout.qualaroo__view_question_lead_gen, null);
 
         final Button button = view.findViewById(R.id.qualaroo__view_question_lead_gen_confirm);
@@ -76,16 +75,18 @@ public class LeadGenRenderer {
 
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                final Map<Long, String> answers = new HashMap<>(questions.size());
+                final List<UserResponse> leadGenResponse = new ArrayList<>(questions.size());
                 for (Question question : questions) {
                     TextInputLayout inputLayout = fields.get(question.id());
-                    String answer = inputLayout.getEditText().getText().toString();
-                    answers.put(question.id(), answer);
+                    UserResponse response = new UserResponse.Builder(question.id())
+                            .addTextAnswer(inputLayout.getEditText().getText().toString())
+                            .build();
+                    leadGenResponse.add(response);
                 }
                 KeyboardUtil.hideKeyboard(button);
                 button.postDelayed(new Runnable() {
                     @Override public void run() {
-                        onLeadGenAnswerListener.onLeadGenAnswered(answers);
+                        onLeadGenAnswerListener.onResponse(leadGenResponse);
                     }
                 }, 600);
             }

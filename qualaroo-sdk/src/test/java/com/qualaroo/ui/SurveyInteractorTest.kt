@@ -14,6 +14,7 @@ import com.qualaroo.internal.model.TestModels.qscreen
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.internal.model.UserResponse
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.TestExecutors
 import org.junit.Assert.assertFalse
@@ -199,9 +200,9 @@ class SurveyInteractorTest {
 
         interactor.displaySurvey()
         verify(observer).showQuestion(question(id = 100))
-        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
         verify(observer).showQuestion(question(id = 200))
-        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.onResponse(UserResponse.Builder(200).addChoiceAnswer(1).build())
         verify(observer, atMost(1)).showQuestion(question(id = 300))
 
         //presenter got lost and calls displaySurvey() again when it's ready to display it
@@ -270,7 +271,7 @@ class SurveyInteractorTest {
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
         verify(observer).showQuestion(question(id = 200))
     }
 
@@ -289,7 +290,7 @@ class SurveyInteractorTest {
                                 language("en") to listOf(
                                         question(
                                                 id = 100,
-                                                 nextMap = node(
+                                                nextMap = node(
                                                         id = 200,
                                                         nodeType = "question"
                                                 ),
@@ -311,38 +312,41 @@ class SurveyInteractorTest {
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(listOf(answer(id = 101)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
         verify(observer).showQuestion(question(id = 200))
     }
 
     @Test
     fun `reports text answers`() {
         interactor.displaySurvey()
-        interactor.questionAnsweredWithText("This is my answer")
+        interactor.onResponse(UserResponse.Builder(100).addTextAnswer("This is my answer").build())
 
-        verify(reportManager, times(1))
-                .recordTextAnswer(survey, question(id = 100), "This is my answer")
+        verify(reportManager, times(1)).reportUserResponse(survey, UserResponse.Builder(100).addTextAnswer("This is my answer").build())
+
     }
 
     @Test
     fun `reports answers`() {
         interactor.displaySurvey()
-        interactor.questionAnswered(listOf(answer(id = 123)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(123).build())
 
         verify(reportManager, times(1))
-                .recordAnswer(
-                        survey,
-                        question(id = 100),
-                        listOf(answer(id = 123)))
+                .reportUserResponse(survey, UserResponse.Builder(100).addChoiceAnswer(123).build())
 
-        interactor.questionAnswered(
-                listOf(answer(id = 1010), answer(id = 1011)))
+        interactor.onResponse(
+                UserResponse.Builder(100)
+                        .addChoiceAnswer(1010)
+                        .addChoiceAnswer(1011)
+                        .build()
+        )
 
-        verify(reportManager, times(1))
-                .recordAnswer(
-                        survey,
-                        question(id = 101),
-                        listOf(answer(id = 1010), answer(id = 1011)))
+        verify(reportManager, times(1)).reportUserResponse(
+                survey,
+                UserResponse.Builder(100)
+                        .addChoiceAnswer(1010)
+                        .addChoiceAnswer(1011)
+                        .build()
+        )
     }
 
     @Test
@@ -376,19 +380,21 @@ class SurveyInteractorTest {
         val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
         interactor.displaySurvey()
 
-        interactor.leadGenAnswered(
-                mapOf(
-                        100L to "John",
-                        101L to "Doe",
-                        102L to "+1 123 123 123"
+        interactor.onLeadGenResponse(
+                listOf(
+                        UserResponse.Builder(100).addTextAnswer("John").build(),
+                        UserResponse.Builder(101).addTextAnswer("Doe").build(),
+                        UserResponse.Builder(102).addTextAnswer("+1 123 123 123").build()
                 )
         )
 
-        verify(reportManager).recordLeadGenAnswer(survey, mapOf(
-                100L to "John",
-                101L to "Doe",
-                102L to "+1 123 123 123"
-        ))
+        verify(reportManager).reportUserResponse(survey,
+                listOf(
+                        UserResponse.Builder(100).addTextAnswer("John").build(),
+                        UserResponse.Builder(101).addTextAnswer("Doe").build(),
+                        UserResponse.Builder(102).addTextAnswer("+1 123 123 123").build()
+                )
+        )
     }
 
     @Test
@@ -432,11 +438,11 @@ class SurveyInteractorTest {
         interactor.registerObserver(observer)
         interactor.displaySurvey()
 
-        interactor.leadGenAnswered(
-                mapOf(
-                        100L to "John",
-                        101L to "Doe",
-                        102L to "+1 123 123 123"
+        interactor.onLeadGenResponse(
+                listOf(
+                        UserResponse.Builder(100).addTextAnswer("John").build(),
+                        UserResponse.Builder(101).addTextAnswer("Doe").build(),
+                        UserResponse.Builder(102).addTextAnswer("+1 123 123 123").build()
                 )
         )
 
@@ -561,7 +567,7 @@ class SurveyInteractorTest {
         val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
         interactor.registerObserver(observer)
         interactor.displaySurvey()
-        interactor.questionAnswered(listOf(answer(id = 10)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(10).build())
 
         verify(observer).closeSurvey()
     }
@@ -603,7 +609,7 @@ class SurveyInteractorTest {
         //user rotated a device maybe?
         interactor.displaySurvey()
 
-        verify(reportManager, times(1)).recordImpression(survey)
+        verify(reportManager, times(1)).reportImpression(survey)
     }
 
     @Test
@@ -649,12 +655,12 @@ class SurveyInteractorTest {
         interactor.displaySurvey()
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
 
-        interactor.questionAnswered(listOf(answer(id = 1)))
-        interactor.questionAnswered(listOf(answer(id = 1)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
 
         interactor.stopSurvey()
         interactor.displaySurvey()
-        interactor.questionAnswered(emptyList())
+        interactor.onResponse(UserResponse.Builder(100).build())
 
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenSeen())
     }
@@ -699,15 +705,15 @@ class SurveyInteractorTest {
         val interactor = SurveyInteractor(survey, localStorage, reportManager, preferredLanguage, backgroundExecutor, uiExecutor)
 
         interactor.displaySurvey()
-        interactor.questionAnswered(listOf(answer(id = 1)))
-        interactor.questionAnswered(listOf(answer(id = 2)))
+        interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
+        interactor.onResponse(UserResponse.Builder(200).addChoiceAnswer(2).build())
 
         interactor.stopSurvey()
 
         assertFalse(localStorage.getSurveyStatus(survey).hasBeenFinished())
 
         interactor.displaySurvey()
-        interactor.questionAnswered(emptyList())
+        interactor.onResponse(UserResponse.Builder(300).build())
 
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
     }
@@ -718,7 +724,7 @@ class SurveyInteractorTest {
                 id = 1,
                 spec = spec(
                         optionMap = optionMap(
-                            mandatory = true
+                                mandatory = true
                         )
                 )
         )

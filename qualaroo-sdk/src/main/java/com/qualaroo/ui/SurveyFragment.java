@@ -24,10 +24,10 @@ import android.widget.TextView;
 
 import com.qualaroo.R;
 import com.qualaroo.internal.ImageProvider;
-import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.ui.render.RestorableView;
 import com.qualaroo.ui.render.ViewState;
@@ -36,7 +36,6 @@ import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
-import java.util.Map;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -183,16 +182,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.removeAllViews();
         questionsTitle.setText(question.title());
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
-            @Override public void onAnswered(Answer answer) {
-                surveyPresenter.onAnswered(answer);
-            }
-
-            @Override public void onAnswered(List<Answer> answers) {
-                surveyPresenter.onAnswered(answers);
-            }
-
-            @Override public void onAnsweredWithText(String answer) {
-                surveyPresenter.onAnsweredWithText(answer);
+            @Override public void onResponse(UserResponse userResponse) {
+                surveyPresenter.onResponse(userResponse);
             }
         });
         questionsContent.addView(restorableView.view());
@@ -217,8 +208,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.removeAllViews();
         questionsTitle.setText(ContentUtils.sanitazeText(qscreen.description()));
         restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
-            @Override public void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
-                surveyPresenter.onLeadGenAnswered(questionIdsWithAnswers);
+            @Override public void onResponse(List<UserResponse> userResponses) {
+                surveyPresenter.onLeadGenResponse(userResponses);
             }
         });
         questionsContent.addView(restorableView.view());
