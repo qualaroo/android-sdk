@@ -11,16 +11,18 @@ class SurveyViewModel {
 
     private final @ColorInt int textColor;
     private final @ColorInt int backgroundColor;
-    private final @ColorInt int buttonDisabledColor;
+    private final @ColorInt int uiNormal;
+    private final @ColorInt int uiSelected;
     private final @ColorInt int dimColor;
     private final boolean cannotBeClosed;
     private final boolean isFullscreen;
     private final @Nullable String logoUrl;
 
-    SurveyViewModel(int textColor, int backgroundColor, int buttonDisabledColor, int dimColor, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
+    SurveyViewModel(int textColor, int backgroundColor, int uiNormal, int uiSelected, int dimColor, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
-        this.buttonDisabledColor = buttonDisabledColor;
+        this.uiNormal = uiNormal;
+        this.uiSelected = uiSelected;
         this.dimColor = dimColor;
         this.cannotBeClosed = cannotBeClosed;
         this.isFullscreen = isFullscreen;
@@ -43,12 +45,16 @@ class SurveyViewModel {
         return backgroundColor;
     }
 
-    int buttonDisabledColor() {
-        return buttonDisabledColor;
-    }
-
     int dimColor() {
         return dimColor;
+    }
+
+    public int uiNormal() {
+        return uiNormal;
+    }
+
+    public int uiSelected() {
+        return uiSelected;
     }
 
     @Nullable public String logoUrl() {
@@ -63,19 +69,36 @@ class SurveyViewModel {
 
         if (textColor != that.textColor) return false;
         if (backgroundColor != that.backgroundColor) return false;
-        if (buttonDisabledColor != that.buttonDisabledColor) return false;
+        if (uiNormal != that.uiNormal) return false;
+        if (uiSelected != that.uiSelected) return false;
         if (dimColor != that.dimColor) return false;
         if (cannotBeClosed != that.cannotBeClosed) return false;
-        return isFullscreen == that.isFullscreen;
+        if (isFullscreen != that.isFullscreen) return false;
+        return logoUrl != null ? logoUrl.equals(that.logoUrl) : that.logoUrl == null;
     }
 
     @Override public int hashCode() {
         int result = textColor;
         result = 31 * result + backgroundColor;
-        result = 31 * result + buttonDisabledColor;
+        result = 31 * result + uiNormal;
+        result = 31 * result + uiSelected;
         result = 31 * result + dimColor;
         result = 31 * result + (cannotBeClosed ? 1 : 0);
         result = 31 * result + (isFullscreen ? 1 : 0);
+        result = 31 * result + (logoUrl != null ? logoUrl.hashCode() : 0);
         return result;
+    }
+
+    @Override public String toString() {
+        return "SurveyViewModel{" +
+                "textColor=" + textColor +
+                ", backgroundColor=" + backgroundColor +
+                ", uiNormal=" + uiNormal +
+                ", uiSelected=" + uiSelected +
+                ", dimColor=" + dimColor +
+                ", cannotBeClosed=" + cannotBeClosed +
+                ", isFullscreen=" + isFullscreen +
+                ", logoUrl='" + logoUrl + '\'' +
+                '}';
     }
 }

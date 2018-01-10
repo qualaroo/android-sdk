@@ -13,6 +13,7 @@ import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.support.v7.widget.AppCompatImageView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.render.Renderer;
 import com.qualaroo.ui.render.RestorableView;
 import com.qualaroo.ui.render.ViewState;
+import com.qualaroo.util.ColorStateListUtils;
 import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
@@ -58,7 +60,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private TextView questionsTitleTop;
     private TextView questionsTitleBottom;
     private FrameLayout questionsContent;
-    private ImageView closeButton;
+    private AppCompatImageView closeButton;
     private ImageView surveyLogo;
 
     private boolean isFullScreen;
@@ -135,7 +137,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsTitleTop.setTextColor(viewModel.textColor());
         questionsTitleBottom.setTextColor(viewModel.textColor());
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
-        closeButton.setColorFilter(viewModel.buttonDisabledColor());
+        closeButton.setSupportImageTintList(ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());
