@@ -47,7 +47,6 @@ public final class Theme {
         return theme;
     }
 
-
     private static @ColorInt int parseColorSafely(String color) {
         try {
             return Color.parseColor(color);
@@ -56,17 +55,22 @@ public final class Theme {
         }
     }
 
+    private static final String LIGHT_DIM_COLOR = "#D4CACED6";
+    private static final String VERY_LIGHT_DIM_COLOR = "#D4FAFAFA";
+    private static final String DARK_DIM_COLOR = "#D4323433";
+    private static final String DEFAULT_DIM_COLOR = DARK_DIM_COLOR;
+
     private static @ColorInt int parseDimType(String dimType) {
         if (dimType == null) {
-            return Color.parseColor("#D4323433");
+            return Color.parseColor(DEFAULT_DIM_COLOR);
         }
         switch(dimType) {
             case "light":
-                return Color.parseColor("#D4CACED6");
+                return Color.parseColor(LIGHT_DIM_COLOR);
             case "very_light":
-                return Color.parseColor("#D4FAFAFA");
+                return Color.parseColor(VERY_LIGHT_DIM_COLOR);
         }
-        return Color.parseColor("#D4323433");
+        return Color.parseColor(DARK_DIM_COLOR);
     }
 
     private static boolean isLegacyColorThemeMap(ColorThemeMap map) {
