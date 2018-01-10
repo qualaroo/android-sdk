@@ -230,6 +230,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
+        questionsTitleBottom.setVisibility(View.GONE);
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitleTop.setText(ContentUtils.sanitazeText(qscreen.description()));
