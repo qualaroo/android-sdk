@@ -49,7 +49,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                     container.setOnCheckedChangeListener(null);
                     container.postDelayed(new Runnable() {
                         @Override public void run() {
-                            UserResponse userResponse = buildUserResponse(question.id(), answerId);
+                            UserResponse userResponse = buildUserResponse(question.id(), container);
                             onAnsweredListener.onResponse(userResponse);
                         }
                     }, 300);
@@ -65,8 +65,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         button.setVisibility(question.alwaysShowSend() ? View.VISIBLE : View.GONE);
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                int answerId = container.getCheckedId();
-                UserResponse userResponse = buildUserResponse(question.id(), answerId);
+                UserResponse userResponse = buildUserResponse(question.id(), container);
                 onAnsweredListener.onResponse(userResponse);
             }
         });
@@ -114,8 +113,21 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         outState.putSparseParcelableArray(KEY_FREEFORM_COMMENTS, freeformComments);
     }
 
-    private UserResponse buildUserResponse(long questionId, int answerId) {
-        return new UserResponse.Builder(questionId).addChoiceAnswer(answerId).build();
+    private UserResponse buildUserResponse(long questionId, ListeningCheckableGroup checkableGroup) {
+        for (int i = 0; i < checkableGroup.getChildCount(); i++) {
+            View child = checkableGroup.getChildAt(i);
+            if (child instanceof Checkable && ((Checkable) child).isChecked()) {
+                Answer answer = (Answer) child.getTag();
+                if (child instanceof FreeformCommentCompoundButton) {
+                    return new UserResponse.Builder(questionId)
+                            .addChoiceAnswerWithComment(answer.id(), ((FreeformCommentCompoundButton) child).getText())
+                            .build();
+                } else {
+                    return new UserResponse.Builder(questionId).addChoiceAnswer(answer.id()).build();
+                }
+            }
+        }
+        return new UserResponse.Builder(questionId).build();
     }
 
     private View buildRadioButton(Context context, Answer answer) {
@@ -130,6 +142,7 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         }
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         view.setLayoutParams(layoutParams);
+        view.setTag(answer);
         return view;
     }
 

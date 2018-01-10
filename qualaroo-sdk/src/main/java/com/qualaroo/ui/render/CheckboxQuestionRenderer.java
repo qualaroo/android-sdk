@@ -68,9 +68,13 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 UserResponse.Builder builder = new UserResponse.Builder(question.id());
                 for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
                     View child = checkablesContainer.getChildAt(i);
-                    if (child instanceof CheckBox && ((CheckBox) child).isChecked()) {
+                    if (child instanceof Checkable && ((Checkable) child).isChecked()) {
                         Answer answer = (Answer) child.getTag();
-                        builder.addChoiceAnswer(answer.id());
+                        if (child instanceof FreeformCommentCompoundButton) {
+                            builder.addChoiceAnswerWithComment(answer.id(), ((FreeformCommentCompoundButton) child).getText());
+                        } else {
+                            builder.addChoiceAnswer(answer.id());
+                        }
                     }
                 }
                 onAnsweredListener.onResponse(builder.build());
