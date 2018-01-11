@@ -65,19 +65,8 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         }
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
-                UserResponse.Builder builder = new UserResponse.Builder(question.id());
-                for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
-                    View child = checkablesContainer.getChildAt(i);
-                    if (child instanceof Checkable && ((Checkable) child).isChecked()) {
-                        Answer answer = (Answer) child.getTag();
-                        if (child instanceof FreeformCommentCompoundButton) {
-                            builder.addChoiceAnswerWithComment(answer.id(), ((FreeformCommentCompoundButton) child).getText());
-                        } else {
-                            builder.addChoiceAnswer(answer.id());
-                        }
-                    }
-                }
-                onAnsweredListener.onResponse(builder.build());
+                UserResponse build = buildUserResponse(question, checkablesContainer);
+                onAnsweredListener.onResponse(build);
             }
         });
         return RestorableView.withId(question.id())
@@ -94,6 +83,22 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                     }
                 })
                 .build();
+    }
+
+    private UserResponse buildUserResponse(Question question, ViewGroup checkablesContainer) {
+        UserResponse.Builder builder = new UserResponse.Builder(question.id());
+        for (int i = 0; i < checkablesContainer.getChildCount(); i++) {
+            View child = checkablesContainer.getChildAt(i);
+            if (child instanceof Checkable && ((Checkable) child).isChecked()) {
+                Answer answer = (Answer) child.getTag();
+                if (child instanceof FreeformCommentCompoundButton) {
+                    builder.addChoiceAnswerWithComment(answer.id(), ((FreeformCommentCompoundButton) child).getText());
+                } else {
+                    builder.addChoiceAnswer(answer.id());
+                }
+            }
+        }
+        return builder.build();
     }
 
     private void restoreState(Bundle savedState, ViewGroup checkablesContainer) {
