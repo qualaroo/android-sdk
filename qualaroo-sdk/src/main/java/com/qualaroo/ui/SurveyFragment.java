@@ -13,7 +13,7 @@ import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v7.widget.AppCompatImageView;
+import android.support.v4.widget.ImageViewCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +60,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private TextView questionsTitleTop;
     private TextView questionsTitleBottom;
     private FrameLayout questionsContent;
-    private AppCompatImageView closeButton;
+    private ImageView closeButton;
     private ImageView surveyLogo;
 
     private boolean isFullScreen;
@@ -137,7 +137,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsTitleTop.setTextColor(viewModel.textColor());
         questionsTitleBottom.setTextColor(viewModel.textColor());
         ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
-        closeButton.setSupportImageTintList(ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
+        ImageViewCompat.setImageTintList(closeButton, ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
         backgroundView.setBackgroundColor(viewModel.dimColor());

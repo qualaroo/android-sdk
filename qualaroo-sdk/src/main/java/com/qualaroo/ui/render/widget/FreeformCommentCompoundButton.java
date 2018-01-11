@@ -65,6 +65,10 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Liste
         ThemeUtils.applyTheme(freeformComment, theme);
     }
 
+    public String getText() {
+        return freeformComment.getText().toString();
+    }
+
     public State getState() {
         return new State(getId(), freeformComment.getText().toString());
     }
