@@ -315,6 +315,9 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 QualarooJobIntentService.start(context);
             } catch (InvalidCredentialsException e) {
                 INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
+            } catch (Exception e) {
+                //TODO: this is unexpected and might be an OS bug, log this event in our own company's bug tracker
+                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
     }
