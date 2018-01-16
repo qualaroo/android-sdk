@@ -1,3 +1,17 @@
+## 1.5.0
+**Features:**
+- support for freeform comments in radio and checkbox type questions
+- support for displaying question's description
+- support for new colors customization options
+- support for anchoring more than one answer as the last one
+
+**Bug fixes:**
+- fixed few cases in which user's parameters might not have been reported back to Qualaroo's API
+-- -- https://github.com/qualaroo/AndroidSDK/issues/7
+- workaround for a bug related to D8 compiler and MediaTek processors:
+-- -- https://issuetracker.google.com/issues/69364976
+-- -- https://github.com/qualaroo/AndroidSDK/issues/6
+
 ## 1.4.4
 **Changes**
 - removed 72h time limit between showing the same survey
