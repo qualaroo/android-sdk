@@ -118,19 +118,19 @@ public final class Theme {
         return textColor;
     }
 
-    @ColorInt int buttonEnabledColor() {
+    @ColorInt public int buttonEnabledColor() {
         return buttonEnabledColor;
     }
 
-    @ColorInt int buttonDisabledColor() {
+    @ColorInt public int buttonDisabledColor() {
         return buttonDisabledColor;
     }
 
-    @ColorInt int buttonTextEnabled() {
+    @ColorInt public int buttonTextEnabled() {
         return buttonTextEnabled;
     }
 
-    @ColorInt int buttonTextDisabled() {
+    @ColorInt public int buttonTextDisabled() {
         return buttonTextDisabled;
     }
 
