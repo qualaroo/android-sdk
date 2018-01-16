@@ -15,6 +15,7 @@ public final class Question implements Serializable {
     private QuestionType type;
     private String title;
     private String description;
+    private String descriptionPlacement;
     private List<Answer> answerList;
     private String sendText;
     private Node nextMap;
@@ -23,14 +24,16 @@ public final class Question implements Serializable {
     private String cname;
     private boolean disableRandom;
     private boolean anchorLast;
+    private int anchorLastCount;
     private boolean alwaysShowSend;
     private boolean isRequired;
 
-    @VisibleForTesting Question(long id, QuestionType type, String title, String description, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description, String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
         this.description = description;
+        this.descriptionPlacement = descriptionPlacement;
         this.answerList = answerList;
         this.sendText = sendText;
         this.nextMap = nextMap;
@@ -38,6 +41,7 @@ public final class Question implements Serializable {
         this.npsMaxLabel = npsMaxLabel;
         this.disableRandom = disableRandom;
         this.anchorLast = anchorLast;
+        this.anchorLastCount = anchorLastCount;
         this.alwaysShowSend = alwaysShowSend;
         this.isRequired = isRequired;
         this.cname = cname;
@@ -61,6 +65,10 @@ public final class Question implements Serializable {
 
     public String description() {
         return description;
+    }
+
+    public String descriptionPlacement() {
+        return descriptionPlacement;
     }
 
     public List<Answer> answerList() {
@@ -87,13 +95,16 @@ public final class Question implements Serializable {
         return cname;
     }
 
-    //made this flag a lot more readable in code
     public boolean enableRandom() {
         return !disableRandom;
     }
 
     public boolean anchorLast() {
         return anchorLast;
+    }
+
+    public int anchorLastCount() {
+        return anchorLastCount;
     }
 
     public boolean alwaysShowSend() {
@@ -110,15 +121,19 @@ public final class Question implements Serializable {
         mutated.type = type;
         mutated.title = title;
         mutated.description = description;
+        mutated.descriptionPlacement = descriptionPlacement;
         mutated.answerList = answerList;
         mutated.sendText = sendText;
         mutated.nextMap = nextMap;
         mutated.npsMinLabel = npsMinLabel;
         mutated.npsMaxLabel = npsMaxLabel;
+        mutated.cname = cname;
         mutated.disableRandom = disableRandom;
         mutated.anchorLast = anchorLast;
         mutated.alwaysShowSend = alwaysShowSend;
         mutated.isRequired = isRequired;
+        mutated.cname = cname;
+        mutated.anchorLastCount = anchorLastCount;
         return mutated;
     }
 

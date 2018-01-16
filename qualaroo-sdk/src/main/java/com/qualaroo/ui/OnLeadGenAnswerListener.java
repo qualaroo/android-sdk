@@ -2,9 +2,11 @@ package com.qualaroo.ui;
 
 import android.support.annotation.RestrictTo;
 
-import java.util.Map;
+import com.qualaroo.internal.model.UserResponse;
+
+import java.util.List;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public interface OnLeadGenAnswerListener {
-    void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers);
+    void onResponse(List<UserResponse> userResponses);
 }

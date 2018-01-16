@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.qualaroo.R;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.NpsView;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
@@ -36,7 +37,11 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         button.setOnClickListener(new DebouncingOnClickListener() {
             @Override public void doClick(View v) {
                 Answer answer = question.answerList().get(npsView.getCurrentlySelectedScore());
-                onAnsweredListener.onAnswered(answer);
+                onAnsweredListener.onResponse(
+                        new UserResponse.Builder(question.id())
+                                .addChoiceAnswer(answer.id())
+                                .build()
+                );
             }
         });
         TextView minLabel = view.findViewById(R.id.qualaroo__nps_view_min_label);
@@ -53,13 +58,13 @@ public final class NpsQuestionRenderer extends QuestionRenderer {
         return RestorableView.withId(question.id())
                 .view(view)
                 .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle into) {
-                        into.putInt(KEY_NPS_SCORE, npsView.getCurrentlySelectedScore());
+                    @Override public void onSaveState(Bundle outState) {
+                        outState.putInt(KEY_NPS_SCORE, npsView.getCurrentlySelectedScore());
                     }
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle from) {
-                        int score = from.getInt(KEY_NPS_SCORE, -1);
+                    @Override public void onRestoreState(Bundle savedState) {
+                        int score = savedState.getInt(KEY_NPS_SCORE, -1);
                         npsView.setScore(score);
                     }
                 })

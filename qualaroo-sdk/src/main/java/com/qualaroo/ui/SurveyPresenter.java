@@ -5,18 +5,16 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
-import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
+import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.render.Theme;
 import com.qualaroo.util.UriOpener;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -40,7 +38,7 @@ class SurveyPresenter {
 
     void setView(SurveyView view) {
         surveyView = view;
-        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.buttonDisabledColor(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen(), survey.spec().optionMap().logoUrl()));
+        surveyView.setup(new SurveyViewModel(theme.textColor(), theme.backgroundColor(), theme.uiNormal(), theme.uiSelected(), theme.dimColor(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen(), survey.spec().optionMap().logoUrl()));
         interactor.registerObserver(eventsObserver);
     }
 
@@ -96,24 +94,16 @@ class SurveyPresenter {
         interactor.stopSurvey();
     }
 
-    void onAnswered(Answer answer) {
-        interactor.questionAnswered(Collections.singletonList(answer));
-    }
-
-    void onAnswered(List<Answer> answers) {
-        interactor.questionAnswered(answers);
-    }
-
-    void onAnsweredWithText(String payload) {
-        interactor.questionAnsweredWithText(payload);
-    }
-
-    void onLeadGenAnswered(Map<Long, String> questionIdsWithAnswers) {
-        interactor.leadGenAnswered(questionIdsWithAnswers);
-    }
-
     void onMessageConfirmed(Message message) {
         interactor.messageConfirmed(message);
+    }
+
+    public void onResponse(UserResponse userResponse) {
+        interactor.onResponse(userResponse);
+    }
+
+    public void onLeadGenResponse(List<UserResponse> userResponse) {
+        interactor.onLeadGenResponse(userResponse);
     }
 
     static class State implements Serializable {

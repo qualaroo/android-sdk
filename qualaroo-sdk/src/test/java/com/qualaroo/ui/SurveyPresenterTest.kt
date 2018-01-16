@@ -1,13 +1,13 @@
 package com.qualaroo.ui
 
 import com.nhaarman.mockito_kotlin.*
-import com.qualaroo.internal.model.TestModels.answer
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.optionMap
 import com.qualaroo.internal.model.TestModels.qscreen
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.internal.model.UserResponse
 import com.qualaroo.ui.render.ThemeUtil.Companion.theme
 import com.qualaroo.util.UriOpener
 import org.junit.Assert.assertTrue
@@ -40,8 +40,9 @@ class SurveyPresenterTest {
         val theme = theme(
                 textColor = 100,
                 dimColor = 200,
-                buttonDisabledColor = 300,
-                backgroundColor = 400
+                backgroundColor = 400,
+                uiNormal = 300,
+                uiSelected = 200
         )
         val survey = survey(
                 id = 1,
@@ -53,12 +54,12 @@ class SurveyPresenterTest {
                 )
         )
         val presenter = SurveyPresenter(interactor, survey, theme, uriOpener)
-
         presenter.setView(view)
 
         val expectedSurveyViewModel = SurveyViewModel(
-                100, 400, 300, 200, true, true, null
+                100, 400, 300, 200, 200, true, true, null
         )
+
         verify(view, times(1)).setup(expectedSurveyViewModel)
     }
 
@@ -108,14 +109,14 @@ class SurveyPresenterTest {
     fun `passes answers to interactor`() {
         capturedEventsObserver.showQuestion(question(id = 10))
 
-        presenter.onAnswered(answer(id = 20))
-        verify(interactor, times(1)).questionAnswered(listOf(answer(id = 20)))
+        presenter.onResponse(UserResponse.Builder(10).addChoiceAnswer(20).build())
+        verify(interactor, times(1)).onResponse(UserResponse.Builder(10).addChoiceAnswer(20).build())
 
-        presenter.onAnswered(listOf(answer(id = 20), answer(id = 30)))
-        verify(interactor, times(1)).questionAnswered(listOf(answer(id = 20), answer(id = 30)))
+        presenter.onResponse(UserResponse.Builder(10).addChoiceAnswer(20).addChoiceAnswer(30).build())
+        verify(interactor, times(1)).onResponse(UserResponse.Builder(10).addChoiceAnswer(20).addChoiceAnswer(30).build())
 
-        presenter.onAnsweredWithText("lorem ipsum")
-        verify(interactor, times(1)).questionAnsweredWithText("lorem ipsum")
+        presenter.onResponse(UserResponse.Builder(10).addTextAnswer("lorem ipsum").build())
+        verify(interactor, times(1)).onResponse(UserResponse.Builder(10).addTextAnswer("lorem ipsum").build())
     }
 
     @Test

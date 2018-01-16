@@ -18,12 +18,12 @@ object TestModels {
         return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl)
     }
 
-    fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, alwaysShowSend: Boolean = true, isRequired: Boolean = false): Question {
-        return Question(id, type, title, description, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, alwaysShowSend, isRequired)
+    fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title", description: String = "some description", descriptionPlacement: String = "after", answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null, npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true, anchorLast: Boolean = false, anchorLastCount: Int = 0, alwaysShowSend: Boolean = true, isRequired: Boolean = false): Question {
+        return Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap, npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend, isRequired)
     }
 
-    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null): Answer {
-        return Answer(id, title, nextMap)
+    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null, explainType: String? = null): Answer {
+        return Answer(id, title, nextMap, explainType)
     }
 
     fun qscreen(id: Long, questionList: List<Long> = emptyList(), description: String = "", sendText: String = "", nextMap: Node? = null): QScreen {
@@ -34,8 +34,8 @@ object TestModels {
 
     fun node(id: Long, nodeType: String) = Node(id, nodeType)
 
-    fun colorThemeMap(dimType: String = "light", backgroundColor: String = "#000000", borderColor: String = "#000000", textColor: String = "#000000", buttonTextColor: String = "#000000", buttonEnabledColor: String = "#000000", buttonDisabledColor: String = "#000000"): ColorThemeMap {
-        return ColorThemeMap(dimType, backgroundColor, borderColor, textColor, buttonTextColor, buttonEnabledColor, buttonDisabledColor)
+    fun colorThemeMap(dimType: String = "light", backgroundColor: String = "#000000", textColor: String = "#000000", buttonEnabledColor: String = "#000000", buttonDisabledColor: String = "#000000", buttonTextEnabled: String = "#000000", buttonTextDisabled: String = "#000000", uiNormal: String = "#000000", uiSelected: String = "#000000"): ColorThemeMap {
+        return ColorThemeMap(backgroundColor, dimType, textColor, buttonEnabledColor, buttonDisabledColor, buttonTextEnabled, buttonTextDisabled, uiNormal, uiSelected)
     }
 
     fun message(id: Long, type: MessageType = MessageType.REGULAR, description: String = "", ctaMap: Message.CtaMap = ctaMap()): Message {

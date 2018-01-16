@@ -2,11 +2,9 @@ package com.qualaroo.internal.network
 
 import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.UserInfo
-import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.Survey
-import com.qualaroo.internal.model.TestModels.answer
-import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.survey
+import com.qualaroo.internal.model.UserResponse
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.internal.storage.LocalStorage
 import com.qualaroo.util.InMemorySettings
@@ -34,7 +32,7 @@ class ReportClientTest {
 
     @Test
     fun `builds proper url for impressions`() {
-        client.recordImpression(survey)
+        client.reportImpression(survey)
 
         val url = restClient.recentHttpUrl!!
 
@@ -45,27 +43,12 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for nps answer`() {
-        val question = question(id = 123456, type = QuestionType.NPS)
-        val answer = answer(id = 10)
+    fun `builds proper url single choice questions`() {
+        val userResponse = UserResponse.Builder(123456)
+                .addChoiceAnswer(10)
+                .build()
 
-        client.recordAnswer(survey, question, listOf(answer))
-
-        val url = restClient.recentHttpUrl!!
-
-        assertEquals("https", url.scheme())
-        assertEquals("turbo.qualaroo.com", url.host())
-        assertEquals("/r.js", url.encodedPath())
-        assertEquals("123", url.queryParameter("id"))
-        assertEquals("10", url.queryParameter("r[123456]"))
-    }
-
-    @Test
-    fun `builds proper url for radio answer`() {
-        val question = question(id = 123456, type = QuestionType.RADIO)
-        val answer = answer(id = 10)
-
-        client.recordAnswer(survey, question, listOf(answer))
+        client.reportUserResponse(survey, userResponse)
 
         val url = restClient.recentHttpUrl!!
 
@@ -73,23 +56,18 @@ class ReportClientTest {
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
-        assertEquals(answer.id().toString(), url.queryParameter("r[123456]"))
+        assertEquals("10", url.queryParameter("r[123456][]"))
     }
 
     @Test
-    fun `builds proper url for checkbox answer`() {
-        val question = question(
-                id = 123456,
-                type = QuestionType.CHECKBOX
-        )
+    fun `builds proper url for multiple choice questions`() {
+        val userResponse = UserResponse.Builder(123456)
+                .addChoiceAnswer(10)
+                .addChoiceAnswer(20)
+                .addChoiceAnswer(30)
+                .build()
 
-        val answers = listOf(
-                answer(id = 10),
-                answer(id = 20),
-                answer(id = 30)
-        )
-
-        client.recordAnswer(survey, question, answers)
+        client.reportUserResponse(survey, userResponse)
 
         val url = restClient.recentHttpUrl!!
 
@@ -97,21 +75,40 @@ class ReportClientTest {
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
-        assertEquals(3, url.queryParameterValues("r[123456]").size)
+        assertEquals(3, url.queryParameterValues("r[123456][]").size)
 
-        assertEquals("10", url.queryParameterValues("r[123456]")[0])
-        assertEquals("20", url.queryParameterValues("r[123456]")[1])
-        assertEquals("30", url.queryParameterValues("r[123456]")[2])
+        assertEquals("10", url.queryParameterValues("r[123456][]")[0])
+        assertEquals("20", url.queryParameterValues("r[123456][]")[1])
+        assertEquals("30", url.queryParameterValues("r[123456][]")[2])
+
     }
 
     @Test
-    fun `builds proper url for text answer`() {
-        val question = question(
-                id = 123456,
-                type = QuestionType.TEXT
-        )
+    fun `builds proper url for choice questions with freeform comments`() {
+        val userResponse = UserResponse.Builder(123456)
+                .addChoiceAnswerWithComment(1, "something1")
+                .addChoiceAnswerWithComment(2, "something2")
+                .build()
 
-        client.recordTextAnswer(survey, question, "long answer with spaces")
+        client.reportUserResponse(survey, userResponse)
+        val url = restClient.recentHttpUrl!!
+
+        assertEquals("https", url.scheme())
+        assertEquals("turbo.qualaroo.com", url.host())
+        assertEquals("/r.js", url.encodedPath())
+        assertEquals("123", url.queryParameter("id"))
+
+        assertEquals("something1", url.queryParameter("re[123456][1]"))
+        assertEquals("something2", url.queryParameter("re[123456][2]"))
+    }
+
+    @Test
+    fun `builds proper url for text questions`() {
+        val userResponse = UserResponse.Builder(123456)
+                .addTextAnswer("long answer with spaces")
+                .build()
+
+        client.reportUserResponse(survey, userResponse)
 
         val url = restClient.recentHttpUrl!!
 
@@ -123,13 +120,15 @@ class ReportClientTest {
     }
 
     @Test
-    fun `builds proper url for lead gen answers`() {
-        client.recordLeadGenAnswer(survey, mapOf(
-                1L to "John",
-                2L to "Doe",
-                3L to "mail@mail.com",
-                4L to "+1 123 123 123"
-        ))
+    fun `builds proper url for lead gens`() {
+        val leadGenResponse = mutableListOf<UserResponse>()
+
+        leadGenResponse.add(UserResponse.Builder(1L).addTextAnswer("John").build())
+        leadGenResponse.add(UserResponse.Builder(2L).addTextAnswer("Doe").build())
+        leadGenResponse.add(UserResponse.Builder(3L).addTextAnswer("mail@mail.com").build())
+        leadGenResponse.add(UserResponse.Builder(4L).addTextAnswer("+1 123 123 123").build())
+
+        client.reportUserResponse(survey, leadGenResponse)
 
         val url = restClient.recentHttpUrl!!
 
@@ -147,13 +146,13 @@ class ReportClientTest {
     fun `stores requests on network errors`() {
         restClient.throwsIoException = true
 
-        client.recordImpression(survey(id = 10))
+        client.reportImpression(survey(id = 10))
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
 
-        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
 
-        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
     }
 
@@ -161,29 +160,29 @@ class ReportClientTest {
     fun `stores failed requests`() {
         restClient.returnedResponseCode = 200
 
-        client.recordImpression(survey(id = 10))
-        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
-        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        client.reportImpression(survey(id = 10))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
 
         verify(localStorage, times(0)).storeFailedReportRequest(any())
 
 
         restClient.returnedResponseCode = 400
 
-        client.recordImpression(survey(id = 10))
-        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
-        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        client.reportImpression(survey(id = 10))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
 
         verify(localStorage, times(0)).storeFailedReportRequest(any())
 
 
         restClient.returnedResponseCode = 500
 
-        client.recordImpression(survey(id = 10))
+        client.reportImpression(survey(id = 10))
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
-        client.recordAnswer(survey(id = 10), question(id = 1), listOf(answer(id = 4)))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
-        client.recordTextAnswer(survey(id = 10), question(id = 1), "textAnswer")
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
         verify(localStorage).storeFailedReportRequest(restClient.recentHttpUrl?.toString())
     }
 
@@ -193,11 +192,15 @@ class ReportClientTest {
 
         whenever(userInfo.deviceId).thenReturn("abcd1234")
 
-        client.recordLeadGenAnswer(survey(id = 1), mapOf(1L to "answer", 2L to "another_answer"))
+        val leadGenResponse = mutableListOf<UserResponse>()
+        leadGenResponse.add(UserResponse.Builder(1L).addTextAnswer("John").build())
+        leadGenResponse.add(UserResponse.Builder(2L).addTextAnswer("Doe").build())
+        client.reportUserResponse(survey, leadGenResponse)
+
         urls.add(restClient.recentHttpUrl!!)
-        client.recordTextAnswer(survey(id = 1), question(id = 1), "text_answer")
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
         urls.add(restClient.recentHttpUrl!!)
-        client.recordAnswer(survey(id = 1), question(id = 1), listOf(answer(id = 1), answer(id = 2)))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
         urls.add(restClient.recentHttpUrl!!)
 
         urls.forEach {
@@ -208,15 +211,36 @@ class ReportClientTest {
 
         userInfo.userId = "lala"
 
-        client.recordLeadGenAnswer(survey(id = 1), mapOf(1L to "answer", 2L to "another_answer"))
+        client.reportUserResponse(survey, leadGenResponse)
         urls.add(restClient.recentHttpUrl!!)
-        client.recordTextAnswer(survey(id = 1), question(id = 1), "text_answer")
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
         urls.add(restClient.recentHttpUrl!!)
-        client.recordAnswer(survey(id = 1), question(id = 1), listOf(answer(id = 1), answer(id = 2)))
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
         urls.add(restClient.recentHttpUrl!!)
 
         urls.forEach {
             assertEquals("lala", it.queryParameter("i"))
+        }
+    }
+
+    @Test
+    fun `injects user properties to answers`() {
+        userInfo.setUserProperty("first_key", "first_value")
+        userInfo.setUserProperty("second_key", "second_value")
+
+        val urls = mutableListOf<HttpUrl>()
+        client.reportUserResponse(survey, UserResponse.Builder(1).addTextAnswer("some answer").build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        client.reportUserResponse(survey, UserResponse.Builder(1).addChoiceAnswer(4).build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        client.reportUserResponse(survey, UserResponse.Builder(123456).addChoiceAnswerWithComment(1, "something1").build())
+        urls.add(restClient.recentHttpUrl!!)
+
+        urls.forEach {
+            assertEquals("first_value", it.queryParameter("rp[first_key]"))
+            assertEquals("second_value", it.queryParameter("rp[second_key]"))
         }
     }
 

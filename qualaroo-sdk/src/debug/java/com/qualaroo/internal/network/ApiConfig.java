@@ -4,7 +4,7 @@ import okhttp3.HttpUrl;
 
 public class ApiConfig {
 
-    private static final String QUALAROO = "testapp1.qualaroo.com";
+    private static final String QUALAROO = "staging-app.qualaroo.com";
     private static final String REPORT_API = "stage1.turbo.qualaroo.com";
 
     public HttpUrl qualarooApi() {
