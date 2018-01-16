@@ -121,7 +121,7 @@ artifacts {
 publishing {
     repositories {
         maven {
-            url "s3://qualaroo-android-sdk/libs/"
+            url "s3://qualaroo-android-sdk/${project.sdkVersionMaven.endsWith('-SNAPSHOT') ? 'snapshots' : 'libs' }/"
             credentials(AwsCredentials) {
                 accessKey QUALAROO_S3_ACCESS_KEY
                 secretKey QUALAROO_S3_SECRET_KEY
