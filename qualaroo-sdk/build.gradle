@@ -13,7 +13,7 @@ apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '27.0.1'
+    buildToolsVersion '27.0.2'
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
@@ -61,9 +61,9 @@ repositories {
 dependencies {
     implementation "com.android.support:appcompat-v7:26.1.0"
     implementation "com.android.support:design:26.1.0"
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
-    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.google.code.gson:gson:2.8.2'
     implementation ('org.apache.commons:commons-jexl3:3.1') {
         exclude group: 'commons-logging'
     }
