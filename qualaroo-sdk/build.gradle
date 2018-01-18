@@ -4,7 +4,13 @@
 
 int major = 1
 int minor = 5
-int patch = 0
+int patch = 1
+
+project.ext {
+    sdkVersionCode = 10000 * major + 100 * minor + patch
+    sdkVersion = "$major.$minor.$patch"
+    sdkVersionMaven = "$sdkVersion-SNAPSHOT"
+}
 
 apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
@@ -20,8 +26,8 @@ android {
         minSdkVersion 15
         targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 10000 * major + 100 * minor + patch
-        versionName "$major.$minor.$patch"
+        versionCode project.sdkVersionCode
+        versionName project.sdkVersion
     }
     buildTypes {
         release {
@@ -115,7 +121,7 @@ artifacts {
 publishing {
     repositories {
         maven {
-            url "s3://qualaroo-android-sdk/libs/"
+            url "s3://qualaroo-android-sdk/${project.sdkVersionMaven.endsWith('-SNAPSHOT') ? 'snapshots' : 'libs' }/"
             credentials(AwsCredentials) {
                 accessKey QUALAROO_S3_ACCESS_KEY
                 secretKey QUALAROO_S3_SECRET_KEY
@@ -130,7 +136,7 @@ publishing {
         aar(MavenPublication) {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
-            version "$major.$minor.$patch"
+            version project.sdkVersionMaven
             artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
             artifact sourcesJar
             artifact javadocJar
