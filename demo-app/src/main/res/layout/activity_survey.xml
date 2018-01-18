@@ -51,31 +51,34 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_marginTop="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <android.support.design.widget.TextInputLayout
+            <Spinner
+                android:id="@+id/qualaroo__demo_survey_alias_spinner"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:layout_height="match_parent"/>
 
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/qualaroo__demo_survey_alias_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_survey_alias"/>
-            </android.support.design.widget.TextInputLayout>
+            <ProgressBar
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:id="@+id/qualaroo__demo_survey_alias_spinner_progress_bar"
+                android:theme="@style/AppTheme"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/qualaroo__demo_show_survey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
+                android:visibility="gone"
                 android:text="Show!"/>
 
         </LinearLayout>
