@@ -24,11 +24,11 @@ public class SurveyOptions {
 
         /**
          * Ignores checks for all of targeting options configured in Qualaroo Dashboard.
-         * The survey will always be displayed. <b>Use with care!</b>
+         * While active, the survey will always be displayed. <b>Use with care!</b>
          * @param ignore true if should ignore targeting options, false otherwise
          * @return {@link SurveyOptions.Builder} instance
          */
-        public Builder ignoreSurveysTargeting(boolean ignore) {
+        public Builder ignoreSurveyTargeting(boolean ignore) {
             this.ignoreTargeting = ignore;
             return this;
         }
@@ -37,7 +37,5 @@ public class SurveyOptions {
             return new SurveyOptions(ignoreTargeting);
         }
     }
-
-
 
 }
