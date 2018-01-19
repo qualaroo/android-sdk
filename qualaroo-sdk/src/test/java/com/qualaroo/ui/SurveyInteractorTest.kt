@@ -13,7 +13,6 @@ import com.qualaroo.internal.model.TestModels.qscreen
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
-import com.qualaroo.internal.model.UserResponse
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.Shuffler
 import com.qualaroo.util.TestExecutors
@@ -738,6 +737,7 @@ class SurveyInteractorTest {
 
     @Test
     fun `accepts only first stopSurvey request`() {
+        interactor.displaySurvey()
         interactor.stopSurvey()
         interactor.stopSurvey()
         interactor.stopSurvey()
@@ -942,6 +942,60 @@ class SurveyInteractorTest {
         assertEquals(3, question.answerList()[2].id())
         assertEquals(4, question.answerList()[3].id())
 
+    }
+
+    @Test
+    fun `marks survey as finished when user dismisses it on last step that is also a message`() {
+        val surveyWithLastNodeAsQuestion = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 1, nextMap = node(id = 2, nodeType = "question")),
+                                        question(id = 2)
+                                )
+                        )
+                )
+        )
+        var interactor = SurveyInteractor(surveyWithLastNodeAsQuestion, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.onResponse(UserResponse.Builder(1).build())
+        interactor.stopSurvey()
+
+        assertFalse(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
+
+        val surveyWithLastNodeAsMessage = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 1, nextMap = node(id = 2, nodeType = "message"))
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                    message(id = 2)
+                                )
+                        )
+                )
+        )
+
+        interactor = SurveyInteractor(surveyWithLastNodeAsMessage, localStorage, reportManager, preferredLanguage, JustReverseShuffler(), backgroundExecutor, uiExecutor)
+        interactor.onResponse(UserResponse.Builder(1).build())
+        interactor.stopSurvey()
+
+        assertTrue(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
     }
 
     class JustReverseShuffler : Shuffler() {
