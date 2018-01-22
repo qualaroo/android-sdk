@@ -944,6 +944,31 @@ class SurveyInteractorTest {
 
     }
 
+    @Test
+    fun `notifies about survey being shown`() {
+        interactor.displaySurvey()
+
+        verify(surveyEventPublisher, times(1)).publish(SurveyEvent.shown(survey.canonicalName()))
+    }
+
+    @Test
+    fun `notifies about survey being finished`() {
+        interactor.displaySurvey()
+        interactor.onResponse(UserResponse.Builder(100).build())
+        interactor.onResponse(UserResponse.Builder(101).build())
+
+        verify(surveyEventPublisher, times(1)).publish(SurveyEvent.finished(survey.canonicalName()))
+    }
+
+    @Test
+    fun `notifies about survey being dismissed`() {
+        interactor.displaySurvey()
+        interactor.stopSurvey()
+
+        verify(surveyEventPublisher, times(1)).publish(SurveyEvent.dismissed(survey.canonicalName()))
+    }
+
+
     class JustReverseShuffler : Shuffler() {
         override fun shuffle(list: MutableList<*>?) {
             list?.reverse()
@@ -969,5 +994,4 @@ class SurveyInteractorTest {
         override fun closeSurvey() {
         }
     }
-
 }

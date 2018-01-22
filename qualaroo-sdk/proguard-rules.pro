@@ -47,6 +47,10 @@
     <init>(...);
 }
 
+-keep public class com.qualaroo.QualarooSurveyEventReceiver {
+    public *;
+}
+
 -dontwarn org.apache.commons.**
 -dontwarn okio.**
 -dontwarn javax.annotation.Nullable

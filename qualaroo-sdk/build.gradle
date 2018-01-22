@@ -100,6 +100,7 @@ task generateJavadoc(type: Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
     include '**//*Qualaroo.java'
     include '**//*QualarooSdk.java'
+    include '**//*QualarooSurveyEventReceiver.java'
 }
 
 task javadocJar(type: Jar, dependsOn: generateJavadoc) {
