@@ -11,6 +11,13 @@ public interface QualarooSdk {
     void showSurvey(@NonNull String alias);
 
     /**
+     * Shows a survey with a specified alias.
+     * @param alias alias of a survey that should be displayed
+     * @param options various options to modify behaviour of a survey
+     */
+    void showSurvey(@NonNull String alias, @NonNull SurveyOptions options);
+
+    /**
      * Sets unique user id for tracking purposes.
      * @param userId unique user's id
      */

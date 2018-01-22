@@ -36,6 +36,12 @@
 -keep public class com.qualaroo.Qualaroo$Builder {
     public *;
 }
+
+-keep public class com.qualaroo.SurveyOptions {*;}
+-keep public class com.qualaroo.SurveyOptions$Builder {
+    public *;
+}
+
 -keep public class com.qualaroo.internal.model.** {
     private *;
     <init>(...);

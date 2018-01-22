@@ -155,6 +155,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     @Override public void showSurvey(@NonNull final String alias) {
+        showSurvey(alias, SurveyOptions.defaultOptions());
+    }
+
+    @Override public void showSurvey(@NonNull final String alias, @NonNull final SurveyOptions options) {
         if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
@@ -175,7 +179,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 }
                 if (surveyToDisplay != null) {
                     boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
-                    if (shouldShowSurvey) {
+                    if (shouldShowSurvey || options.ignoreTargeting()) {
                         QualarooLogger.debug("Displaying survey " + alias);
                         final Survey finalSurveyToDisplay = surveyToDisplay;
                         uiExecutor.execute(new Runnable() {
@@ -347,6 +351,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         }
 
         @Override public void showSurvey(@NonNull String alias) {
+            logErrorMessage();
+        }
+
+        @Override public void showSurvey(@NonNull String alias, @NonNull SurveyOptions options) {
             logErrorMessage();
         }
 
