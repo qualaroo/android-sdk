@@ -14,7 +14,7 @@ import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
-import com.qualaroo.internal.SessionInfo;
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.SurveySession;
 import com.qualaroo.internal.UserGroupPercentageProvider;
@@ -134,13 +134,13 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
                 .build();
 
-        SessionInfo sessionInfo = new SessionInfo(this.context);
+        SdkSession sdkSession = new SdkSession(this.context);
 
         Cache<List<Survey>> cache = BuildConfig.DEBUG ?
                 new NonWorkingCache<List<Survey>>() :
                 new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
 
-        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
         QualarooLogger.info("Initialized QualarooSdk");
     }
