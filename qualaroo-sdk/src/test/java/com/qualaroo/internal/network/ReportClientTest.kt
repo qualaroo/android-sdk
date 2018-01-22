@@ -1,6 +1,7 @@
 package com.qualaroo.internal.network
 
 import com.nhaarman.mockito_kotlin.*
+import com.qualaroo.internal.SurveySession
 import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.survey
@@ -28,7 +29,11 @@ class ReportClientTest {
 
     val userInfo = spy(UserInfo(InMemorySettings(), InMemoryLocalStorage()))
 
-    val client = ReportClient(restClient, apiConfig, localStorage, userInfo)
+    val session = mock<SurveySession> {
+        on { uuid() } doReturn "mocked_session_id"
+    }
+
+    val client = ReportClient(restClient, apiConfig, localStorage, userInfo, session)
 
     @Test
     fun `builds proper url for impressions`() {
@@ -40,6 +45,7 @@ class ReportClientTest {
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/c.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
+        assertEquals(session.uuid(), url.queryParameter("u"))
     }
 
     @Test
@@ -55,6 +61,7 @@ class ReportClientTest {
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
+        assertEquals(session.uuid(), url.queryParameter("u"))
         assertEquals("123", url.queryParameter("id"))
         assertEquals("10", url.queryParameter("r[123456][]"))
     }
@@ -75,6 +82,7 @@ class ReportClientTest {
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
         assertEquals("123", url.queryParameter("id"))
+        assertEquals(session.uuid(), url.queryParameter("u"))
         assertEquals(3, url.queryParameterValues("r[123456][]").size)
 
         assertEquals("10", url.queryParameterValues("r[123456][]")[0])
@@ -96,6 +104,7 @@ class ReportClientTest {
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
+        assertEquals(session.uuid(), url.queryParameter("u"))
         assertEquals("123", url.queryParameter("id"))
 
         assertEquals("something1", url.queryParameter("re[123456][1]"))
@@ -115,6 +124,7 @@ class ReportClientTest {
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
+        assertEquals(session.uuid(), url.queryParameter("u"))
         assertEquals("123", url.queryParameter("id"))
         assertEquals("long answer with spaces", url.queryParameter("r[123456][text]"))
     }
@@ -135,6 +145,7 @@ class ReportClientTest {
         assertEquals("https", url.scheme())
         assertEquals("turbo.qualaroo.com", url.host())
         assertEquals("/r.js", url.encodedPath())
+        assertEquals(session.uuid(), url.queryParameter("u"))
         assertEquals(survey.id().toString(), url.queryParameter("id"))
         assertEquals("John", url.queryParameter("r[1][text]"))
         assertEquals("Doe", url.queryParameter("r[2][text]"))
