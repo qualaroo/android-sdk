@@ -13,8 +13,21 @@ import com.qualaroo.internal.event.SurveyEvent;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * <p>Base {@link BroadcastReceiver} class for getting survey related events.</p>
+ * <p>Events are being distributed via {@link android.support.v4.content.LocalBroadcastManager}.</p>
+ *
+ * <h3>Usage:</h3>
+ * <p>Register your implementation via {@link android.support.v4.content.LocalBroadcastManager}, use {@link this#intentFilter()}
+ * to acquire an {@link IntentFilter}.</p>
+ *
+ * <p>Register your implementation via AndroidManifest.xml using <b>com.qualaroo.event.ACTION_SURVEY_EVENT</b> action</p>
+ */
 public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
 
+    /**
+     * Type of an event
+     */
     @IntDef({EVENT_TYPE_SHOWN, EVENT_TYPE_DISMISSED, EVENT_TYPE_FINISHED})
     @Retention(RetentionPolicy.CLASS)
     public @interface Type {}
@@ -52,7 +65,7 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
 
     /**
      * Called when there are new events related to any survey.
-     * @param surveyAlias alias of a survey related to an event
+     * @param surveyAlias alias of a survey
      * @param eventType one of EVENT_TYPE_SHOWN, EVENT_TYPE_DISMISSED, EVENT_TYPE_FINISHED
      */
     protected abstract void onSurveyEvent(@NonNull String surveyAlias, @Type int eventType);
