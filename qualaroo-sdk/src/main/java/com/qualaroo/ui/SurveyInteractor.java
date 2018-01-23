@@ -155,7 +155,7 @@ public class SurveyInteractor {
     }
 
     @MainThread
-    void stopSurvey() {
+    void requestSurveyToStop() {
         if (!survey.spec().optionMap().isMandatory()) {
             if ("message".equals(currentNode.nodeType())) {
                 markSurveyAsFinished();

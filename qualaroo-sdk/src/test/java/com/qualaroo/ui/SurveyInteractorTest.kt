@@ -675,7 +675,7 @@ class SurveyInteractorTest {
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
 
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
         interactor.displaySurvey()
         interactor.onResponse(UserResponse.Builder(100).build())
 
@@ -725,7 +725,7 @@ class SurveyInteractorTest {
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
         interactor.onResponse(UserResponse.Builder(200).addChoiceAnswer(2).build())
 
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         assertFalse(localStorage.getSurveyStatus(survey).hasBeenFinished())
 
@@ -748,7 +748,7 @@ class SurveyInteractorTest {
         val interactor = interactor(withSurvey = survey)
         interactor.registerObserver(observer)
 
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         verifyZeroInteractions(observer)
     }
@@ -756,12 +756,12 @@ class SurveyInteractorTest {
     @Test
     fun `accepts only first stopSurvey request`() {
         interactor.displaySurvey()
-        interactor.stopSurvey()
-        interactor.stopSurvey()
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
+        interactor.requestSurveyToStop()
+        interactor.requestSurveyToStop()
         interactor.messageConfirmed(message(id = 1))
         interactor.messageConfirmed(message(id = 1))
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         verify(observer, times(1)).closeSurvey()
     }
@@ -981,7 +981,7 @@ class SurveyInteractorTest {
     @Test
     fun `notifies about survey being dismissed`() {
         interactor.displaySurvey()
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         verify(surveyEventPublisher, times(1)).publish(SurveyEvent.dismissed(survey.canonicalName()))
     }
@@ -1008,7 +1008,7 @@ class SurveyInteractorTest {
         )
         var interactor = interactor(withSurvey = surveyWithLastNodeAsQuestion, withShuffler = JustReverseShuffler())
         interactor.onResponse(UserResponse.Builder(1).build())
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         assertFalse(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
 
@@ -1036,7 +1036,7 @@ class SurveyInteractorTest {
 
         interactor = interactor(withSurvey = surveyWithLastNodeAsMessage, withShuffler = JustReverseShuffler())
         interactor.onResponse(UserResponse.Builder(1).build())
-        interactor.stopSurvey()
+        interactor.requestSurveyToStop()
 
         assertTrue(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
     }
