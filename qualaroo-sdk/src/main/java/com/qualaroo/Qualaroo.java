@@ -14,8 +14,9 @@ import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
-import com.qualaroo.internal.SessionInfo;
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveyDisplayQualifier;
+import com.qualaroo.internal.SurveySession;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
@@ -103,7 +104,6 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final SurveyDisplayQualifier surveyDisplayQualifier;
     private final Context context;
     private final Executor dataExecutor;
-    private final ReportManager reportManager;
     private final UriOpener uriOpener;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
@@ -127,9 +127,6 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         Settings settings = new Settings(sharedPreferences);
         this.userInfo = new UserInfo(settings, localStorage);
         ApiConfig apiConfig = new ApiConfig();
-        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo);
-        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
-
         this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()
                 .register(new UserPropertiesMatcher(userInfo))
                 .register(new UserIdentityMatcher(userInfo))
@@ -137,13 +134,13 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
                 .build();
 
-        SessionInfo sessionInfo = new SessionInfo(this.context);
+        SdkSession sdkSession = new SdkSession(this.context);
 
         Cache<List<Survey>> cache = BuildConfig.DEBUG ?
                 new NonWorkingCache<List<Survey>>() :
                 new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
 
-        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
+        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
         QualarooLogger.info("Initialized QualarooSdk");
     }
@@ -228,6 +225,9 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
+        ApiConfig apiConfig = new ApiConfig();
+        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo, new SurveySession());
+        ReportManager reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
         return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, new Shuffler(), new SurveyEventPublisher(context), backgroundExecutor, uiExecutor, uriOpener, imageProvider);
     }
 

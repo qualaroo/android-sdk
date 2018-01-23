@@ -1,7 +1,7 @@
 package com.qualaroo.internal.network
 
 import com.nhaarman.mockito_kotlin.*
-import com.qualaroo.internal.SessionInfo
+import com.qualaroo.internal.SdkSession
 import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.Survey
@@ -23,7 +23,7 @@ class SurveysRepositoryTest {
     val apiConfig = mock<ApiConfig> {
         on { qualarooApi() } doReturn HttpUrl.parse("https://api.qualaroo.com/api/v1.5")
     }
-    val sessionInfo = mock<SessionInfo> {
+    val sessionInfo = mock<SdkSession> {
         on { appName() } doReturn "com.qualaroo.test"
         on { androidVersion() } doReturn "27"
         on { deviceType() } doReturn "GF3210"

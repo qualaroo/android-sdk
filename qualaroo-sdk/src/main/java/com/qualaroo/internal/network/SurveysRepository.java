@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 
 import com.qualaroo.QualarooLogger;
-import com.qualaroo.internal.SessionInfo;
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Question;
@@ -31,16 +31,16 @@ public class SurveysRepository {
     private final RestClient restClient;
     private final ApiConfig apiConfig;
     private final UserInfo userInfo;
-    private final SessionInfo sessionInfo;
+    private final SdkSession sdkSession;
     private final Cache<List<Survey>> cache;
 
     private final Object lock = new Object();
 
-    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SessionInfo sessionInfo, UserInfo userInfo, Cache<List<Survey>> cache) {
+    public SurveysRepository(String siteId, RestClient restClient, ApiConfig apiConfig, SdkSession sdkSession, UserInfo userInfo, Cache<List<Survey>> cache) {
         this.siteId = siteId;
         this.restClient = restClient;
         this.apiConfig = apiConfig;
-        this.sessionInfo = sessionInfo;
+        this.sdkSession = sdkSession;
         this.userInfo = userInfo;
         this.cache = cache;
     }
@@ -135,10 +135,10 @@ public class SurveysRepository {
 
     private void injectAnalyticsParams(HttpUrl.Builder httpUrlBuilder) {
         httpUrlBuilder
-                .addQueryParameter("sdk_version", sessionInfo.sdkVersion())
-                .addQueryParameter("client_app", sessionInfo.appName())
-                .addQueryParameter("device_type", sessionInfo.deviceType())
-                .addQueryParameter("os_version", sessionInfo.androidVersion())
+                .addQueryParameter("sdk_version", sdkSession.sdkVersion())
+                .addQueryParameter("client_app", sdkSession.appName())
+                .addQueryParameter("device_type", sdkSession.deviceType())
+                .addQueryParameter("os_version", sdkSession.androidVersion())
                 .addQueryParameter("os", "Android")
                 .addQueryParameter("device_id", userInfo.getDeviceId());
     }
