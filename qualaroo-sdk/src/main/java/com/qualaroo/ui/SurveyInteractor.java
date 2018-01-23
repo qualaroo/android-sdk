@@ -56,7 +56,6 @@ public class SurveyInteractor {
 
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
-    private Question currentQuestion;
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
@@ -120,15 +119,13 @@ public class SurveyInteractor {
 
     private void followNode(@Nullable Node node) {
         this.currentNode = node;
-        this.currentQuestion = null;
         if (node == null) {
             markSurveyAsFinished();
             eventsObserver.closeSurvey();
         } else if (node.nodeType().equals("message")) {
             eventsObserver.showMessage(messages.get(node.id()));
         } else if (node.nodeType().equals("question")) {
-            currentQuestion = questions.get(node.id());
-            eventsObserver.showQuestion(currentQuestion);
+            eventsObserver.showQuestion(questions.get(node.id()));
         } else if (node.nodeType().equals("qscreen")) {
             QScreen leadGen = qscreens.get(node.id());
             List<Question> leadGenQuestions = new ArrayList<>(leadGen.questionList().size());
@@ -160,7 +157,11 @@ public class SurveyInteractor {
     @MainThread
     void stopSurvey() {
         if (!survey.spec().optionMap().isMandatory()) {
-            surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
+            if ("message".equals(currentNode.nodeType())) {
+                markSurveyAsFinished();
+            } else {
+                surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
+            }
             closeSurvey();
         }
     }

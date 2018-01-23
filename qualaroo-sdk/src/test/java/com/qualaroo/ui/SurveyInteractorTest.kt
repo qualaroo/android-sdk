@@ -755,6 +755,7 @@ class SurveyInteractorTest {
 
     @Test
     fun `accepts only first stopSurvey request`() {
+        interactor.displaySurvey()
         interactor.stopSurvey()
         interactor.stopSurvey()
         interactor.stopSurvey()
@@ -985,6 +986,60 @@ class SurveyInteractorTest {
         verify(surveyEventPublisher, times(1)).publish(SurveyEvent.dismissed(survey.canonicalName()))
     }
 
+
+    @Test
+    fun `marks survey as finished when user dismisses it on last step that is also a message`() {
+        val surveyWithLastNodeAsQuestion = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 1, nextMap = node(id = 2, nodeType = "question")),
+                                        question(id = 2)
+                                )
+                        )
+                )
+        )
+        var interactor = interactor(withSurvey = surveyWithLastNodeAsQuestion, withShuffler = JustReverseShuffler())
+        interactor.onResponse(UserResponse.Builder(1).build())
+        interactor.stopSurvey()
+
+        assertFalse(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
+
+        val surveyWithLastNodeAsMessage = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 1, nextMap = node(id = 2, nodeType = "message"))
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                    message(id = 2)
+                                )
+                        )
+                )
+        )
+
+        interactor = interactor(withSurvey = surveyWithLastNodeAsMessage, withShuffler = JustReverseShuffler())
+        interactor.onResponse(UserResponse.Builder(1).build())
+        interactor.stopSurvey()
+
+        assertTrue(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
+    }
 
     class JustReverseShuffler : Shuffler() {
         override fun shuffle(list: MutableList<*>?) {
