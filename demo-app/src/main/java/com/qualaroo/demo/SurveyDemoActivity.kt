@@ -2,12 +2,14 @@ package com.qualaroo.demo
 
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.*
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.qualaroo.Qualaroo
+import com.qualaroo.QualarooSurveyEventReceiver
 import com.qualaroo.demo.dialog.AddUserPropertyDialog
 import com.qualaroo.demo.dialog.LogsDialog
 import com.qualaroo.demo.repository.SurveyAliasesRepository
@@ -26,6 +28,15 @@ class SurveyDemoActivity : AppCompatActivity() {
 
     private var aliasAdapter: ArrayAdapter<String>? = null
     private lateinit var surveyAliasesRepository: SurveyAliasesRepository
+    private val broadcastReceiver = object : QualarooSurveyEventReceiver() {
+        override fun onSurveyEvent(surveyAlias: String, eventType: Int) {
+            when (eventType) {
+                EVENT_TYPE_SHOWN -> Log.d("Observer", "$surveyAlias has been shown")
+                EVENT_TYPE_DISMISSED -> Log.d("Observer", "$surveyAlias has been dismissed")
+                EVENT_TYPE_FINISHED -> Log.d("Observer", "$surveyAlias has been finished")
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +67,7 @@ class SurveyDemoActivity : AppCompatActivity() {
         findViewById<View>(R.id.qualaroo__demo_check_logs).setOnClickListener { showLogsDialog() }
 
         loadAvailableAliases()
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, QualarooSurveyEventReceiver.intentFilter())
     }
 
     private fun loadAvailableAliases() {
@@ -109,5 +121,10 @@ class SurveyDemoActivity : AppCompatActivity() {
 
     private fun View.hide() {
         visibility = View.GONE
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
+        super.onDestroy()
     }
 }

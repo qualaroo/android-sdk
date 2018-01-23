@@ -7,6 +7,8 @@ import android.support.annotation.RestrictTo;
 import android.support.v4.util.LongSparseArray;
 
 import com.qualaroo.internal.ReportManager;
+import com.qualaroo.internal.event.SurveyEvent;
+import com.qualaroo.internal.event.SurveyEventPublisher;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Message;
@@ -45,6 +47,7 @@ public class SurveyInteractor {
     private final ReportManager reportManager;
     private final Language preferredLanguage;
     private final Shuffler shuffler;
+    private final SurveyEventPublisher surveyEventPublisher;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
     private final LongSparseArray<Question> questions;
@@ -55,12 +58,13 @@ public class SurveyInteractor {
     private EventsObserver eventsObserver = new StubEventsObserver();
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
-    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, Executor backgroundExecutor, Executor uiExecutor) {
+    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
         this.localStorage = localStorage;
         this.reportManager = reportManager;
         this.preferredLanguage = preferredLanguage;
         this.shuffler = shuffler;
+        this.surveyEventPublisher = surveyEventPublisher;
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
@@ -151,10 +155,12 @@ public class SurveyInteractor {
     }
 
     @MainThread
-    void stopSurvey() {
+    void requestSurveyToStop() {
         if (!survey.spec().optionMap().isMandatory()) {
             if ("message".equals(currentNode.nodeType())) {
                 markSurveyAsFinished();
+            } else {
+                surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
             }
             closeSurvey();
         }
@@ -167,6 +173,7 @@ public class SurveyInteractor {
     }
 
     private void markSurveyAsSeen() {
+        surveyEventPublisher.publish(SurveyEvent.shown(survey.canonicalName()));
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
                 localStorage.markSurveyAsSeen(survey);
@@ -175,6 +182,7 @@ public class SurveyInteractor {
     }
 
     private void markSurveyAsFinished() {
+        surveyEventPublisher.publish(SurveyEvent.finished(survey.canonicalName()));
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
                 localStorage.markSurveyFinished(survey);

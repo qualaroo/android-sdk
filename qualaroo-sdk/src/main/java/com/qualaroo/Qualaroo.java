@@ -20,6 +20,7 @@ import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
+import com.qualaroo.internal.event.SurveyEventPublisher;
 import com.qualaroo.internal.executor.UiThreadExecutor;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.LanguageJsonDeserializer;
@@ -227,7 +228,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, new Shuffler(), backgroundExecutor, uiExecutor, uriOpener, imageProvider);
+        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, new Shuffler(), new SurveyEventPublisher(context), backgroundExecutor, uiExecutor, uriOpener, imageProvider);
     }
 
     private RestClient buildRestClient(OkHttpClient okHttpClient, Credentials credentials) {

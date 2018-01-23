@@ -4,6 +4,7 @@ import android.support.annotation.RestrictTo;
 
 import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.ReportManager;
+import com.qualaroo.internal.event.SurveyEventPublisher;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.storage.LocalStorage;
@@ -23,13 +24,13 @@ public class SurveyComponent {
     private final Renderer renderer;
     private final ImageProvider imageProvider;
 
-    public static SurveyComponent from(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener, ImageProvider imageProvider) {
-        return new SurveyComponent(survey, localStorage, reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor, uriOpener, imageProvider);
+    public static SurveyComponent from(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener, ImageProvider imageProvider) {
+        return new SurveyComponent(survey, localStorage, reportManager, preferredLanguage, surveyEventPublisher, backgroundExecutor, shuffler, uriOpener, imageProvider, uiExecutor);
     }
 
-    private SurveyComponent(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, Executor backgroundExecutor, Executor uiExecutor, UriOpener uriOpener, ImageProvider imageProvider) {
+    private SurveyComponent(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Shuffler shuffler, UriOpener uriOpener, ImageProvider imageProvider, Executor uiExecutor) {
         Theme theme = Theme.create(survey.spec().optionMap().colorThemeMap());
-        SurveyInteractor surveyInteractor = new SurveyInteractor(survey, localStorage,  reportManager, preferredLanguage, shuffler, backgroundExecutor, uiExecutor);
+        SurveyInteractor surveyInteractor = new SurveyInteractor(survey, localStorage,  reportManager, preferredLanguage, shuffler, surveyEventPublisher, backgroundExecutor, uiExecutor);
         this.surveyPresenter = new SurveyPresenter(surveyInteractor, survey, theme, uriOpener);
         this.renderer = new Renderer(theme);
         this.imageProvider = imageProvider;
