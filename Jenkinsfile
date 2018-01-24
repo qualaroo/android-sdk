@@ -14,7 +14,7 @@ node {
              if (env.BRANCH_NAME == "dev") {            
                 echo "Running full analysis because it's a dev branch" 
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectName='Android SDK' -Dsonar.projectKey=android-sdk -Dsonar.sources=qualaroo-sdk/src/main/java -Dsonar.language=java -Dsonar.java.binaries=qualaroo-sdk/build/intermediates/classes/debug -Dsonar.junit.reportPaths=qualaroo-sdk/build/test-results/testDebugUnitTest -Dsonar.jacoco.reportPaths=qualaroo-sdk/build/jacoco/testDebugUnitTest.exec -Dsonar.java.source=1.7"
-             } else {
+             } else if (env.BRANCH_NAME != null) {
                 echo "Running preview analysis because it's probably a PR" 
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectName='Android SDK' -Dsonar.projectKey=android-sdk -Dsonar.sources=qualaroo-sdk/src/main/java -Dsonar.language=java -Dsonar.java.binaries=qualaroo-sdk/build/intermediates/classes/debug -Dsonar.junit.reportPaths=qualaroo-sdk/build/test-results/testDebugUnitTest -Dsonar.jacoco.reportPaths=qualaroo-sdk/build/jacoco/testDebugUnitTest.exec -Dsonar.java.source=1.7 -Dsonar.github.pullRequest=${env.CHANGE_ID} -Dsonar.github.repository=qualaroo/android-mobile-sdk-src -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN -Dsonar.analysis.mode=preview"
              }             
