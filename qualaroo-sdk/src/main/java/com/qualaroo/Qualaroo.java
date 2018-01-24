@@ -111,7 +111,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
     private Language preferredLanguage = new Language("en");
 
-    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository, UserInfo userInfo, ImageProvider imageProvider, RestClient restClient, LocalStorage localStorage, ExecutorSet executorSet, SurveyDisplayQualifier surveyDisplayQualifier, SurveyStarter surveyStarter) {
+    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository, SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider, RestClient restClient, LocalStorage localStorage, ExecutorSet executorSet) {
         this.surveyStarter = surveyStarter;
         this.surveyComponentFactory = surveyComponentFactory;
         this.restClient = restClient;
@@ -255,12 +255,11 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
                 Settings settings = new Settings(sharedPreferences);
                 UserInfo userInfo = new UserInfo(settings, localStorage);
-                Language preferredLanguage = new Language("en");
                 ExecutorSet executorSet = new ExecutorSet(new UiThreadExecutor(), Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor());
                 UriOpener uriOpener = new UriOpener(context);
                 ImageRepository imageRepository = new ImageRepository(okHttpClient, context.getCacheDir());
                 ImageProvider imageProvider = new ImageProvider(context, imageRepository, executorSet.backgroundExecutor(), executorSet.uiThreadExecutor());
-                SurveyComponent.Factory componentFactory = new SurveyComponent.Factory(context, restClient, localStorage, userInfo, preferredLanguage, executorSet, uriOpener, imageProvider);
+                SurveyComponent.Factory componentFactory = new SurveyComponent.Factory(context, restClient, localStorage, userInfo, executorSet, uriOpener, imageProvider);
                 SdkSession sdkSession = new SdkSession(this.context);
                 SurveyStarter surveyStarter = new SurveyStarter(context);
 
@@ -278,7 +277,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .build();
 
 
-                INSTANCE = new Qualaroo(componentFactory, surveysRepository, userInfo, imageProvider, restClient, localStorage, executorSet, surveyDisplayQualifier, surveyStarter);
+                INSTANCE = new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier, userInfo, imageProvider, restClient, localStorage, executorSet);
                 QualarooLogger.info("Initialized QualarooSdk");
                 QualarooJobIntentService.start(context);
             } catch (InvalidCredentialsException e) {

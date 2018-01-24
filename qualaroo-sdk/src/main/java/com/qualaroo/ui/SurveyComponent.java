@@ -54,7 +54,7 @@ public class SurveyComponent {
         private final UriOpener uriOpener;
         private final ImageProvider imageProvider;
 
-        public Factory(Context context, RestClient restClient, LocalStorage localStorage, UserInfo userInfo, Language preferredLanguage, ExecutorSet executorSet, UriOpener uriOpener, ImageProvider imageProvider) {
+        public Factory(Context context, RestClient restClient, LocalStorage localStorage, UserInfo userInfo, ExecutorSet executorSet, UriOpener uriOpener, ImageProvider imageProvider) {
             this.context = context.getApplicationContext();
             this.restClient = restClient;
             this.localStorage = localStorage;
