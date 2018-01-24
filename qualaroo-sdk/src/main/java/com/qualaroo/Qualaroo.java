@@ -275,8 +275,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
                         .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
                         .build();
-
-
+                
                 INSTANCE = new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier, userInfo, imageProvider, restClient, localStorage, executorSet);
                 QualarooLogger.info("Initialized QualarooSdk");
                 QualarooJobIntentService.start(context);
