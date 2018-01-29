@@ -791,14 +791,58 @@ class SurveyInteractorTest {
 
     @Test
     fun `opens uri for CTA messages`() {
+        val surveyWithRegularMessage = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(1, MessageType.REGULAR)
+                                )
+                        )
+                )
+        )
+        var interactor = interactor(withSurvey = surveyWithRegularMessage)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
         interactor.messageConfirmed(message(id = 1, type = MessageType.REGULAR))
         verify(observer, never()).openUri(any())
 
+        val surveyWithCtaMessage = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 1,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(
+                                                id = 1,
+                                                type = MessageType.CALL_TO_ACTION,
+                                                ctaMap = ctaMap(
+                                                        text = "buttonText",
+                                                        uri = "http://qualaroo.com"
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+        interactor = interactor(withSurvey = surveyWithCtaMessage)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
         interactor.messageConfirmed(
                 message(
                         id = 1,
                         type = MessageType.CALL_TO_ACTION,
-                        description = "text",
                         ctaMap = ctaMap(
                                 text = "buttonText",
                                 uri = "http://qualaroo.com"
