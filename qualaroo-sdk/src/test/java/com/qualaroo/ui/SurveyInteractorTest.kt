@@ -684,7 +684,7 @@ class SurveyInteractorTest {
 
     @Test
     fun `marks survey as finished`() {
-        val survey = survey(
+        var survey = survey(
                 id = 123,
                 spec = spec(
                         startMap = mapOf(
@@ -719,7 +719,7 @@ class SurveyInteractorTest {
                 )
         )
 
-        val interactor = interactor(withSurvey = survey)
+        var interactor = interactor(withSurvey = survey)
 
         interactor.displaySurvey()
         interactor.onResponse(UserResponse.Builder(100).addChoiceAnswer(1).build())
@@ -732,6 +732,29 @@ class SurveyInteractorTest {
         interactor.displaySurvey()
         interactor.onResponse(UserResponse.Builder(300).build())
 
+        assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
+
+
+        survey = survey(
+                id = 321,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 100)
+                                )
+                        )
+                )
+
+        )
+        interactor = interactor(withSurvey = survey)
+        interactor.displaySurvey()
+        interactor.messageConfirmed(message(id = 100))
         assertTrue(localStorage.getSurveyStatus(survey).hasBeenFinished())
     }
 
