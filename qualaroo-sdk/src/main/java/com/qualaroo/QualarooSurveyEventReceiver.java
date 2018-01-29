@@ -15,13 +15,14 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * <p>Base {@link BroadcastReceiver} class for getting survey related events.</p>
- * <p>Events are being distributed via {@link android.support.v4.content.LocalBroadcastManager}.</p>
+ * <p>Events are being distributed via {@link android.content.Context#sendBroadcast(Intent)}.</p>
  *
  * <h3>Usage:</h3>
- * <p>Register your implementation via {@link android.support.v4.content.LocalBroadcastManager}, use {@link this#intentFilter()}
+ * <p>Register your implementation via {@link Context#registerReceiver Context.registerReceiver()}, use {@link this#intentFilter()}
  * to acquire an {@link IntentFilter}.</p>
  *
- * <p>Register your implementation via AndroidManifest.xml using <b>com.qualaroo.event.ACTION_SURVEY_EVENT</b> action</p>
+ * <p>Register your implementation via AndroidManifest.xml using <b>com.qualaroo.event.ACTION_SURVEY_EVENT</b> action.</p>
+ *
  */
 public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
 
@@ -36,8 +37,9 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
     public static final int EVENT_TYPE_DISMISSED = 2;
     public static final int EVENT_TYPE_FINISHED = 3;
 
-    public static Intent buildIntent(SurveyEvent event) {
+    public static Intent buildIntent(Context context, SurveyEvent event) {
         Intent intent = new Intent(ACTION_SURVEY_EVENT);
+        intent.setPackage(context.getPackageName());
         intent.putExtra(EXTRA_KEY_SURVEY_EVENT, event);
         return intent;
     }
