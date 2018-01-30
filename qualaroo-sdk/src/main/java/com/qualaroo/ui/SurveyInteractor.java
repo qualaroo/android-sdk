@@ -141,7 +141,7 @@ public class SurveyInteractor {
         if (message.type() == MessageType.CALL_TO_ACTION) {
             eventsObserver.openUri(message.ctaMap().uri());
         }
-        closeSurvey();
+        requestSurveyToStop();
     }
 
     @MainThread

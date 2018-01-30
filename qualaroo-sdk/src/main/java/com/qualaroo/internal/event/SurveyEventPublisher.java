@@ -2,7 +2,6 @@ package com.qualaroo.internal.event;
 
 import android.content.Context;
 import android.support.annotation.RestrictTo;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.qualaroo.QualarooSurveyEventReceiver;
 
@@ -16,8 +15,7 @@ public class SurveyEventPublisher {
     }
 
     public void publish(SurveyEvent surveyEvent) {
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context);
-        broadcastManager.sendBroadcast(QualarooSurveyEventReceiver.buildIntent(surveyEvent));
+        context.sendBroadcast(QualarooSurveyEventReceiver.buildIntent(context, surveyEvent));
     }
 
 }
