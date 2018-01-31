@@ -9,7 +9,7 @@ int patch = 0
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
     sdkVersion = "$major.$minor.$patch"
-    sdkVersionMaven = "$sdkVersion-SNAPSHOT"
+    sdkVersionMaven = "$sdkVersion"
 }
 
 apply from: 'quality.gradle'
