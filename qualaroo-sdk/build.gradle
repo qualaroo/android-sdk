@@ -131,6 +131,7 @@ publishing {
         maven {
             url "$buildDir/localRepo"
         }
+        mavenLocal()
     }
 
     publications {
