@@ -1,7 +1,7 @@
 package com.qualaroo.demo
 
+import android.util.Log
 import com.google.gson.Gson
-import com.qualaroo.QualarooLogger
 import com.qualaroo.demo.repository.Credentials
 import com.qualaroo.demo.repository.SurveyAliasesRepository
 import okhttp3.OkHttpClient
@@ -22,7 +22,7 @@ class DependenciesComponent(private val apiKey: String) {
     }
 
     private fun okHttpClient(): OkHttpClient {
-        val httpLoggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> QualarooLogger.info(message) })
+        val httpLoggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> Log.d("OkHttp", message) })
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
                 .addInterceptor(httpLoggingInterceptor)
