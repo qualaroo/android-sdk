@@ -47,9 +47,7 @@
     <init>(...);
 }
 
--keep public class com.qualaroo.QualarooSurveyEventReceiver {
-    public *;
-}
+-keep class com.qualaroo.QualarooSurveyEventReceiver {*;}
 
 -dontwarn org.apache.commons.**
 -dontwarn okio.**

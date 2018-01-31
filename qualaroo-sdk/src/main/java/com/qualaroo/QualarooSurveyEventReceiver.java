@@ -70,5 +70,5 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
      * @param surveyAlias alias of a survey
      * @param eventType one of EVENT_TYPE_SHOWN, EVENT_TYPE_DISMISSED, EVENT_TYPE_FINISHED
      */
-    protected abstract void onSurveyEvent(@NonNull String surveyAlias, @Type int eventType);
+    public abstract void onSurveyEvent(@NonNull String surveyAlias, @Type int eventType);
 }

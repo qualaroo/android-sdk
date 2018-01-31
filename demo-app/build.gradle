@@ -39,7 +39,7 @@ android {
 
 repositories {
     maven { url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs' }
-    maven { url 'https://s3.amazonaws.com/qualaroo-android-sdk/snapshots' }
+    mavenLocal()
     jcenter()
 }
 

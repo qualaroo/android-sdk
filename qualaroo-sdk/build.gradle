@@ -3,13 +3,13 @@
  */
 
 int major = 1
-int minor = 5
-int patch = 1
+int minor = 6
+int patch = 0
 
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
     sdkVersion = "$major.$minor.$patch"
-    sdkVersionMaven = "$sdkVersion-SNAPSHOT"
+    sdkVersionMaven = "$sdkVersion"
 }
 
 apply from: 'quality.gradle'
@@ -101,6 +101,7 @@ task generateJavadoc(type: Javadoc) {
     include '**//*Qualaroo.java'
     include '**//*QualarooSdk.java'
     include '**//*QualarooSurveyEventReceiver.java'
+    include '**//*SurveyOptions.java'
 }
 
 task javadocJar(type: Jar, dependsOn: generateJavadoc) {
@@ -110,7 +111,11 @@ task javadocJar(type: Jar, dependsOn: generateJavadoc) {
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    include("**/QualarooSdk.java")
+    include(
+            "**/QualarooSdk.java",
+            "**/SurveyOptions.java",
+            "**/QualarooSurveyEventReceiver.java"
+    )
     classifier = 'sources'
 }
 
@@ -131,6 +136,7 @@ publishing {
         maven {
             url "$buildDir/localRepo"
         }
+        mavenLocal()
     }
 
     publications {
