@@ -3,6 +3,7 @@ package com.qualaroo.internal.network;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 
+import com.qualaroo.internal.SurveySession;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
@@ -24,19 +25,22 @@ public class ReportClient {
     private final ApiConfig apiConfig;
     private final LocalStorage localStorage;
     private final UserInfo userInfo;
+    private final SurveySession surveySession;
 
-    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo) {
+    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo, SurveySession surveySession) {
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.localStorage = localStorage;
         this.userInfo = userInfo;
+        this.surveySession = surveySession;
     }
 
     public void reportImpression(Survey survey) {
-        final HttpUrl url = apiConfig.reportApi().newBuilder()
+        HttpUrl.Builder builder = apiConfig.reportApi().newBuilder()
                 .addPathSegment("c.js")
-                .addQueryParameter("id", String.valueOf(survey.id()))
-                .build();
+                .addQueryParameter("id", String.valueOf(survey.id()));
+        injectSessionParam(builder);
+        final HttpUrl url = builder.build();
         report(url);
     }
 
@@ -71,6 +75,7 @@ public class ReportClient {
                 .addQueryParameter("id", String.valueOf(survey.id()));
         injectUserParams(builder);
         injectAnalyticsParams(builder);
+        injectSessionParam(builder);
         return builder;
     }
 
@@ -111,6 +116,10 @@ public class ReportClient {
         for (Map.Entry<String, String> userParam : userProperties.entrySet()) {
             httpUrlBuilder.addQueryParameter(format("rp[%s]", userParam.getKey()), userParam.getValue());
         }
+    }
+
+    private void injectSessionParam(HttpUrl.Builder httpUrlBuilder) {
+        httpUrlBuilder.addQueryParameter("u", surveySession.uuid());
     }
 
     private static String format(String format, Object... args) {

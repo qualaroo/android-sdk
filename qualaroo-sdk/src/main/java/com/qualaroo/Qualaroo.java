@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -12,14 +13,14 @@ import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.InvalidCredentialsException;
-import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.SamplePercentMatcher;
-import com.qualaroo.internal.SessionInfo;
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveyDisplayQualifier;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.UserPropertiesMatcher;
+import com.qualaroo.internal.executor.ExecutorSet;
 import com.qualaroo.internal.executor.UiThreadExecutor;
 import com.qualaroo.internal.model.Language;
 import com.qualaroo.internal.model.LanguageJsonDeserializer;
@@ -31,14 +32,14 @@ import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ApiConfig;
 import com.qualaroo.internal.network.Cache;
 import com.qualaroo.internal.network.ImageRepository;
-import com.qualaroo.internal.network.ReportClient;
+import com.qualaroo.internal.network.NonWorkingCache;
 import com.qualaroo.internal.network.RestClient;
 import com.qualaroo.internal.network.SurveysRepository;
 import com.qualaroo.internal.storage.DatabaseLocalStorage;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
-import com.qualaroo.util.Shuffler;
+import com.qualaroo.ui.SurveyStarter;
 import com.qualaroo.util.TimeProvider;
 import com.qualaroo.util.UriOpener;
 
@@ -58,6 +59,8 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public final class Qualaroo extends QualarooBase implements QualarooSdk {
+
+    private static final String PREF_NAME = "qualaroo_prefs";
 
     /**
      * Starts initialization phase of the SDK.
@@ -97,64 +100,36 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final RestClient restClient;
     private final SurveysRepository surveysRepository;
     private final ImageProvider imageProvider;
-
     private final UserInfo userInfo;
     private final SurveyDisplayQualifier surveyDisplayQualifier;
-    private final Context context;
+    private final SurveyStarter surveyStarter;
     private final Executor dataExecutor;
-    private final ReportManager reportManager;
-    private final UriOpener uriOpener;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
+    private final SurveyComponent.Factory surveyComponentFactory;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
 
     private Language preferredLanguage = new Language("en");
 
-    private Qualaroo(Context context, Credentials credentials, boolean debugMode) {
-        initLogging(debugMode);
-        this.context = context.getApplicationContext();
-        this.uiExecutor = new UiThreadExecutor();
-        this.dataExecutor = Executors.newSingleThreadExecutor();
-        this.backgroundExecutor = Executors.newSingleThreadExecutor();
-        this.localStorage = new DatabaseLocalStorage(this.context);
-        OkHttpClient okHttpClient = buildOkHttpClient();
-        this.restClient = buildRestClient(okHttpClient, credentials);
-        ImageRepository imageRepository = new ImageRepository(okHttpClient, context.getCacheDir());
-        this.imageProvider = new ImageProvider(context, imageRepository, backgroundExecutor, uiExecutor);
-        this.uriOpener = new UriOpener(context);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("qualaroo_prefs", Context.MODE_PRIVATE);
-        Settings settings = new Settings(sharedPreferences);
-        this.userInfo = new UserInfo(settings, localStorage);
-        ApiConfig apiConfig = new ApiConfig();
-        ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo);
-        this.reportManager = new ReportManager(reportClient, Executors.newSingleThreadExecutor());
-
-        this.surveyDisplayQualifier = SurveyDisplayQualifier.builder()
-                .register(new UserPropertiesMatcher(userInfo))
-                .register(new UserIdentityMatcher(userInfo))
-                .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
-                .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
-                .build();
-
-        SessionInfo sessionInfo = new SessionInfo(this.context);
-
-        Cache<List<Survey>> cache = BuildConfig.DEBUG ?
-                new NonWorkingCache<List<Survey>>() :
-                new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
-
-        this.surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sessionInfo, userInfo, cache);
-
-        QualarooLogger.info("Initialized QualarooSdk");
-    }
-
-    private void initLogging(boolean debugMode) {
-        QualarooLogger.enableLogging();
-        if (debugMode) {
-            QualarooLogger.setDebugMode();
-        }
+    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository, SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider, RestClient restClient, LocalStorage localStorage, ExecutorSet executorSet) {
+        this.surveyStarter = surveyStarter;
+        this.surveyComponentFactory = surveyComponentFactory;
+        this.restClient = restClient;
+        this.localStorage = localStorage;
+        this.uiExecutor = executorSet.uiThreadExecutor();
+        this.dataExecutor = executorSet.dataExecutor();
+        this.backgroundExecutor = executorSet.backgroundExecutor();
+        this.surveysRepository = surveysRepository;
+        this.userInfo = userInfo;
+        this.imageProvider = imageProvider;
+        this.surveyDisplayQualifier = surveyDisplayQualifier;
     }
 
     @Override public void showSurvey(@NonNull final String alias) {
+        showSurvey(alias, SurveyOptions.defaultOptions());
+    }
+
+    @Override public void showSurvey(@NonNull final String alias, @NonNull final SurveyOptions options) {
         if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
@@ -175,12 +150,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 }
                 if (surveyToDisplay != null) {
                     boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
-                    if (shouldShowSurvey) {
+                    if (shouldShowSurvey || options.ignoreTargeting()) {
                         QualarooLogger.debug("Displaying survey " + alias);
                         final Survey finalSurveyToDisplay = surveyToDisplay;
                         uiExecutor.execute(new Runnable() {
                             @Override public void run() {
-                                QualarooActivity.showSurvey(context, finalSurveyToDisplay);
+                                surveyStarter.start(finalSurveyToDisplay);
                             }
                         });
                     }
@@ -223,45 +198,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     SurveyComponent buildSurveyComponent(Survey survey) {
-        return SurveyComponent.from(survey, localStorage, reportManager, preferredLanguage, new Shuffler(), backgroundExecutor, uiExecutor, uriOpener, imageProvider);
-    }
-
-    private RestClient buildRestClient(OkHttpClient okHttpClient, Credentials credentials) {
-        final String authToken = okhttp3.Credentials.basic(credentials.apiKey(), credentials.apiSecret());
-        OkHttpClient.Builder builder = okHttpClient.newBuilder();
-        builder.addInterceptor(new Interceptor() {
-                    @Override public Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request().newBuilder()
-                                .header("Authorization", authToken)
-                                .build();
-                        return chain.proceed(request);
-                    }
-                });
-        okHttpClient = builder.build();
-        return new RestClient(okHttpClient, buildGson());
-    }
-
-    private OkHttpClient buildOkHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        if (BuildConfig.DEBUG) {
-            final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                @Override public void log(String message) {
-                    QualarooLogger.info(message);
-                }
-            });
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            builder.addInterceptor(httpLoggingInterceptor);
-        }
-        return builder.build();
-    }
-
-    private Gson buildGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
-                .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
-                .registerTypeAdapter(MessageType.class, new MessageTypeDeserializer())
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
+        return surveyComponentFactory.create(survey, preferredLanguage);
     }
 
     @Override LocalStorage localStorage() {
@@ -286,9 +223,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         private boolean debugMode = false;
 
         Builder(Context context) {
-            this.context = context;
-            //TODO: figure out a way of avoiding calling enableLogging() method everywhere
-            //(this method has been exposed to avoid using Log.d calls in unit tests)
+            this.context = context.getApplicationContext();
             QualarooLogger.enableLogging();
         }
 
@@ -310,8 +245,39 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 return;
             }
             try {
+                if (debugMode) {
+                    QualarooLogger.setDebugMode();
+                }
                 Credentials credentials = new Credentials(apiKey);
-                INSTANCE = new Qualaroo(context, credentials, debugMode);
+                OkHttpClient okHttpClient = buildOkHttpClient();
+                RestClient restClient = buildRestClient(okHttpClient, credentials);
+                LocalStorage localStorage = new DatabaseLocalStorage(context);
+                SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                Settings settings = new Settings(sharedPreferences);
+                UserInfo userInfo = new UserInfo(settings, localStorage);
+                ExecutorSet executorSet = new ExecutorSet(new UiThreadExecutor(), Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor());
+                UriOpener uriOpener = new UriOpener(context);
+                ImageRepository imageRepository = new ImageRepository(okHttpClient, context.getCacheDir());
+                ImageProvider imageProvider = new ImageProvider(context, imageRepository, executorSet.backgroundExecutor(), executorSet.uiThreadExecutor());
+                SurveyComponent.Factory componentFactory = new SurveyComponent.Factory(context, restClient, localStorage, userInfo, executorSet, uriOpener, imageProvider);
+                SdkSession sdkSession = new SdkSession(this.context);
+                SurveyStarter surveyStarter = new SurveyStarter(context);
+
+                Cache<List<Survey>> cache = BuildConfig.DEBUG ?
+                        new NonWorkingCache<List<Survey>>() :
+                        new Cache<List<Survey>>(TimeProvider.DEFAULT, TimeUnit.HOURS.toMillis(1));
+                ApiConfig apiConfig = new ApiConfig();
+                SurveysRepository surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
+
+                SurveyDisplayQualifier surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new UserPropertiesMatcher(userInfo))
+                        .register(new UserIdentityMatcher(userInfo))
+                        .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
+                        .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
+                        .build();
+                
+                INSTANCE = new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier, userInfo, imageProvider, restClient, localStorage, executorSet);
+                QualarooLogger.info("Initialized QualarooSdk");
                 QualarooJobIntentService.start(context);
             } catch (InvalidCredentialsException e) {
                 INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
@@ -320,20 +286,44 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
-    }
 
-    private static class NonWorkingCache<T> extends Cache<T> {
-        NonWorkingCache() {
-            super(TimeProvider.DEFAULT, 0);
+        private OkHttpClient buildOkHttpClient() {
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            if (BuildConfig.DEBUG) {
+                final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                    @Override public void log(String message) {
+                        QualarooLogger.info(message);
+                    }
+                });
+                httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                builder.addInterceptor(httpLoggingInterceptor);
+            }
+            return builder.build();
         }
 
-        @Override public boolean isStale() {
-            return true;
+        private RestClient buildRestClient(OkHttpClient okHttpClient, Credentials credentials) {
+            final String authToken = okhttp3.Credentials.basic(credentials.apiKey(), credentials.apiSecret());
+            OkHttpClient.Builder builder = okHttpClient.newBuilder();
+            builder.addInterceptor(new Interceptor() {
+                @Override public Response intercept(Chain chain) throws IOException {
+                    Request request = chain.request().newBuilder()
+                            .header("Authorization", authToken)
+                            .build();
+                    return chain.proceed(request);
+                }
+            });
+            okHttpClient = builder.build();
+
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Language.class, new LanguageJsonDeserializer())
+                    .registerTypeAdapter(QuestionType.class, new QuestionTypeDeserializer())
+                    .registerTypeAdapter(MessageType.class, new MessageTypeDeserializer())
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .create();
+
+            return new RestClient(okHttpClient, gson);
         }
 
-        @Override public boolean isInvalid() {
-            return true;
-        }
     }
 
     private static class InvalidApiKeyQualarooSdk implements QualarooSdk {
@@ -342,11 +332,14 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
         InvalidApiKeyQualarooSdk(String providedApiKey) {
             this.providedApiKey = providedApiKey;
-            QualarooLogger.enableLogging();
             logErrorMessage();
         }
 
         @Override public void showSurvey(@NonNull String alias) {
+            logErrorMessage();
+        }
+
+        @Override public void showSurvey(@NonNull String alias, @NonNull SurveyOptions options) {
             logErrorMessage();
         }
 

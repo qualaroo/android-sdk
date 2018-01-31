@@ -102,7 +102,7 @@ class SurveyPresenterTest {
     fun `requests stopping survey on close clicked`() {
         presenter.onCloseClicked()
 
-        verify(interactor, times(1)).stopSurvey()
+        verify(interactor, times(1)).requestSurveyToStop()
     }
 
     @Test
@@ -164,7 +164,7 @@ class SurveyPresenterTest {
     fun `passes close requests to interactor`() {
         presenter.onCloseClicked()
 
-        verify(interactor, times(1)).stopSurvey()
+        verify(interactor, times(1)).requestSurveyToStop()
     }
 
     @Test

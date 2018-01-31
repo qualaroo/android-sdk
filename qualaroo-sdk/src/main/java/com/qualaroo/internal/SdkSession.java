@@ -9,7 +9,7 @@ import com.qualaroo.BuildConfig;
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
-public class SessionInfo {
+public class SdkSession {
 
     private static final String SDK_VERSION = BuildConfig.VERSION_NAME;
 
@@ -17,7 +17,7 @@ public class SessionInfo {
     private final String deviceType;
     private final String androidVersion;
 
-    public SessionInfo(Context context) {
+    public SdkSession(Context context) {
         this.appName = context.getPackageName();
         this.deviceType = Build.MODEL;
         this.androidVersion = String.valueOf(Build.VERSION.SDK_INT);

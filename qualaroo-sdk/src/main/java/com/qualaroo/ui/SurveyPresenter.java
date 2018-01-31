@@ -91,7 +91,7 @@ class SurveyPresenter {
     };
 
     void onCloseClicked() {
-        interactor.stopSurvey();
+        interactor.requestSurveyToStop();
     }
 
     void onMessageConfirmed(Message message) {
