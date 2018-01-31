@@ -101,6 +101,7 @@ task generateJavadoc(type: Javadoc) {
     include '**//*Qualaroo.java'
     include '**//*QualarooSdk.java'
     include '**//*QualarooSurveyEventReceiver.java'
+    include '**//*SurveyOptions.java'
 }
 
 task javadocJar(type: Jar, dependsOn: generateJavadoc) {
@@ -110,7 +111,11 @@ task javadocJar(type: Jar, dependsOn: generateJavadoc) {
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    include("**/QualarooSdk.java")
+    include(
+            "**/QualarooSdk.java",
+            "**/SurveyOptions.java",
+            "**/QualarooSurveyEventReceiver.java"
+    )
     classifier = 'sources'
 }
 
