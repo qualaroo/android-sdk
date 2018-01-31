@@ -1,3 +1,11 @@
+## 1.6.0
+**Features:**
+- support for observing surveys related events:
+  - show (start)
+  - dismiss
+  - finish
+- support for omitting survey's targeting checks
+
 ## 1.5.0
 **Features:**
 - support for freeform comments in radio and checkbox type questions

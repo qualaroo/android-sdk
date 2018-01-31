@@ -16,7 +16,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:1.5.0` dependency to your app's `build.gradle` file:
+Simply add the `com.qualaroo:qualaroo-sdk:1.6.0` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -25,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    compile 'com.qualaroo:qualaroo-sdk:1.5.0'
+    compile 'com.qualaroo:qualaroo-sdk:1.6.0'
 }
 ```
 ## Step 2. Code Integration
@@ -66,6 +66,33 @@ You can set preferred language that you want to use when displaying surveys.
 Qualaroo.getInstance().setPrefferedLanguage("fr");
 ```
 Language that you provide should be an ISO 639-1 compatible language code (two lowercase letters)
+
+#### Configure options for displaying survey
+```java
+//Omit targetting options
+SurveyOptions options = new SurveyOptions.Builder()
+            .ignoreSurveyTargeting(true)
+            .build();
+Qualaroo.getInstance().showSurvey("your_survey_alias", options);
+```
+
+#### Observe survey related events
+In order to be able to listen to events, you need to create your own implementation of `com.qualaroo.QualarooSurveyEventReceiver` class.
+
+To enable your receiver, register it in your `AndroidManifest.xml` file:
+```xml
+<application>
+    ...
+    <receiver 
+        android:name="com.example.MySurveyEventReceiver"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.qualaroo.event.ACTION_SURVEY_EVENT"/>
+        </intent-filter>
+    </receiver>
+</application> 
+```
+
 ## Debugging
 If you run into any issues while using the Android library, we recommend turning on logging to help you trace the issue. 
 You can do this by setting debug mode to true.
