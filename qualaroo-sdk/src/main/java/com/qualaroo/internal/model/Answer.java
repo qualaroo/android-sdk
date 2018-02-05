@@ -10,10 +10,10 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Answer implements Serializable {
-    private int id;
-    private String title;
-    private Node nextMap;
-    private String explainType;
+    private final int id;
+    private final String title;
+    private final Node nextMap;
+    private final String explainType;
 
     @VisibleForTesting Answer(int id, String title, @Nullable Node nextMap, @Nullable String explainType) {
         this.id = id;
@@ -22,8 +22,11 @@ public final class Answer implements Serializable {
         this.explainType = explainType;
     }
 
-    @SuppressWarnings("unused") Answer() {
-        //deserializing with gson requires a default constructor
+    @SuppressWarnings("unused") private Answer() {
+        this.id = 0;
+        this.title = null;
+        this.nextMap = null;
+        this.explainType = null;
     }
 
     public int id() {
