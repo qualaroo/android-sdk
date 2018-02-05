@@ -1,6 +1,7 @@
 package com.qualaroo.internal;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.model.Language;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public class UserPropertiesInjector extends SurveySpecMatcher {
 
     private static final Pattern USER_PROPERTY_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
@@ -52,138 +54,166 @@ public class UserPropertiesInjector extends SurveySpecMatcher {
         return survey.copy(spec);
     }
 
-    private List<Question> injectQuestions(List<Question> questions, Map<String, String> userProperties) {
-        List<Question> result = new ArrayList<>(questions.size());
-        for (Question question : questions) {
-            String title = question.title();
-            Matcher matcher = propertyMatcher(title);
-            while (matcher.find()) {
-                String key = matcher.group(1);
-                title = title.replace(matcher.group(), getUserPropertySafely(userProperties, key));
+    private List<QScreen> injectQscreens(List<QScreen> qScreens, Map<String, String> userProperties) {
+        return injectDescriptions(qScreens, userProperties, new TextExtractor<QScreen>() {
+            @Nullable @Override public String getText(QScreen qScreen) {
+                return qScreen.description();
             }
-            String description = question.description();
-            matcher = propertyMatcher(description);
-            while (matcher.find()) {
-                String key = matcher.group(1);
-                description = description.replace(matcher.group(), getUserPropertySafely(userProperties, key));
+        }, new ContentConverter<QScreen>() {
+            @Override public QScreen replace(QScreen item, String... args) {
+                return item.copy(args[0]);
             }
-            result.add(question.copy(title, description));
-        }
-        return result;
+        });
     }
 
     private List<Message> injectMessages(List<Message> messages, Map<String, String> userProperties) {
-        List<Message> result = new ArrayList<>(messages.size());
-        for (Message message : messages) {
-            String description = message.description();
-            Matcher matcher = propertyMatcher(description);
-            while (matcher.find()) {
-                String key = matcher.group(1);
-                description = description.replace(matcher.group(), getUserPropertySafely(userProperties, key));
+        return injectDescriptions(messages, userProperties, new TextExtractor<Message>() {
+            @Nullable @Override public String getText(Message message) {
+                return message.description();
             }
-            result.add(message.copy(description));
+        }, new ContentConverter<Message>() {
+            @Override public Message replace(Message item, String... args) {
+                return item.copy(args[0]);
+            }
+        });
+    }
+
+    private List<Question> injectQuestions(final List<Question> questions, Map<String, String> userProperties) {
+        return injectTitlesAndDescriptions(questions, userProperties, new TextExtractor<Question>() {
+            @Nullable @Override public String getText(Question question) {
+                return question.title();
+            }
+        }, new TextExtractor<Question>() {
+            @Nullable @Override public String getText(Question question) {
+                return question.description();
+            }
+        }, new ContentConverter<Question>() {
+            @Override public Question replace(Question item, String... args) {
+                return item.copy(args[0], args[1]);
+            }
+        });
+    }
+
+    private <T> List<T> injectDescriptions(List<T> origin, Map<String, String> userProperties,
+                                           TextExtractor<T> descriptionExtractor, ContentConverter<T> converter) {
+        List<T> result = new ArrayList<>(origin.size());
+        for (T item : origin) {
+            String description = fillWithUserProperties(userProperties, descriptionExtractor, item);
+            result.add(converter.replace(item, description));
         }
         return result;
     }
 
-    private List<QScreen> injectQscreens(List<QScreen> qScreens, Map<String, String> userProperties) {
-        List<QScreen> result = new ArrayList<>(qScreens.size());
-        for (QScreen qScreen: qScreens) {
-            String description = qScreen.description();
-            Matcher matcher = propertyMatcher(description);
-            while (matcher.find()) {
-                String key = matcher.group(1);
-                description = description.replace(matcher.group(), getUserPropertySafely(userProperties, key));
-            }
-            result.add(qScreen.copy(description));
+    private <T> List<T> injectTitlesAndDescriptions(List<T> origin, Map<String, String> userProperties,
+                                                    TextExtractor<T> titleExtractor,
+                                                    TextExtractor<T> descriptionExtractor,
+                                                    ContentConverter<T> converter) {
+        List<T> result = new ArrayList<>(origin.size());
+        for (T item : origin) {
+            String title = fillWithUserProperties(userProperties, titleExtractor, item);
+            String description = fillWithUserProperties(userProperties, descriptionExtractor, item);
+            result.add(converter.replace(item, title, description));
         }
         return result;
     }
 
-    private String getUserPropertySafely(Map<String, String> userProperties, String key) {
-        String value = userProperties.get(key);
-        if (value == null) {
-            return "";
+    private <T> String fillWithUserProperties(Map<String, String> userProperties,
+                                              TextExtractor<T> textExtractor, T item) {
+        String text = textExtractor.getText(item);
+        Matcher matcher = propertyMatcher(text);
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            text = replaceText(text, matcher.group(), userProperties.get(key));
         }
-        return value;
+        return text;
     }
 
-    @Override boolean matches(Survey survey) {
-        Set<String> userPropertyKeys = userInfo.getUserProperties().keySet();
-        return allQuestionsMatch(survey.spec().questionList(), userPropertyKeys)
-                && allMessagesMatch(survey.spec().msgScreenList(), userPropertyKeys)
-                && allQscreensMatch(survey.spec().qscreenList(), userPropertyKeys);
-    }
-
-    private boolean allMessagesMatch(Map<Language, List<Message>> messagesMap, Set<String> userPropertyKeys) {
-        for (Map.Entry<Language, List<Message>> languageListEntry : messagesMap.entrySet()) {
-            List<Message> messages = languageListEntry.getValue();
-            for (Message message : messages) {
-                Matcher matcher = propertyMatcher(message.description());
-                while (matcher.find()) {
-                    String key = matcher.group(1);
-                    if (!userPropertyKeys.contains(key)) {
-                        reportMissingProperty(key);
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean allQuestionsMatch(Map<Language, List<Question>> questionsMap, Set<String> userPropertyKeys) {
-        for (Map.Entry<Language, List<Question>> languageListEntry : questionsMap.entrySet()) {
-            List<Question> questions = languageListEntry.getValue();
-            for (Question question : questions) {
-                Matcher matcher = propertyMatcher(question.title());
-                while (matcher.find()) {
-                    String key = matcher.group(1);
-                    if (!userPropertyKeys.contains(key)) {
-                        reportMissingProperty(key);
-                        return false;
-                    }
-                }
-                matcher = propertyMatcher(question.description());
-                while (matcher.find()) {
-                    String key = matcher.group(1);
-                    if (!userPropertyKeys.contains(key)) {
-                        reportMissingProperty(key);
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean allQscreensMatch(Map<Language, List<QScreen>> qScreensMap, Set<String> userPropertyKeys) {
-        for (Map.Entry<Language, List<QScreen>> languageListEntry : qScreensMap.entrySet()) {
-            List<QScreen> qScreens = languageListEntry.getValue();
-            for (QScreen qScreen: qScreens) {
-                Matcher matcher = propertyMatcher(qScreen.description());
-                while (matcher.find()) {
-                    String key = matcher.group(1);
-                    if (!userPropertyKeys.contains(key)) {
-                        reportMissingProperty(key);
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private Matcher propertyMatcher(@Nullable String text) {
+    private static Matcher propertyMatcher(@Nullable String text) {
         if (text == null) {
             return USER_PROPERTY_PATTERN.matcher("");
         }
         return USER_PROPERTY_PATTERN.matcher(text);
     }
 
-    private void reportMissingProperty(String property) {
-        QualarooLogger.debug("%s property is not set", property);
+    private static String replaceText(String origin, String target, @Nullable String replacement) {
+        if (replacement == null) {
+            return origin.replace(target, "");
+        }
+        return origin.replace(target, replacement);
     }
 
+    @Override boolean matches(Survey survey) {
+        return new SpecMatcher(userInfo).matches(survey);
+    }
 
+    private interface TextExtractor<T> {
+        @Nullable String getText(T t);
+    }
+
+    private interface ContentConverter<T> {
+        T replace(T item, String... args);
+    }
+
+    private static class SpecMatcher extends SurveySpecMatcher {
+
+        private final UserInfo userInfo;
+
+        SpecMatcher(UserInfo userInfo) {
+            this.userInfo = userInfo;
+        }
+
+        @Override boolean matches(Survey survey) {
+            Set<String> userPropertyKeys = userInfo.getUserProperties().keySet();
+            return matchesQuestions(survey, userPropertyKeys)
+                    && matchesMessages(survey, userPropertyKeys)
+                    && matchesQscreens(survey, userPropertyKeys);
+        }
+
+        private boolean matchesQuestions(Survey survey, Set<String> userPropertyKeys) {
+            return matches(survey.spec().questionList(), userPropertyKeys, new TextExtractor<Question>() {
+                @Override public String getText(Question question) {
+                    return question.title() + " " + question.description();
+                }
+            });
+        }
+
+        private boolean matchesMessages(Survey survey, Set<String> userPropertyKeys) {
+            return matches(survey.spec().msgScreenList(), userPropertyKeys, new TextExtractor<Message>() {
+                @Override public String getText(Message message) {
+                    return message.description();
+                }
+            });
+        }
+
+        private boolean matchesQscreens(Survey survey, Set<String> userPropertyKeys) {
+            return matches(survey.spec().qscreenList(), userPropertyKeys, new TextExtractor<QScreen>() {
+                @Nullable @Override public String getText(QScreen qScreen) {
+                    return qScreen.description();
+                }
+            });
+        }
+
+        private <T> boolean matches(Map<Language, List<T>> itemsMap, Set<String> userPropertyKeys,
+                                    TextExtractor<T> textExtractor) {
+            for (Map.Entry<Language, List<T>> languageListEntry : itemsMap.entrySet()) {
+                List<T> items = languageListEntry.getValue();
+                for (T item : items) {
+                    String text = textExtractor.getText(item);
+                    Matcher matcher = propertyMatcher(text);
+                    while (matcher.find()) {
+                        String key = matcher.group(1);
+                        if (!userPropertyKeys.contains(key)) {
+                            reportMissingProperty(key);
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static void reportMissingProperty(String property) {
+            QualarooLogger.debug("%s property is not set", property);
+        }
+    }
 }
