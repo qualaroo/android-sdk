@@ -13,12 +13,12 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Survey implements Serializable {
-    private int id;
-    private String name;
-    private String canonicalName;
-    private boolean active;
-    private Spec spec;
-    private String type;
+    private final int id;
+    private final String name;
+    private final String canonicalName;
+    private final boolean active;
+    private final Spec spec;
+    private final String type;
 
     @VisibleForTesting Survey(int id, String name, String canonicalName, boolean active, Spec spec, String type) {
         this.id = id;
@@ -29,8 +29,13 @@ public final class Survey implements Serializable {
         this.type = type;
     }
 
-    @SuppressWarnings("unused") Survey() {
-        //deserializing with gson requires a default constructor
+    @SuppressWarnings("unused") private Survey() {
+        this.id = 0;
+        this.name = null;
+        this.canonicalName = null;
+        this.active = false;
+        this.spec = null;
+        this.type = null;
     }
 
     public int id() {
@@ -57,6 +62,10 @@ public final class Survey implements Serializable {
         return type;
     }
 
+    public Survey copy(Spec spec) {
+        return new Survey(id, name, canonicalName, active, spec, type);
+    }
+
     @Override public String toString() {
         return String.format(Locale.ROOT, "%s (%d)", name, id);
     }
@@ -75,13 +84,13 @@ public final class Survey implements Serializable {
     }
 
     public static final class Spec implements Serializable {
-        private RequireMap requireMap;
-        private OptionMap optionMap;
-        private Map<Language, List<Question>> questionList;
-        private Map<Language, List<Message>> msgScreenList;
-        private Map<Language, List<QScreen>> qscreenList;
-        private Map<Language, Node> startMap;
-        private List<Language> surveyVariations;
+        private final RequireMap requireMap;
+        private final OptionMap optionMap;
+        private final Map<Language, List<Question>> questionList;
+        private final Map<Language, List<Message>> msgScreenList;
+        private final Map<Language, List<QScreen>> qscreenList;
+        private final Map<Language, Node> startMap;
+        private final List<Language> surveyVariations;
 
         public RequireMap requireMap() {
             return requireMap;
@@ -111,7 +120,9 @@ public final class Survey implements Serializable {
             return optionMap;
         }
 
-        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, List<QScreen>> qscreenList, Map<Language, Node> startMap, List<Language> surveyVariations) {
+        @VisibleForTesting Spec(RequireMap requireMap, OptionMap optionMap, Map<Language, List<Question>> questionList,
+                                Map<Language, List<Message>> msgScreenList, Map<Language, List<QScreen>> qscreenList,
+                                Map<Language, Node> startMap, List<Language> surveyVariations) {
             this.requireMap = requireMap;
             this.optionMap = optionMap;
             this.questionList = questionList;
@@ -121,19 +132,29 @@ public final class Survey implements Serializable {
             this.surveyVariations = surveyVariations;
         }
 
-        @SuppressWarnings("unused") Spec() {
-            //deserializing with gson requires a default constructor
+        @SuppressWarnings("unused") private Spec() {
+            this.requireMap = null;
+            this.optionMap = null;
+            this.questionList = null;
+            this.msgScreenList = null;
+            this.qscreenList = null;
+            this.startMap = null;
+            this.surveyVariations = null;
+        }
+
+        public Spec copy(Map<Language, List<Question>> questionList, Map<Language, List<Message>> msgScreenList, Map<Language, List<QScreen>> qscreenList) {
+            return new Spec(requireMap, optionMap, questionList, msgScreenList, qscreenList, startMap, surveyVariations);
         }
     }
 
     public static final class RequireMap implements Serializable {
-        private List<String> deviceTypeList;
-        private boolean isPersistent;
-        private boolean isOneShot;
-        private String customMap;
+        private final List<String> deviceTypeList;
+        private final boolean isPersistent;
+        private final boolean isOneShot;
+        private final String customMap;
         //whether identity of the user should be known or not
-        private String wantUserStr;
-        private Integer samplePercent;
+        private final String wantUserStr;
+        private final Integer samplePercent;
 
         public String wantUserStr() {
             return wantUserStr;
@@ -159,7 +180,8 @@ public final class Survey implements Serializable {
             return samplePercent;
         }
 
-        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot, String customMap, String wantUserStr, Integer samplePercent) {
+        @VisibleForTesting RequireMap(List<String> deviceTypeList, boolean isPersistent, boolean isOneShot,
+                                      String customMap, String wantUserStr, Integer samplePercent) {
             this.deviceTypeList = deviceTypeList;
             this.isPersistent = isPersistent;
             this.isOneShot = isOneShot;
@@ -168,16 +190,21 @@ public final class Survey implements Serializable {
             this.samplePercent = samplePercent;
         }
 
-        RequireMap() {
-            //deserializing with gson requires a default constructor
+        @SuppressWarnings("unused") private RequireMap() {
+            this.deviceTypeList = null;
+            this.isPersistent = false;
+            this.isOneShot = false;
+            this.customMap = null;
+            this.wantUserStr = null;
+            this.samplePercent = null;
         }
     }
 
     public static final class OptionMap implements Serializable {
-        private ColorThemeMap colorThemeMap;
-        private boolean mandatory;
-        private boolean showFullScreen;
-        private String logoUrl;
+        private final ColorThemeMap colorThemeMap;
+        private final boolean mandatory;
+        private final boolean showFullScreen;
+        private final String logoUrl;
 
         public ColorThemeMap colorThemeMap() {
             return colorThemeMap;
@@ -195,15 +222,19 @@ public final class Survey implements Serializable {
             return logoUrl;
         }
 
-        @VisibleForTesting OptionMap(ColorThemeMap colorThemeMap, boolean mandatory, boolean showFullScreen, String logoUrl) {
+        @VisibleForTesting OptionMap(ColorThemeMap colorThemeMap, boolean mandatory, boolean showFullScreen,
+                                     String logoUrl) {
             this.colorThemeMap = colorThemeMap;
             this.mandatory = mandatory;
             this.showFullScreen = showFullScreen;
             this.logoUrl = logoUrl;
         }
 
-        OptionMap() {
-            //deserializing with gson requires a default constructor
+        @SuppressWarnings("unused") private OptionMap() {
+            this.colorThemeMap = null;
+            this.mandatory = false;
+            this.showFullScreen = false;
+            this.logoUrl = null;
         }
     }
 

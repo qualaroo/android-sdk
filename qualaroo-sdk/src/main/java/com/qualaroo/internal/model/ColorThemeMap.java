@@ -10,16 +10,16 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 @RestrictTo(LIBRARY)
 public final class ColorThemeMap implements Serializable {
 
-    private String backgroundColor;
-    private String dimType;
-    private String textColor;
-    @Deprecated private String buttonTextColor;
-    private String buttonEnabledColor;
-    private String buttonDisabledColor;
-    private String buttonTextEnabled;
-    private String buttonTextDisabled;
-    private String uiNormal;
-    private String uiSelected;
+    private final String backgroundColor;
+    private final String dimType;
+    private final String textColor;
+    @Deprecated private final String buttonTextColor;
+    private final String buttonEnabledColor;
+    private final String buttonDisabledColor;
+    private final String buttonTextEnabled;
+    private final String buttonTextDisabled;
+    private final String uiNormal;
+    private final String uiSelected;
 
     public String dimType() {
         return dimType;
@@ -61,7 +61,15 @@ public final class ColorThemeMap implements Serializable {
         return buttonTextColor;
     }
 
-    @VisibleForTesting ColorThemeMap(String backgroundColor, String dimType, String textColor, String buttonEnabledColor, String buttonDisabledColor, String buttonTextEnabled, String buttonTextDisabled, String uiNormal, String uiSelected) {
+    @VisibleForTesting ColorThemeMap(String backgroundColor,
+                                     String dimType,
+                                     String textColor,
+                                     String buttonEnabledColor,
+                                     String buttonDisabledColor,
+                                     String buttonTextEnabled,
+                                     String buttonTextDisabled,
+                                     String uiNormal,
+                                     String uiSelected) {
         this.backgroundColor = backgroundColor;
         this.dimType = dimType;
         this.textColor = textColor;
@@ -71,9 +79,19 @@ public final class ColorThemeMap implements Serializable {
         this.buttonTextDisabled = buttonTextDisabled;
         this.uiNormal = uiNormal;
         this.uiSelected = uiSelected;
+        this.buttonTextColor = null;
     }
 
-    ColorThemeMap() {
-
+    @SuppressWarnings("unused") private ColorThemeMap() {
+        this.backgroundColor = null;
+        this.dimType = null;
+        this.textColor = null;
+        this.buttonEnabledColor = null;
+        this.buttonDisabledColor = null;
+        this.buttonTextEnabled = null;
+        this.buttonTextDisabled = null;
+        this.uiNormal = null;
+        this.uiSelected = null;
+        this.buttonTextColor = null;
     }
 }

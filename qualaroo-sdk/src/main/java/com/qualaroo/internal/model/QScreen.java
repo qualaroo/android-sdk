@@ -8,11 +8,11 @@ import java.util.List;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class QScreen implements Serializable{
-    private long id;
-    private List<Long> questionList;
-    private String description;
-    private String sendText;
-    private Node nextMap;
+    private final long id;
+    private final List<Long> questionList;
+    private final String description;
+    private final String sendText;
+    private final Node nextMap;
 
     @VisibleForTesting QScreen(long id, List<Long> questionList, String description, String sendText, Node nextMap) {
         this.id = id;
@@ -22,8 +22,12 @@ public final class QScreen implements Serializable{
         this.nextMap = nextMap;
     }
 
-    @SuppressWarnings("unused") QScreen() {
-
+    @SuppressWarnings("unused") private QScreen() {
+        this.id = 0;
+        this.questionList = null;
+        this.description = null;
+        this.sendText = null;
+        this.nextMap = null;
     }
 
     public long id() {
@@ -44,6 +48,10 @@ public final class QScreen implements Serializable{
 
     public Node nextMap() {
         return nextMap;
+    }
+
+    public QScreen copy(String description) {
+        return new QScreen(id, questionList, description, sendText, nextMap);
     }
 
     @Override public boolean equals(Object o) {
