@@ -1,6 +1,7 @@
 package com.qualaroo.internal.model;
 
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -11,24 +12,27 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Question implements Serializable {
-    private long id;
-    private QuestionType type;
-    private String title;
-    private String description;
-    private String descriptionPlacement;
-    private List<Answer> answerList;
-    private String sendText;
-    private Node nextMap;
-    private String npsMinLabel;
-    private String npsMaxLabel;
-    private String cname;
-    private boolean disableRandom;
-    private boolean anchorLast;
-    private int anchorLastCount;
-    private boolean alwaysShowSend;
-    private boolean isRequired;
+    private final long id;
+    private final QuestionType type;
+    private final String title;
+    @Nullable private final String description;
+    private final String descriptionPlacement;
+    private final List<Answer> answerList;
+    private final String sendText;
+    private final Node nextMap;
+    private final String npsMinLabel;
+    private final String npsMaxLabel;
+    private final String cname;
+    private final boolean disableRandom;
+    private final boolean anchorLast;
+    private final int anchorLastCount;
+    private final boolean alwaysShowSend;
+    private final boolean isRequired;
 
-    @VisibleForTesting Question(long id, QuestionType type, String title, String description, String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap, String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom, boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
+    @VisibleForTesting Question(long id, QuestionType type, String title, String description,
+                                String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap,
+                                String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom,
+                                boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -47,8 +51,23 @@ public final class Question implements Serializable {
         this.cname = cname;
     }
 
-    Question() {
-        //deserializing with gson requires a default constructor
+    @SuppressWarnings("unused") private Question() {
+        this.id = 0;
+        this.type = null;
+        this.title = null;
+        this.description = null;
+        this.descriptionPlacement = null;
+        this.answerList = null;
+        this.sendText = null;
+        this.nextMap = null;
+        this.npsMinLabel = null;
+        this.npsMaxLabel = null;
+        this.disableRandom = false;
+        this.anchorLast = false;
+        this.anchorLastCount = 0;
+        this.alwaysShowSend = false;
+        this.isRequired = false;
+        this.cname = null;
     }
 
     public long id() {
@@ -63,7 +82,7 @@ public final class Question implements Serializable {
         return title;
     }
 
-    public String description() {
+    @Nullable public String description() {
         return description;
     }
 
@@ -115,26 +134,16 @@ public final class Question implements Serializable {
         return isRequired;
     }
 
-    public Question mutateWith(List<Answer> answerList) {
-        Question mutated = new Question();
-        mutated.id = id;
-        mutated.type = type;
-        mutated.title = title;
-        mutated.description = description;
-        mutated.descriptionPlacement = descriptionPlacement;
-        mutated.answerList = answerList;
-        mutated.sendText = sendText;
-        mutated.nextMap = nextMap;
-        mutated.npsMinLabel = npsMinLabel;
-        mutated.npsMaxLabel = npsMaxLabel;
-        mutated.cname = cname;
-        mutated.disableRandom = disableRandom;
-        mutated.anchorLast = anchorLast;
-        mutated.alwaysShowSend = alwaysShowSend;
-        mutated.isRequired = isRequired;
-        mutated.cname = cname;
-        mutated.anchorLastCount = anchorLastCount;
-        return mutated;
+    public Question copy(List<Answer> answerList) {
+        return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
+                            npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
+                            isRequired);
+    }
+
+    public Question copy(String title, String description) {
+        return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
+                            npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
+                            isRequired);
     }
 
     @Override public boolean equals(Object o) {

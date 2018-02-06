@@ -4,7 +4,9 @@ import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ImageProvider
 import com.qualaroo.internal.SurveyDisplayQualifier
 import com.qualaroo.internal.UserInfo
+import com.qualaroo.internal.UserPropertiesInjector
 import com.qualaroo.internal.executor.ExecutorSet
+import com.qualaroo.internal.model.Survey
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.network.RestClient
 import com.qualaroo.internal.network.SurveysRepository
@@ -27,6 +29,9 @@ class QualarooTest {
     val userInfo = UserInfo(InMemorySettings(), InMemoryLocalStorage())
     val imageProvider = mock<ImageProvider>()
     val restClient = mock<RestClient>()
+    val userPropertiesInjector = mock<UserPropertiesInjector> {
+        on { injectCustomProperties(any(), any()) } doAnswer { it.arguments[0] as Survey }
+    }
     val qualaroo = Qualaroo(
             surveyComponentFactory,
             surveysRepository,
@@ -36,7 +41,8 @@ class QualarooTest {
             imageProvider,
             restClient,
             InMemoryLocalStorage(),
-            CurrentThreadExecutorSet()
+            CurrentThreadExecutorSet(),
+            userPropertiesInjector
     )
 
     @Test
@@ -109,6 +115,20 @@ class QualarooTest {
         qualaroo.removeUserProperty("second")
         assertEquals("firstValue", userInfo.userProperties["first"])
         assertNull(userInfo.userProperties["second"])
+    }
+
+    @Test
+    fun `runs user property injector`() {
+        whenever(surveysRepository.surveys).thenReturn(listOf(survey(id = 1, canonicalName = "mySurvey")))
+        whenever(userPropertiesInjector.injectCustomProperties(eq(survey(id = 1)), any())).thenReturn(survey(id = 111, canonicalName = "injected_survey"))
+
+        qualaroo.showSurvey("mySurvey")
+
+        val surveyCaptor = argumentCaptor<Survey>()
+        verify(surveyStarter).start(surveyCaptor.capture())
+
+        assertEquals(111, surveyCaptor.firstValue.id())
+        assertEquals("injected_survey", surveyCaptor.firstValue.canonicalName())
     }
 
     private class CurrentThreadExecutorSet : ExecutorSet(

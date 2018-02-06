@@ -10,10 +10,10 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Message implements Serializable {
-    private long id;
-    private MessageType type;
-    private String description;
-    private CtaMap ctaMap;
+    private final long id;
+    private final MessageType type;
+    private final String description;
+    private final CtaMap ctaMap;
 
     @VisibleForTesting Message(long id, MessageType type, String description, CtaMap ctaMap) {
         this.id = id;
@@ -22,8 +22,11 @@ public final class Message implements Serializable {
         this.ctaMap = ctaMap;
     }
 
-    Message() {
-
+    @SuppressWarnings("unused") private Message() {
+        this.id = 0;
+        this.type = null;
+        this.description = null;
+        this.ctaMap = null;
     }
 
     public long id() {
@@ -42,6 +45,10 @@ public final class Message implements Serializable {
         return ctaMap;
     }
 
+    public Message copy(String description) {
+        return new Message(id, type, description, ctaMap);
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -57,8 +64,8 @@ public final class Message implements Serializable {
     }
 
     public static class CtaMap implements Serializable{
-        private String text;
-        private String uri;
+        private final String text;
+        private final String uri;
 
         @Nullable public String text() {
             return text;
@@ -73,8 +80,9 @@ public final class Message implements Serializable {
             this.uri = uri;
         }
 
-        CtaMap() {
-
+        @SuppressWarnings("unused") private CtaMap() {
+            this.text = null;
+            this.uri = null;
         }
     }
 }
