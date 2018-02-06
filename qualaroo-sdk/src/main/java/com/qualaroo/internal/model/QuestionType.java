@@ -12,6 +12,7 @@ public enum QuestionType {
     TEXT("text"),
     TEXT_SINGLE("text_single"),
     DROPDOWN("dropdown"),
+    BINARY("binary"),
     UNKNOWN("-1");
 
     private final String value;
