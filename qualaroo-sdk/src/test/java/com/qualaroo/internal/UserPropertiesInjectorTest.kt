@@ -8,9 +8,7 @@ import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import com.qualaroo.util.InMemorySettings
-import org.junit.Assert
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 @Suppress("IllegalIdentifier", "MemberVisibilityCanBePrivate")
@@ -28,7 +26,9 @@ class UserPropertiesInjectorTest {
                                 language("en") to listOf(
                                         question(id = 1, title = "Hello \${name}", description = "This is your last name: \${last_name}"),
                                         question(id = 2, title = "Are you still there \${name} \${last_name}?"),
-                                        question(id = 3, title = "\${name}? Are you still there, \${name}?")
+                                        question(id = 3, title = "\${name}? Are you still there, \${name}?"),
+                                        question(id = 4, title = "No custom properties here"),
+                                        question(id = 5, title = "\${missing_property} <- this?")
                                 )
                         )
                 )
@@ -40,10 +40,12 @@ class UserPropertiesInjectorTest {
         val result = injector.injectCustomProperties(survey, language("en"))
 
         val questions = result.spec().questionList()[language("en")]!!
-        Assert.assertEquals("Hello Adam", questions[0].title())
-        Assert.assertEquals("This is your last name: Tester", questions[0].description())
-        Assert.assertEquals("Are you still there Adam Tester?", questions[1].title())
-        Assert.assertEquals("Adam? Are you still there, Adam?", questions[2].title())
+        assertEquals("Hello Adam", questions[0].title())
+        assertEquals("This is your last name: Tester", questions[0].description())
+        assertEquals("Are you still there Adam Tester?", questions[1].title())
+        assertEquals("Adam? Are you still there, Adam?", questions[2].title())
+        assertEquals("No custom properties here", questions[3].title())
+        assertEquals(" <- this?", questions[4].title())
     }
 
     @Test
@@ -55,7 +57,9 @@ class UserPropertiesInjectorTest {
                                 language("en") to listOf(
                                         message(id = 1, description = "Hello \${name}"),
                                         message(id = 2, description = "Are you still there \${name} \${last_name}?"),
-                                        message(id = 3, description = "\${name}? Are you still there, \${name}?")
+                                        message(id = 3, description = "\${name}? Are you still there, \${name}?"),
+                                        message(id = 4, description = "No custom properties here?"),
+                                        message(id = 5, description = "\${missing_property} <- this?")
                                 )
                         )
                 )
@@ -67,9 +71,11 @@ class UserPropertiesInjectorTest {
         val result = injector.injectCustomProperties(survey, language("en"))
 
         val messages = result.spec().msgScreenList()[language("en")]!!
-        Assert.assertEquals("Hello Adam", messages[0].description())
-        Assert.assertEquals("Are you still there Adam Tester?", messages[1].description())
-        Assert.assertEquals("Adam? Are you still there, Adam?", messages[2].description())
+        assertEquals("Hello Adam", messages[0].description())
+        assertEquals("Are you still there Adam Tester?", messages[1].description())
+        assertEquals("Adam? Are you still there, Adam?", messages[2].description())
+        assertEquals("No custom properties here?", messages[3].description())
+        assertEquals(" <- this?", messages[4].description())
     }
 
     @Test
@@ -81,7 +87,9 @@ class UserPropertiesInjectorTest {
                                 language("en") to listOf(
                                         qscreen(id = 1, description = "Hello \${name}"),
                                         qscreen(id = 2, description = "Are you still there \${name} \${last_name}?"),
-                                        qscreen(id = 3, description = "\${name}? Are you still there, \${name}?")
+                                        qscreen(id = 3, description = "\${name}? Are you still there, \${name}?"),
+                                        qscreen(id = 4, description = "No custom properties here?"),
+                                        qscreen(id = 5, description = "\${missing_property} <- this?")
                                 )
                         )
                 )
@@ -93,9 +101,11 @@ class UserPropertiesInjectorTest {
         val result = injector.injectCustomProperties(survey, language("en"))
 
         val qscreens = result.spec().qscreenList()[language("en")]!!
-        Assert.assertEquals("Hello Adam", qscreens[0].description())
-        Assert.assertEquals("Are you still there Adam Tester?", qscreens[1].description())
-        Assert.assertEquals("Adam? Are you still there, Adam?", qscreens[2].description())
+        assertEquals("Hello Adam", qscreens[0].description())
+        assertEquals("Are you still there Adam Tester?", qscreens[1].description())
+        assertEquals("Adam? Are you still there, Adam?", qscreens[2].description())
+        assertEquals("No custom properties here?", qscreens[3].description())
+        assertEquals(" <- this?", qscreens[4].description())
     }
 
     @Test
