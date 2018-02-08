@@ -163,7 +163,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 }
                 if (surveyToDisplay != null) {
                     boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
-                    if (shouldShowSurvey || options.ignoreTargeting()) {
+                    boolean canInjectProperties = userPropertiesInjector.canInjectAllProperties(surveyToDisplay);
+                    if (canInjectProperties && (shouldShowSurvey || options.ignoreTargeting())) {
                         QualarooLogger.debug("Displaying survey " + alias);
                         final Survey finalSurveyToDisplay =
                                 userPropertiesInjector.injectCustomProperties(surveyToDisplay, preferredLanguage);
@@ -295,7 +296,6 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .register(new UserIdentityMatcher(userInfo))
                         .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
                         .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
-                        .register(userPropertiesInjector)
                         .build();
 
                 return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,

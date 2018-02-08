@@ -29,9 +29,7 @@ class QualarooTest {
     val userInfo = UserInfo(InMemorySettings(), InMemoryLocalStorage())
     val imageProvider = mock<ImageProvider>()
     val restClient = mock<RestClient>()
-    val userPropertiesInjector = mock<UserPropertiesInjector> {
-        on { injectCustomProperties(any(), any()) } doAnswer { it.arguments[0] as Survey }
-    }
+    val userPropertiesInjector = spy(UserPropertiesInjector(UserInfo(InMemorySettings(), InMemoryLocalStorage())))
     val qualaroo = Qualaroo(
             surveyComponentFactory,
             surveysRepository,
