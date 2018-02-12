@@ -49,7 +49,6 @@ public interface QualarooSdk {
         /**
          * Sets an API key.
          * You are required to set a key to be able to work with the SDK.
-         * @throws com.qualaroo.internal.InvalidCredentialsException on malformed or invalid key
          * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
          */
         Builder setApiKey(String apiKey);
