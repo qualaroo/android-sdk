@@ -95,6 +95,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         return INSTANCE;
     }
 
+    private static void setSharedInstance(QualarooSdk qualarooSdk) {
+        if (INSTANCE == null) {
+            INSTANCE = qualarooSdk;
+        }
+    }
+
     private static QualarooSdk INSTANCE;
 
     private final LocalStorage localStorage;
@@ -252,6 +258,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             if (INSTANCE != null) {
                 return;
             }
+            setSharedInstance(createInstance());
+            QualarooLogger.info("Initialized QualarooSdk");
+            QualarooJobIntentService.start(context);
+        }
+
+        @SuppressWarnings("WeakerAccess") public QualarooSdk createInstance() {
             try {
                 if (debugMode) {
                     QualarooLogger.setDebugMode();
@@ -286,16 +298,14 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .register(userPropertiesInjector)
                         .build();
 
-                INSTANCE = new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
+                return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
                                         userInfo, imageProvider, restClient, localStorage, executorSet,
                                         userPropertiesInjector);
-                QualarooLogger.info("Initialized QualarooSdk");
-                QualarooJobIntentService.start(context);
             } catch (InvalidCredentialsException e) {
-                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
+                return new InvalidApiKeyQualarooSdk(apiKey);
             } catch (Exception e) {
                 //TODO: this is unexpected and might be an OS bug, log this event in our own company's bug tracker
-                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
+                return new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
 
