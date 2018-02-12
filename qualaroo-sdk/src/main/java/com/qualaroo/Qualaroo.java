@@ -69,7 +69,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
      * @param context application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    @SuppressWarnings({"WeakerAccess", "unused"}) public static Builder initializeWith(Context context) {
+    @SuppressWarnings({"WeakerAccess", "unused"}) public static QualarooSdk.Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
