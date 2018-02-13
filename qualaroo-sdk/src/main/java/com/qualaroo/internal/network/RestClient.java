@@ -12,6 +12,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -35,10 +36,11 @@ public class RestClient {
             if (!response.isSuccessful()) {
                 return Result.error(new HttpException(response.code()));
             }
-            if (response.body() != null) {
-                return Result.of(gson.fromJson(response.body().string(), resultClass));
-            } else {
-                return Result.of(gson.fromJson("", resultClass));
+            ResponseBody body = response.body();
+            try {
+                return Result.of(gson.fromJson(body.charStream(), resultClass));
+            } finally {
+                body.close();
             }
         } catch (IOException e) {
             return Result.error(e);
