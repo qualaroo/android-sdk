@@ -8,11 +8,9 @@ import com.qualaroo.internal.storage.LocalStorage;
 public class SurveyStatusMatcher extends SurveySpecMatcher {
 
     private final LocalStorage localStorage;
-    private final TimeMatcher timeMatcher;
 
-    public SurveyStatusMatcher(LocalStorage localStorage, TimeMatcher timeMatcher) {
+    public SurveyStatusMatcher(LocalStorage localStorage) {
         this.localStorage = localStorage;
-        this.timeMatcher = timeMatcher;
     }
 
     @Override boolean matches(Survey survey) {
@@ -24,11 +22,6 @@ public class SurveyStatusMatcher extends SurveySpecMatcher {
 
         if (survey.spec().requireMap().isOneShot() && status.hasBeenSeen()) {
             QualarooLogger.debug("Survey %1$s has already been seen", survey.canonicalName());
-            return false;
-        }
-
-        if (!timeMatcher.enoughTimePassedFrom(status.seenAtInMillis())) {
-            QualarooLogger.debug("Survey %1$s cannot be shown yet.", survey.canonicalName());
             return false;
         }
 

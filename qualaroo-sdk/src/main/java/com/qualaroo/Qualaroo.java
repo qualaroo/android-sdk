@@ -16,6 +16,7 @@ import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveyDisplayQualifier;
+import com.qualaroo.internal.SurveyStatusMatcher;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
@@ -270,6 +271,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 SurveysRepository surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
                 SurveyDisplayQualifier surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new SurveyStatusMatcher(localStorage))
                         .register(new UserPropertiesMatcher(userInfo))
                         .register(new UserIdentityMatcher(userInfo))
                         .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
