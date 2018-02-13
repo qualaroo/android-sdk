@@ -1108,6 +1108,37 @@ class SurveyInteractorTest {
         assertTrue(localStorage.getSurveyStatus(surveyWithLastNodeAsQuestion).hasBeenFinished())
     }
 
+    @Test
+    fun `allow to close mandatory messages`() {
+        val survey = survey(
+                id = 1,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 100)
+                                )
+                        ),
+                        optionMap = optionMap(
+                                mandatory = true
+                        )
+                )
+        )
+        val interactor = interactor(withSurvey = survey)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        interactor.messageConfirmed(message(id = 100))
+
+        verify(observer, times(1)).closeSurvey()
+    }
+
+
     class JustReverseShuffler : Shuffler() {
         override fun shuffle(list: MutableList<*>?) {
             list?.reverse()
