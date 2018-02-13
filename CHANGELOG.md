@@ -1,3 +1,7 @@
+## 1.6.1
+- fixed bug related to survey's not being properly marked as seen/finished
+- fixed bug related to displaying messages
+
 ## 1.6.0
 **Features:**
 - support for observing surveys related events:
