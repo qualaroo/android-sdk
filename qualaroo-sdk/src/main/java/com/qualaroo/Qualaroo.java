@@ -16,6 +16,7 @@ import com.qualaroo.internal.InvalidCredentialsException;
 import com.qualaroo.internal.SamplePercentMatcher;
 import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveyDisplayQualifier;
+import com.qualaroo.internal.SurveyStatusMatcher;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
@@ -68,7 +69,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
      * @param context application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    @SuppressWarnings({"WeakerAccess", "unused"}) public static Builder initializeWith(Context context) {
+    @SuppressWarnings({"WeakerAccess", "unused"}) public static QualarooSdk.Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
@@ -92,6 +93,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                     "Qualaroo SDK has not been properly initialized. Make sure you finish initalizeWith");
         }
         return INSTANCE;
+    }
+
+    private static void setSharedInstance(QualarooSdk qualarooSdk) {
+        if (INSTANCE == null) {
+            INSTANCE = qualarooSdk;
+        }
     }
 
     private static QualarooSdk INSTANCE;
@@ -244,6 +251,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             if (INSTANCE != null) {
                 return;
             }
+            setSharedInstance(createInstance());
+            QualarooLogger.info("Initialized QualarooSdk");
+            QualarooJobIntentService.start(context);
+        }
+
+        @SuppressWarnings("WeakerAccess") public QualarooSdk createInstance() {
             try {
                 if (debugMode) {
                     QualarooLogger.setDebugMode();
@@ -270,20 +283,20 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 SurveysRepository surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
                 SurveyDisplayQualifier surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new SurveyStatusMatcher(localStorage))
                         .register(new UserPropertiesMatcher(userInfo))
                         .register(new UserIdentityMatcher(userInfo))
                         .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
                         .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
                         .build();
-                
-                INSTANCE = new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier, userInfo, imageProvider, restClient, localStorage, executorSet);
-                QualarooLogger.info("Initialized QualarooSdk");
-                QualarooJobIntentService.start(context);
+
+                return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
+                                        userInfo, imageProvider, restClient, localStorage, executorSet);
             } catch (InvalidCredentialsException e) {
-                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
+                return new InvalidApiKeyQualarooSdk(apiKey);
             } catch (Exception e) {
                 //TODO: this is unexpected and might be an OS bug, log this event in our own company's bug tracker
-                INSTANCE = new InvalidApiKeyQualarooSdk(apiKey);
+                return new InvalidApiKeyQualarooSdk(apiKey);
             }
         }
 
