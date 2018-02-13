@@ -137,15 +137,15 @@ class UserPropertiesInjectorTest {
                 )
         )
 
-        assertFalse(injector.matches(survey))
+        assertFalse(injector.canInjectAllProperties(survey))
 
         userInfo.setUserProperty("name", "Adam")
 
-        assertFalse(injector.matches(survey))
+        assertFalse(injector.canInjectAllProperties(survey))
 
         userInfo.setUserProperty("last_name", "Tester")
 
-        assertTrue(injector.matches(survey))
+        assertTrue(injector.canInjectAllProperties(survey))
     }
 
 }

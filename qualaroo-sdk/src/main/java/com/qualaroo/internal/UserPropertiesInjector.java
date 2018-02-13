@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-public class UserPropertiesInjector extends SurveySpecMatcher {
+public class UserPropertiesInjector {
 
     private static final Pattern USER_PROPERTY_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
 
@@ -27,6 +27,10 @@ public class UserPropertiesInjector extends SurveySpecMatcher {
 
     public UserPropertiesInjector(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public boolean canInjectAllProperties(Survey survey) {
+        return new PropertiesMatcher(userInfo).matches(survey);
     }
 
     public Survey injectCustomProperties(Survey survey, Language language) {
@@ -142,10 +146,6 @@ public class UserPropertiesInjector extends SurveySpecMatcher {
         return origin.replace(target, replacement);
     }
 
-    @Override boolean matches(Survey survey) {
-        return new SpecMatcher(userInfo).matches(survey);
-    }
-
     private interface TextExtractor<T> {
         @Nullable String getText(T t);
     }
@@ -154,15 +154,15 @@ public class UserPropertiesInjector extends SurveySpecMatcher {
         T replace(T item, String... args);
     }
 
-    private static class SpecMatcher extends SurveySpecMatcher {
+    private static class PropertiesMatcher {
 
         private final UserInfo userInfo;
 
-        SpecMatcher(UserInfo userInfo) {
+        PropertiesMatcher(UserInfo userInfo) {
             this.userInfo = userInfo;
         }
 
-        @Override boolean matches(Survey survey) {
+        boolean matches(Survey survey) {
             Set<String> userPropertyKeys = userInfo.getUserProperties().keySet();
             return matchesQuestions(survey, userPropertyKeys)
                     && matchesMessages(survey, userPropertyKeys)
