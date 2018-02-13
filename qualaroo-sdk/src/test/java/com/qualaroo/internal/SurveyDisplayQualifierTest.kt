@@ -29,7 +29,7 @@ class SurveyDisplayQualifierTest {
                 .build()
 
         val survey = survey(id = 10)
-        assertTrue(qualifier.shouldShowSurvey(survey))
+        assertTrue(qualifier.doesQualify(survey))
     }
 
     @Test
@@ -50,6 +50,6 @@ class SurveyDisplayQualifierTest {
                 .build()
 
         val survey = survey(id = 10)
-        assertFalse(qualifier.shouldShowSurvey(survey))
+        assertFalse(qualifier.doesQualify(survey))
     }
 }

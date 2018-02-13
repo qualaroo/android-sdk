@@ -162,9 +162,9 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                     }
                 }
                 if (surveyToDisplay != null) {
-                    boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
+                    boolean matchesTargeting = surveyDisplayQualifier.doesQualify(surveyToDisplay);
                     boolean canInjectProperties = userPropertiesInjector.canInjectAllProperties(surveyToDisplay);
-                    if (canInjectProperties && (shouldShowSurvey || options.ignoreTargeting())) {
+                    if (canInjectProperties && (matchesTargeting || options.ignoreTargeting())) {
                         QualarooLogger.debug("Displaying survey " + alias);
                         final Survey finalSurveyToDisplay =
                                 userPropertiesInjector.injectCustomProperties(surveyToDisplay, preferredLanguage);
