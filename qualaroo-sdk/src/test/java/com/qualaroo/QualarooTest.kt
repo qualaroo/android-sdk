@@ -4,7 +4,12 @@ import com.nhaarman.mockito_kotlin.*
 import com.qualaroo.internal.ImageProvider
 import com.qualaroo.internal.SurveyDisplayQualifier
 import com.qualaroo.internal.UserInfo
+import com.qualaroo.internal.UserPropertiesInjector
 import com.qualaroo.internal.executor.ExecutorSet
+import com.qualaroo.internal.model.Survey
+import com.qualaroo.internal.model.TestModels.language
+import com.qualaroo.internal.model.TestModels.question
+import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.network.RestClient
 import com.qualaroo.internal.network.SurveysRepository
@@ -27,6 +32,7 @@ class QualarooTest {
     val userInfo = UserInfo(InMemorySettings(), InMemoryLocalStorage())
     val imageProvider = mock<ImageProvider>()
     val restClient = mock<RestClient>()
+    val userPropertiesInjector = spy(UserPropertiesInjector(userInfo))
     val qualaroo = Qualaroo(
             surveyComponentFactory,
             surveysRepository,
@@ -36,7 +42,8 @@ class QualarooTest {
             imageProvider,
             restClient,
             InMemoryLocalStorage(),
-            CurrentThreadExecutorSet()
+            CurrentThreadExecutorSet(),
+            userPropertiesInjector
     )
 
     @Test
@@ -65,7 +72,7 @@ class QualarooTest {
     @Test
     fun `doesn't show survey if it's not qualified`() {
         whenever(surveysRepository.surveys).thenReturn(listOf(survey(id = 1, canonicalName = "mySurvey")))
-        whenever(surveyDisplayQualifier.shouldShowSurvey(survey(id = 1))).thenReturn(false)
+        whenever(surveyDisplayQualifier.doesQualify(survey(id = 1))).thenReturn(false)
 
         qualaroo.showSurvey("mySurvey")
 
@@ -75,13 +82,43 @@ class QualarooTest {
     @Test
     fun `ignores survey qualifier when targeting is disabled`() {
         whenever(surveysRepository.surveys).thenReturn(listOf(survey(id = 1, canonicalName = "mySurvey")))
-        whenever(surveyDisplayQualifier.shouldShowSurvey(survey(id = 1))).thenReturn(false)
+        whenever(surveyDisplayQualifier.doesQualify(survey(id = 1))).thenReturn(false)
 
         val options = SurveyOptions.Builder()
                 .ignoreSurveyTargeting(true)
                 .build()
         qualaroo.showSurvey("mySurvey", options)
 
+        verify(surveyStarter, times(1)).start(survey(id = 1))
+    }
+
+    @Test
+    fun `shows survey only if all user properties are matched`() {
+        val surveyWithCustomProperties = survey(
+                id = 1,
+                canonicalName = "mySurvey",
+                spec = spec(
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(id = 1, title = "\${first_name}", description = "\${last_name}")
+                                )
+                        )
+                )
+        )
+        whenever(surveysRepository.surveys).thenReturn(listOf(surveyWithCustomProperties))
+        whenever(surveyDisplayQualifier.doesQualify(survey(id = 1))).thenReturn(true)
+
+        qualaroo.showSurvey("mySurvey")
+        verify(surveyStarter, never()).start(any())
+
+        userInfo.setUserProperty("first_name", "Greg")
+
+        qualaroo.showSurvey("mySurvey")
+        verify(surveyStarter, never()).start(any())
+
+        userInfo.setUserProperty("last_name", "Gregowsky")
+
+        qualaroo.showSurvey("mySurvey")
         verify(surveyStarter, times(1)).start(survey(id = 1))
     }
 
@@ -109,6 +146,20 @@ class QualarooTest {
         qualaroo.removeUserProperty("second")
         assertEquals("firstValue", userInfo.userProperties["first"])
         assertNull(userInfo.userProperties["second"])
+    }
+
+    @Test
+    fun `runs user property injector`() {
+        whenever(surveysRepository.surveys).thenReturn(listOf(survey(id = 1, canonicalName = "mySurvey")))
+        whenever(userPropertiesInjector.injectCustomProperties(eq(survey(id = 1)), any())).thenReturn(survey(id = 111, canonicalName = "injected_survey"))
+
+        qualaroo.showSurvey("mySurvey")
+
+        val surveyCaptor = argumentCaptor<Survey>()
+        verify(surveyStarter).start(surveyCaptor.capture())
+
+        assertEquals(111, surveyCaptor.firstValue.id())
+        assertEquals("injected_survey", surveyCaptor.firstValue.canonicalName())
     }
 
     private class CurrentThreadExecutorSet : ExecutorSet(

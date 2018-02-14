@@ -20,6 +20,7 @@ import com.qualaroo.internal.SurveyStatusMatcher;
 import com.qualaroo.internal.UserGroupPercentageProvider;
 import com.qualaroo.internal.UserIdentityMatcher;
 import com.qualaroo.internal.UserInfo;
+import com.qualaroo.internal.UserPropertiesInjector;
 import com.qualaroo.internal.UserPropertiesMatcher;
 import com.qualaroo.internal.executor.ExecutorSet;
 import com.qualaroo.internal.executor.UiThreadExecutor;
@@ -110,6 +111,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final UserInfo userInfo;
     private final SurveyDisplayQualifier surveyDisplayQualifier;
     private final SurveyStarter surveyStarter;
+    private final UserPropertiesInjector userPropertiesInjector;
     private final Executor dataExecutor;
     private final Executor uiExecutor;
     private final Executor backgroundExecutor;
@@ -118,7 +120,11 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
     private Language preferredLanguage = new Language("en");
 
-    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository, SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider, RestClient restClient, LocalStorage localStorage, ExecutorSet executorSet) {
+    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
+                                SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
+                                UserInfo userInfo, ImageProvider imageProvider, RestClient restClient,
+                                LocalStorage localStorage, ExecutorSet executorSet,
+                                UserPropertiesInjector userPropertiesInjector) {
         this.surveyStarter = surveyStarter;
         this.surveyComponentFactory = surveyComponentFactory;
         this.restClient = restClient;
@@ -130,6 +136,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         this.userInfo = userInfo;
         this.imageProvider = imageProvider;
         this.surveyDisplayQualifier = surveyDisplayQualifier;
+        this.userPropertiesInjector = userPropertiesInjector;
     }
 
     @Override public void showSurvey(@NonNull final String alias) {
@@ -156,10 +163,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                     }
                 }
                 if (surveyToDisplay != null) {
-                    boolean shouldShowSurvey = surveyDisplayQualifier.shouldShowSurvey(surveyToDisplay);
-                    if (shouldShowSurvey || options.ignoreTargeting()) {
+                    boolean matchesTargeting = surveyDisplayQualifier.doesQualify(surveyToDisplay);
+                    boolean canInjectProperties = userPropertiesInjector.canInjectAllProperties(surveyToDisplay);
+                    if (canInjectProperties && (matchesTargeting || options.ignoreTargeting())) {
                         QualarooLogger.debug("Displaying survey " + alias);
-                        final Survey finalSurveyToDisplay = surveyToDisplay;
+                        final Survey finalSurveyToDisplay =
+                                userPropertiesInjector.injectCustomProperties(surveyToDisplay, preferredLanguage);
                         uiExecutor.execute(new Runnable() {
                             @Override public void run() {
                                 surveyStarter.start(finalSurveyToDisplay);
@@ -282,6 +291,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 ApiConfig apiConfig = new ApiConfig();
                 SurveysRepository surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
+                UserPropertiesInjector userPropertiesInjector = new UserPropertiesInjector(userInfo);
                 SurveyDisplayQualifier surveyDisplayQualifier = SurveyDisplayQualifier.builder()
                         .register(new SurveyStatusMatcher(localStorage))
                         .register(new UserPropertiesMatcher(userInfo))
@@ -291,7 +301,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .build();
 
                 return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
-                                        userInfo, imageProvider, restClient, localStorage, executorSet);
+                                        userInfo, imageProvider, restClient, localStorage, executorSet,
+                                        userPropertiesInjector);
             } catch (InvalidCredentialsException e) {
                 return new InvalidApiKeyQualarooSdk(apiKey);
             } catch (Exception e) {

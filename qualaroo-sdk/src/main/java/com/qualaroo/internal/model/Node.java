@@ -9,8 +9,8 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class Node implements Serializable {
-    private long id;
-    private String nodeType;
+    private final long id;
+    private final String nodeType;
 
     public long id() {
         return id;
@@ -25,5 +25,8 @@ public final class Node implements Serializable {
         this.nodeType = nodeType;
     }
 
-    Node() {}
+    @SuppressWarnings("unused") private Node() {
+        this.id = 0;
+        this.nodeType = null;
+    }
 }

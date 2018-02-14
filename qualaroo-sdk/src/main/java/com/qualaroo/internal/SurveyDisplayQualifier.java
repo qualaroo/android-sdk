@@ -23,7 +23,7 @@ public final class SurveyDisplayQualifier {
         this.surveySpecMatchers.addAll(matchers);
     }
 
-    public boolean shouldShowSurvey(Survey survey) {
+    public boolean doesQualify(Survey survey) {
         for (SurveySpecMatcher surveySpecMatcher : surveySpecMatchers) {
             if (!surveySpecMatcher.matches(survey)) {
                 QualarooLogger.debug("User properties do not match survey %1$s's requirements", survey.canonicalName());

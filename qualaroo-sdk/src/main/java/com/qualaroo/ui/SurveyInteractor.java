@@ -278,7 +278,7 @@ public class SurveyInteractor {
         if (anchoredAnswers.size() > 0) {
             answerList.addAll(anchoredAnswers);
         }
-        return question.mutateWith(answerList);
+        return question.copy(answerList);
     }
 
     private <T> LongSparseArray<T> prepareData(Map<Language, List<T>> data, IdExtractor<T> extractor) {
