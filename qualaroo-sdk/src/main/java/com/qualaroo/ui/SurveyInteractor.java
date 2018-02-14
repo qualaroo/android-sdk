@@ -141,7 +141,7 @@ public class SurveyInteractor {
         if (message.type() == MessageType.CALL_TO_ACTION) {
             eventsObserver.openUri(message.ctaMap().uri());
         }
-        requestSurveyToStop();
+        closeSurvey();
     }
 
     @MainThread
@@ -157,16 +157,16 @@ public class SurveyInteractor {
     @MainThread
     void requestSurveyToStop() {
         if (!survey.spec().optionMap().isMandatory()) {
-            if ("message".equals(currentNode.nodeType())) {
-                markSurveyAsFinished();
-            } else {
-                surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
-            }
             closeSurvey();
         }
     }
 
     private void closeSurvey() {
+        if ("message".equals(currentNode.nodeType())) {
+            markSurveyAsFinished();
+        } else {
+            surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
+        }
         if (isStoppingSurvey.compareAndSet(false, true)) {
             this.eventsObserver.closeSurvey();
         }
