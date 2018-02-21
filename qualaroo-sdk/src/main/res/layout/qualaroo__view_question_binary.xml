@@ -8,17 +8,17 @@
 
     <Button
         android:id="@+id/qualaroo__view_question_binary_first"
-        tools:text="First button"
+        tools:text="Single line"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
     <Button
         android:id="@+id/qualaroo__view_question_binary_second"
-        tools:text="Second button"
+        tools:text="Really\nlong\ntext"
         android:layout_marginLeft="8dp"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
