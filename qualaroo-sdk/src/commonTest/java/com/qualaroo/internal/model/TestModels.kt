@@ -34,7 +34,7 @@ object TestModels {
 
     fun node(id: Long, nodeType: String) = Node(id, nodeType)
 
-    fun colorThemeMap(dimType: String = "light", backgroundColor: String = "#000000", textColor: String = "#000000", buttonEnabledColor: String = "#000000", buttonDisabledColor: String = "#000000", buttonTextEnabled: String = "#000000", buttonTextDisabled: String = "#000000", uiNormal: String = "#000000", uiSelected: String = "#000000"): ColorThemeMap {
+    fun colorThemeMap(dimType: String = "light", backgroundColor: String = "#FFFFFF", textColor: String = "#000000", buttonEnabledColor: String = "#00A000", buttonDisabledColor: String = "#A00000", buttonTextEnabled: String = "#FFFFFF", buttonTextDisabled: String = "#FFFFFF", uiNormal: String = "#81D4FA", uiSelected: String = "#01579B"): ColorThemeMap {
         return ColorThemeMap(backgroundColor, dimType, textColor, buttonEnabledColor, buttonDisabledColor, buttonTextEnabled, buttonTextDisabled, uiNormal, uiSelected)
     }
 
