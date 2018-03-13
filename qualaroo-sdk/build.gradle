@@ -85,6 +85,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.1'
     androidTestImplementation ('com.squareup.okhttp3:mockwebserver:3.9.0') {
         exclude group: 'org.bouncycastle'
     }

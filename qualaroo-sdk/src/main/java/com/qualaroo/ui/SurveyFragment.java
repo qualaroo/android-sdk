@@ -313,8 +313,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
         runCloseAnimation();
         surveyContainer.postDelayed(new Runnable() {
             @Override public void run() {
-                getActivity().finish();
-                getActivity().overridePendingTransition(0, 0);
+                if (getActivity() != null) {
+                    getActivity().finish();
+                    getActivity().overridePendingTransition(0, 0);
+                }
             }
         }, 600);
     }
