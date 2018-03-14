@@ -1,14 +1,12 @@
 package com.qualaroo
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.UiController
-import android.support.test.espresso.ViewAction
 import android.support.test.espresso.action.ViewActions
+import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
-import android.view.View
 import com.qualaroo.internal.model.QuestionType
 import com.qualaroo.internal.model.TestModels
 import com.qualaroo.internal.model.TestModels.answer
@@ -16,10 +14,8 @@ import com.qualaroo.internal.model.TestModels.language
 import com.qualaroo.internal.model.TestModels.question
 import com.qualaroo.internal.model.TestModels.spec
 import com.qualaroo.internal.model.TestModels.survey
-import com.qualaroo.ui.NpsView
 import com.qualaroo.util.QualarooActivityTestRule
 import com.qualaroo.util.SurveyTestUtil
-import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
@@ -42,6 +38,7 @@ class NpsQuestionTest {
                                                 npsMaxLabel = "maxLabel",
                                                 sendText = "confirm",
                                                 answerList = listOf(
+                                                        answer(id = 0),
                                                         answer(id = 1),
                                                         answer(id = 2),
                                                         answer(id = 3),
@@ -77,34 +74,18 @@ class NpsQuestionTest {
     @Test
     fun enablesButtonAfterSelection() {
         onView(withId(R.id.qualaroo__nps_view_confirm)).check(matches(not(isEnabled())))
-        onView(withId(R.id.qualaroo__nps_scores)).perform(selectNpsScore(4))
+        onView(withText("4")).perform(click())
         onView(withId(R.id.qualaroo__nps_view_confirm)).check(matches(isEnabled()))
 
-        onView(withId(R.id.qualaroo__nps_scores)).perform(selectNpsScore(1))
+        onView(withText("1")).perform(click())
         onView(withId(R.id.qualaroo__nps_view_confirm)).check(matches(isEnabled()))
     }
 
     @Test
     fun closesAfterConfirm() {
-        onView(withId(R.id.qualaroo__nps_scores)).perform(selectNpsScore(4))
+        onView(withText("5")).perform(click())
         onView(withId(R.id.qualaroo__nps_view_confirm)).perform(ViewActions.click())
 
         SurveyTestUtil.assertActivityFinishing(testRule)
     }
-
-    private fun selectNpsScore(selectedScore: Int) = object : ViewAction {
-        override fun getDescription(): String {
-            return "select nps score"
-        }
-
-        override fun getConstraints(): Matcher<View> {
-            return isAssignableFrom(NpsView::class.java)
-        }
-
-        override fun perform(uiController: UiController?, view: View?) {
-            (view as NpsView).setScore(selectedScore)
-        }
-    }
-
-
 }
