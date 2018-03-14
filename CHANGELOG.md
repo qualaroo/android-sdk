@@ -1,3 +1,6 @@
+## 1.6.2
+- fixed bug which could cause crashes on older devices while using CTA messages
+
 ## 1.6.1
 - fixed bug related to survey's not being properly marked as seen/finished
 - fixed bug related to displaying messages
