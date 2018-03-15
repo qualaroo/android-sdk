@@ -7,7 +7,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.RestrictTo;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.TintableBackgroundView;
-import android.support.v4.widget.TintableCompoundButton;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -26,11 +26,12 @@ public class ThemeUtils {
     }
 
     public static void applyTheme(CompoundButton compoundButton, Theme theme) {
-        if (compoundButton instanceof TintableCompoundButton) {
-            int[][] states = new int[][]{new int[]{-android.R.attr.state_checked}, new int[]{android.R.attr.state_checked}};
-            int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
-            ((TintableCompoundButton) compoundButton).setSupportButtonTintList(new ColorStateList(states, colors));
-        }
+        int[][] states = new int[][]{
+                new int[]{-android.R.attr.state_checked},
+                new int[]{android.R.attr.state_checked}
+        };
+        int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
+        CompoundButtonCompat.setButtonTintList(compoundButton, new ColorStateList(states, colors));
     }
 
     public static void applyTheme(EditText editText, Theme theme) {
