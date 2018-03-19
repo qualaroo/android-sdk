@@ -21,6 +21,7 @@ public final class UriOpener {
             return;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setData(Uri.parse(stringUri));
         if (canIntentBeHandled(intent)) {
             context.startActivity(intent);
