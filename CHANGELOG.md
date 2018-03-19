@@ -1,3 +1,6 @@
+## 1.6.3
+- radio and checkbox improvements for pre-Marshmallow devices
+
 ## 1.6.2
 - fixed bug which could cause crashes on older devices while using CTA messages
 
