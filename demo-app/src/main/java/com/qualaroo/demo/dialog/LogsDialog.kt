@@ -33,7 +33,7 @@ class LogsDialog : BottomSheetDialogFragment() {
     }
 
     private fun copyContentToClipboard(textView: TextView) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+        val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
         if (clipboard != null) {
             val clip = ClipData.newPlainText("logcat", textView.text.toString())
             clipboard.primaryClip = clip
