@@ -2,9 +2,13 @@ node {
     stage('Checkout') {
         checkout scm
     }
-    stage('Build') {
+    stage('Build and test') {
         sh './gradlew clean qualaroo-sdk:build jacocoTestReport -PQUALAROO_S3_ACCESS_KEY=0 -PQUALAROO_S3_SECRET_KEY=0'
         junit 'qualaroo-sdk/build/test-results/**/*.xml'
+    }
+    stage('UI tests') {
+        sh "$ANDROID_HOME/emulator/emulator @NexusSAPI19"
+        sh './gradlew connectedCheck'
     }
     stage('SonarQube analysis') {    
           def PULL_REQUEST = env.CHANGE_ID
