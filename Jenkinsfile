@@ -2,9 +2,38 @@ node {
     stage('Checkout') {
         checkout scm
     }
-    stage('Build') {
-        sh './gradlew clean qualaroo-sdk:build jacocoTestReport -PQUALAROO_S3_ACCESS_KEY=0 -PQUALAROO_S3_SECRET_KEY=0'
+    stage('Build and test') {
+        sh './gradlew clean qualaroo-sdk:build jacocoTestReport'
         junit 'qualaroo-sdk/build/test-results/**/*.xml'
+    }
+    stage('Android tests') {
+        def error
+        parallel (
+          emulator: {
+            sh "$ANDROID_HOME/tools/emulator -avd NexusSAPI19 -no-audio -no-boot-anim -no-snapshot-load -no-snapshot-save &"
+          },
+          androidTest: {
+            timeout(time: 20, unit: 'SECONDS') {
+                sh 'adb wait-for-device'
+                echo "Turning off animations on emulators..."
+                sh 'adb devices | grep emulator | cut -f1 | while read emulator; do \
+                  adb -s $emulator shell settings put global window_animation_scale 0 && \
+                  adb -s $emulator shell settings put global transition_animation_scale && \
+                  adb -s $emulator shell settings put global animator_duration_scale 0; \
+                  done'                                           
+            }
+            try { 
+              sh './gradlew qualaroo-sdk:connectedCheck'
+            } catch(e) {
+              error = e
+            }
+            echo "Shutting down all emulators..."
+            sh 'adb devices | grep emulator | cut -f1 | while read emulator; do adb -s $emulator emu kill; done'          
+          }
+        )
+        if (error != null) {
+          throw error
+        }
     }
     stage('SonarQube analysis') {    
           def PULL_REQUEST = env.CHANGE_ID
