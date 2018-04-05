@@ -1,5 +1,7 @@
 package com.qualaroo
 
+import android.app.Activity
+import android.app.Instrumentation.ActivityResult
 import android.content.Intent
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
@@ -7,8 +9,8 @@ import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.Intents.intended
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasAction
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasData
+import android.support.test.espresso.intent.Intents.intending
+import android.support.test.espresso.intent.matcher.IntentMatchers.*
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
@@ -72,6 +74,8 @@ class CallToActionMessageTest {
     @Test
     fun redirectsAndClosesAfterCtaClick() {
         Intents.init()
+        val okIntentResult = ActivityResult(Activity.RESULT_OK, Intent())
+        intending(anyIntent()).respondWith(okIntentResult)
 
         onView(withId(R.id.qualaroo__view_message_cta)).perform(click())
         intended(allOf(
