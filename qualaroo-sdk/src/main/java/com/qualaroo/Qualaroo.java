@@ -62,8 +62,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
-    private static final String PREF_NAME = "qualaroo_prefs";
-
     /**
      * Starts initialization phase of the SDK.
      * Make sure to call {@link QualarooSdk.Builder#init()} to finish initialization properly.
@@ -234,6 +232,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     }
 
     public final static class Builder implements QualarooSdk.Builder {
+
+        private static final String PREF_NAME = "qualaroo_prefs";
+        private static final long NETWORK_CACHE_SIZE_IN_BYTES = 1 * 1024 * 1024;
+
         private final Context context;
         private String apiKey;
         private boolean debugMode = false;
@@ -336,6 +338,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                     return chain.proceed(request);
                 }
             });
+            builder.cache(new okhttp3.Cache(context.getCacheDir(), NETWORK_CACHE_SIZE_IN_BYTES));
             okHttpClient = builder.build();
 
             Gson gson = new GsonBuilder()
