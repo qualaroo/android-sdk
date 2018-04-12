@@ -28,11 +28,14 @@ public final class Question implements Serializable {
     private final int anchorLastCount;
     private final boolean alwaysShowSend;
     private final boolean isRequired;
+    private final int minAnswersCount;
+    private final int maxAnswersCount;
 
     @VisibleForTesting Question(long id, QuestionType type, String title, String description,
                                 String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap,
                                 String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom,
-                                boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired) {
+                                boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired,
+                                int minAnswersCount, int maxAnswersCount) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -49,6 +52,8 @@ public final class Question implements Serializable {
         this.alwaysShowSend = alwaysShowSend;
         this.isRequired = isRequired;
         this.cname = cname;
+        this.minAnswersCount = minAnswersCount;
+        this.maxAnswersCount = maxAnswersCount;
     }
 
     @SuppressWarnings("unused") private Question() {
@@ -68,6 +73,8 @@ public final class Question implements Serializable {
         this.alwaysShowSend = false;
         this.isRequired = false;
         this.cname = null;
+        this.minAnswersCount = 0;
+        this.maxAnswersCount = 0;
     }
 
     public long id() {
@@ -134,16 +141,24 @@ public final class Question implements Serializable {
         return isRequired;
     }
 
+    public int minAnswersCount() {
+        return minAnswersCount;
+    }
+
+    public int maxAnswersCount() {
+        return maxAnswersCount;
+    }
+
     public Question copy(List<Answer> answerList) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired);
+                            isRequired, minAnswersCount, maxAnswersCount);
     }
 
     public Question copy(String title, String description) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired);
+                            isRequired, minAnswersCount, maxAnswersCount);
     }
 
     @Override public boolean equals(Object o) {

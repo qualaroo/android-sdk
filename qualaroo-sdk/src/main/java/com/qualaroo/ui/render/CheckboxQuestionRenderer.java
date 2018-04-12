@@ -43,19 +43,26 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         button.setText(question.sendText());
         button.setEnabled(!question.isRequired());
         ThemeUtils.applyTheme(button, getTheme());
-        CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                boolean anyChecked = false;
-                for (int j = 0; j < checkablesContainer.getChildCount(); j++) {
-                    View child = checkablesContainer.getChildAt(j);
-                    if (child instanceof Checkable && ((Checkable) child).isChecked()) {
-                        anyChecked = true;
-                        break;
-                    }
-                }
-                if (question.isRequired()) {
-                    button.setEnabled(anyChecked);
-                }
+
+        final int minAnswersCount = question.minAnswersCount();
+        final int maxAnswersCount;
+        if (question.maxAnswersCount() == 0) {
+            maxAnswersCount = question.answerList().size();
+        } else {
+            maxAnswersCount = question.maxAnswersCount();
+        }
+
+        CompoundButton.OnCheckedChangeListener listener = (compoundButton, b) -> {
+            int selectedAnswers = selectedAnswers(checkablesContainer);
+            if ((selectedAnswers < minAnswersCount || selectedAnswers == 0)  && question.isRequired()) {
+                button.setEnabled(false);
+            } else if (selectedAnswers == maxAnswersCount) {
+                enableUncheckedAnswers(checkablesContainer, false);
+            } else if (selectedAnswers > maxAnswersCount) {
+                button.setEnabled(false);
+            } else {
+                enableUncheckedAnswers(checkablesContainer, true);
+                button.setEnabled(true);
             }
         };
         for (Answer answer : question.answerList()) {
@@ -71,18 +78,30 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         });
         return RestorableView.withId(question.id())
                 .view(view)
-                .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle outState) {
-                        saveState(outState, checkablesContainer);
-
-                    }
-                })
-                .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle savedState) {
-                        restoreState(savedState, checkablesContainer);
-                    }
-                })
+                .onSaveState(outState -> saveState(outState, checkablesContainer))
+                .onRestoreState(savedState -> restoreState(savedState, checkablesContainer))
                 .build();
+    }
+
+    private int selectedAnswers(ViewGroup checkablesContainer) {
+        int selectedAnswers = 0;
+        for (int j = 0; j < checkablesContainer.getChildCount(); j++) {
+            View child = checkablesContainer.getChildAt(j);
+            if (child instanceof Checkable && ((Checkable) child).isChecked()) {
+                selectedAnswers++;
+            }
+        }
+        return selectedAnswers;
+    }
+
+    private void enableUncheckedAnswers(ViewGroup checkablesContainer, boolean enable) {
+        for (int j = 0; j < checkablesContainer.getChildCount(); j++) {
+            View child = checkablesContainer.getChildAt(j);
+            if (child instanceof Checkable && !((Checkable) child).isChecked()) {
+                child.setEnabled(enable);
+                child.setAlpha(enable ? 1.0f : 0.4f);
+            }
+        }
     }
 
     private UserResponse buildUserResponse(Question question, ViewGroup checkablesContainer) {

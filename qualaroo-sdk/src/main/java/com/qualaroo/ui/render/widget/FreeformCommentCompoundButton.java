@@ -60,6 +60,11 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Liste
         compoundButton.toggle();
     }
 
+    @Override public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        compoundButton.setEnabled(enabled);
+    }
+
     public void acceptTheme(Theme theme) {
         ThemeUtils.applyTheme(compoundButton, theme);
         ThemeUtils.applyTheme(freeformComment, theme);
