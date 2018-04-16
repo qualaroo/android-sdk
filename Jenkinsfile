@@ -13,22 +13,22 @@ node {
             sh "$ANDROID_HOME/tools/emulator -avd NexusSAPI19 -no-audio -no-boot-anim -no-snapshot-load -no-snapshot-save &"
           },
           androidTest: {
-            timeout(time: 20, unit: 'SECONDS') {
-                sh 'adb wait-for-device'
-                echo "Turning off animations on emulators..."
-                sh 'adb devices | grep emulator | cut -f1 | while read emulator; do \
-                  adb -s $emulator shell settings put global window_animation_scale 0 && \
-                  adb -s $emulator shell settings put global transition_animation_scale && \
-                  adb -s $emulator shell settings put global animator_duration_scale 0; \
-                  done'                                           
-            }
-            try { 
-              sh './gradlew qualaroo-sdk:connectedCheck'
+            try {
+                timeout(time: 20, unit: 'SECONDS') {
+                    sh 'adb wait-for-device'
+                    echo "Turning off animations on emulators..."
+                    sh 'adb devices | grep emulator | cut -f1 | while read emulator; do \
+                      adb -s $emulator shell settings put global window_animation_scale 0 && \
+                      adb -s $emulator shell settings put global transition_animation_scale && \
+                      adb -s $emulator shell settings put global animator_duration_scale 0; \
+                      done'                                           
+                }    
+                sh './gradlew qualaroo-sdk:connectedCheck'
             } catch(e) {
               error = e
             }
             echo "Shutting down all emulators..."
-            sh 'adb devices | grep emulator | cut -f1 | while read emulator; do adb -s $emulator emu kill; done'          
+            sh './scripts/kill_all_emulators.sh'          
           }
         )
         if (error != null) {
