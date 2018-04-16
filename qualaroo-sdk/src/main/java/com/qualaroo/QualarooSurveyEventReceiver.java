@@ -30,7 +30,7 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
      * Type of an event
      */
     @IntDef({EVENT_TYPE_SHOWN, EVENT_TYPE_DISMISSED, EVENT_TYPE_FINISHED})
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     public @interface Type {}
 
     public static final int EVENT_TYPE_SHOWN = 1;

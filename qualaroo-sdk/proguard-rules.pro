@@ -50,6 +50,7 @@
 
 -keep class com.qualaroo.QualarooSurveyEventReceiver {*;}
 
+-dontwarn java.lang.invoke.**
 -dontwarn org.apache.commons.**
 -dontwarn okio.**
 -dontwarn javax.annotation.Nullable

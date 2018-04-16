@@ -99,7 +99,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
             View child = checkablesContainer.getChildAt(j);
             if (child instanceof Checkable && !((Checkable) child).isChecked()) {
                 child.setEnabled(enable);
-                child.setAlpha(enable ? 1.0f : 0.4f);
+                child.animate().alpha(enable ? 1.0f : 0.4f);
             }
         }
     }
