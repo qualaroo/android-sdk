@@ -126,4 +126,14 @@ class InMemoryLocalStorageTest {
         assertFalse(localStorage.userProperties.containsKey("someKey"))
     }
 
+    @Test
+    fun `stores ab test group percentage`() {
+        val surveys = listOf(survey(id = 1), survey(id = 2), survey(id = 3))
+        val reversedSurveys = surveys.reversed()
+
+        localStorage.storeAbTestGroupPercent(surveys, 20)
+
+        assertEquals(20, localStorage.getAbTestGroupPercent(reversedSurveys))
+    }
+
 }
