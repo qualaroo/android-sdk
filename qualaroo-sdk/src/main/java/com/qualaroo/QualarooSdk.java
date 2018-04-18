@@ -3,6 +3,8 @@ package com.qualaroo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.List;
+
 public interface QualarooSdk {
     /**
      * Shows a survey with specified alias if all targeting conditions are met.
@@ -45,6 +47,12 @@ public interface QualarooSdk {
      */
     void setPreferredLanguage(@NonNull String iso2Language);
 
+    /**
+     * Starts a configuration of an AB test.
+     * @return an instance of {@link QualarooSdk.AbTestBuilder}
+     */
+    AbTestBuilder abTest();
+
     interface Builder {
         /**
          * Sets an API key.
@@ -66,5 +74,21 @@ public interface QualarooSdk {
          * This method has an effect only once. Configured instance of QualarooSdk is then stored per application's process.
          */
         void init();
+    }
+
+    interface AbTestBuilder {
+
+        /**
+         * @param aliases of surveys that you want to make an AB test out of
+         * @return {@link QualarooSdk.AbTestBuilder} for further configuration
+         */
+        AbTestBuilder fromSurveys(List<String> aliases);
+
+        /**
+         * Shows one of a provided surveys by {@link AbTestBuilder#fromSurveys(List)} call.
+         * A survey will be chosen based on a random test group that a user is assigned to.
+         */
+        void show();
+
     }
 }

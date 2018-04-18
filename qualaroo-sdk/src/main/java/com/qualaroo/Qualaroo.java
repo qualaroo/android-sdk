@@ -9,6 +9,7 @@ import android.support.annotation.VisibleForTesting;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.qualaroo.internal.AbTestGroupPercentageProvider;
 import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ImageProvider;
@@ -47,6 +48,7 @@ import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executor;
@@ -108,6 +110,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final ImageProvider imageProvider;
     private final UserInfo userInfo;
     private final SurveyDisplayQualifier surveyDisplayQualifier;
+    private final SurveyDisplayQualifier abTestDisplayQualifier;
+    private final AbTestGroupPercentageProvider abTestGroupPercentageProvider;
     private final SurveyStarter surveyStarter;
     private final UserPropertiesInjector userPropertiesInjector;
     private final Executor dataExecutor;
@@ -120,13 +124,15 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
     @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
                                 SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
-                                UserInfo userInfo, ImageProvider imageProvider, RestClient restClient,
-                                LocalStorage localStorage, ExecutorSet executorSet,
-                                UserPropertiesInjector userPropertiesInjector) {
+                                SurveyDisplayQualifier abTestDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider,
+                                RestClient restClient, LocalStorage localStorage, AbTestGroupPercentageProvider abTestGroupPercentageProvider,
+                                ExecutorSet executorSet, UserPropertiesInjector userPropertiesInjector) {
         this.surveyStarter = surveyStarter;
         this.surveyComponentFactory = surveyComponentFactory;
+        this.abTestDisplayQualifier = abTestDisplayQualifier;
         this.restClient = restClient;
         this.localStorage = localStorage;
+        this.abTestGroupPercentageProvider = abTestGroupPercentageProvider;
         this.uiExecutor = executorSet.uiThreadExecutor();
         this.dataExecutor = executorSet.dataExecutor();
         this.backgroundExecutor = executorSet.backgroundExecutor();
@@ -145,11 +151,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
-        if (requestingForSurvey.get()) {
+        if (requestingForSurvey.getAndSet(true)) {
             return;
         }
         QualarooLogger.debug("Trying to show survey: " + alias);
-        requestingForSurvey.set(true);
         backgroundExecutor.execute(new Runnable() {
             @Override public void run() {
                 List<Survey> surveys = surveysRepository.getSurveys();
@@ -161,24 +166,34 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                     }
                 }
                 if (surveyToDisplay != null) {
-                    boolean matchesTargeting = surveyDisplayQualifier.doesQualify(surveyToDisplay);
-                    boolean canInjectProperties = userPropertiesInjector.canInjectAllProperties(surveyToDisplay);
-                    if (canInjectProperties && (matchesTargeting || options.ignoreTargeting())) {
-                        QualarooLogger.debug("Displaying survey " + alias);
-                        final Survey finalSurveyToDisplay =
-                                userPropertiesInjector.injectCustomProperties(surveyToDisplay, preferredLanguage);
-                        uiExecutor.execute(new Runnable() {
-                            @Override public void run() {
-                                surveyStarter.start(finalSurveyToDisplay);
-                            }
-                        });
-                    }
+                    showSurvey(surveyToDisplay, options, surveyDisplayQualifier);
                 } else {
                     QualarooLogger.info("Survey %s not found", alias);
                 }
                 requestingForSurvey.set(false);
             }
         });
+    }
+
+    private boolean showSurvey(@NonNull final Survey survey, @NonNull final SurveyOptions options, final SurveyDisplayQualifier surveyDisplayQualifier) {
+        if (canDisplaySurvey(survey, options, surveyDisplayQualifier)) {
+            QualarooLogger.debug("Displaying survey " + survey.canonicalName());
+            final Survey finalSurveyToDisplay =
+                    userPropertiesInjector.injectCustomProperties(survey, preferredLanguage);
+            uiExecutor.execute(new Runnable() {
+                @Override public void run() {
+                    surveyStarter.start(finalSurveyToDisplay);
+                }
+            });
+            return true;
+        }
+        return false;
+    }
+
+    private boolean canDisplaySurvey(Survey survey, SurveyOptions options, SurveyDisplayQualifier surveyDisplayQualifier) {
+        boolean matchesTargeting = surveyDisplayQualifier.doesQualify(survey);
+        boolean canInjectProperties = userPropertiesInjector.canInjectAllProperties(survey);
+        return canInjectProperties && (matchesTargeting || options.ignoreTargeting());
     }
 
     @Override public void setUserId(@NonNull final String userId) {
@@ -211,6 +226,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         this.preferredLanguage = new Language(iso2Language);
     }
 
+    @Override public AbTestBuilder abTest() {
+        return new AbTestBuilderImpl(abTestGroupPercentageProvider);
+    }
+
     SurveyComponent buildSurveyComponent(Survey survey) {
         return surveyComponentFactory.create(survey, preferredLanguage);
     }
@@ -229,6 +248,74 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
     @Override ImageProvider imageProvider() {
         return imageProvider;
+    }
+
+    private final class AbTestBuilderImpl implements AbTestBuilder {
+
+        private final AbTestGroupPercentageProvider percentageProvider;
+        private final List<String> aliases = new ArrayList<>();
+
+        private AbTestBuilderImpl(AbTestGroupPercentageProvider percentageProvider) {
+            this.percentageProvider = percentageProvider;
+        }
+
+        @Override public AbTestBuilder fromSurveys(List<String> aliases) {
+            this.aliases.clear();
+            this.aliases.addAll(aliases);
+            return this;
+        }
+
+        @Override public void show() {
+            if (aliases.isEmpty()) return;
+
+            if (!requestingForSurvey.getAndSet(true)) {
+                backgroundExecutor.execute(new Runnable() {
+                    @Override public void run() {
+                        List<Survey> surveys = surveysRepository.getSurveys();
+                        List<Survey> abTestSurveys = new ArrayList<>(aliases.size());
+                        for (String alias : aliases) {
+                            for (Survey survey : surveys) {
+                                if (alias.equals(survey.canonicalName())) {
+                                    abTestSurveys.add(survey);
+                                }
+                            }
+                        }
+                        if (!abTestSurveys.isEmpty()) {
+                            int percentage = percentageProvider.abTestGroupPercent(abTestSurveys);
+                            Survey surveyToDisplay = findMatchingSurvey(abTestSurveys, percentage);
+                            if (surveyToDisplay != null) {
+                                boolean didShowSurvey = showSurvey(surveyToDisplay, SurveyOptions.defaultOptions(), abTestDisplayQualifier);
+                                if (didShowSurvey) {
+                                    matchSurveysAsFinished(abTestSurveys, surveyToDisplay);
+                                }
+                            }
+                        }
+                        requestingForSurvey.set(false);
+                    }
+                });
+            }
+        }
+
+        private Survey findMatchingSurvey(List<Survey> surveys, int percentage) {
+            int range = 0;
+            for (Survey survey : surveys) {
+                Integer samplePercent = survey.spec().requireMap().samplePercent();
+                if (samplePercent == null) continue;
+                if (percentage >= range && percentage < range + samplePercent) {
+                    return survey;
+                } else {
+                    range += samplePercent;
+                }
+            }
+            return null;
+        }
+
+        private void matchSurveysAsFinished(List<Survey> surveys, Survey exceptForSurvey) {
+            for (Survey survey : surveys) {
+                if (survey.equals(exceptForSurvey)) continue;
+                localStorage.markSurveyFinished(survey);
+            }
+        }
     }
 
     public final static class Builder implements QualarooSdk.Builder {
@@ -302,8 +389,16 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .register(new SamplePercentMatcher(new UserGroupPercentageProvider(localStorage, new SecureRandom())))
                         .build();
 
+                SurveyDisplayQualifier abTestDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new SurveyStatusMatcher(localStorage))
+                        .register(new UserPropertiesMatcher(userInfo))
+                        .register(new UserIdentityMatcher(userInfo))
+                        .register(new DeviceTypeMatcher(new DeviceTypeMatcher.AndroidDeviceTypeProvider(this.context)))
+                        .build();
+
+                AbTestGroupPercentageProvider abTestGroupPercentageProvider = new AbTestGroupPercentageProvider(localStorage, new SecureRandom());
                 return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
-                                        userInfo, imageProvider, restClient, localStorage, executorSet,
+                        abTestDisplayQualifier, userInfo, imageProvider, restClient, localStorage, abTestGroupPercentageProvider, executorSet,
                                         userPropertiesInjector);
             } catch (InvalidCredentialsException e) {
                 return new InvalidApiKeyQualarooSdk(apiKey);
@@ -386,6 +481,10 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             logErrorMessage();
         }
 
+        @Override public AbTestBuilder abTest() {
+            return new AbTestBuilderStub();
+        }
+
         private void logErrorMessage() {
             QualarooLogger.error(
                     String.format(
@@ -394,6 +493,17 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                             providedApiKey
                     )
             );
+        }
+
+        private class AbTestBuilderStub implements AbTestBuilder {
+
+            @Override public AbTestBuilder fromSurveys(List<String> aliases) {
+                return this;
+            }
+
+            @Override public void show() {
+                logErrorMessage();
+            }
         }
     }
 
