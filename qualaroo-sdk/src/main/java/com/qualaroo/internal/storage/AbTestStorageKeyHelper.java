@@ -8,6 +8,8 @@ import java.util.List;
 
 public final class AbTestStorageKeyHelper {
 
+    private AbTestStorageKeyHelper() {}
+
     public static String build(List<Survey> surveys) {
         Collections.sort(surveys, new Comparator<Survey>() {
             @Override public int compare(Survey o1, Survey o2) {

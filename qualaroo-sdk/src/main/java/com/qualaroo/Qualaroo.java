@@ -271,15 +271,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             if (!requestingForSurvey.getAndSet(true)) {
                 backgroundExecutor.execute(new Runnable() {
                     @Override public void run() {
-                        List<Survey> surveys = surveysRepository.getSurveys();
-                        List<Survey> abTestSurveys = new ArrayList<>(aliases.size());
-                        for (String alias : aliases) {
-                            for (Survey survey : surveys) {
-                                if (alias.equals(survey.canonicalName())) {
-                                    abTestSurveys.add(survey);
-                                }
-                            }
-                        }
+                        List<Survey> abTestSurveys = getSurveys(aliases);
                         if (!abTestSurveys.isEmpty()) {
                             int percentage = percentageProvider.abTestGroupPercent(abTestSurveys);
                             Survey surveyToDisplay = findMatchingSurvey(abTestSurveys, percentage);
@@ -315,6 +307,19 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 if (survey.equals(exceptForSurvey)) continue;
                 localStorage.markSurveyFinished(survey);
             }
+        }
+
+        private List<Survey> getSurveys(List<String> aliases) {
+            List<Survey> surveys = surveysRepository.getSurveys();
+            List<Survey> abTestSurveys = new ArrayList<>(aliases.size());
+            for (String alias : aliases) {
+                for (Survey survey : surveys) {
+                    if (alias.equals(survey.canonicalName())) {
+                        abTestSurveys.add(survey);
+                    }
+                }
+            }
+            return abTestSurveys;
         }
     }
 
