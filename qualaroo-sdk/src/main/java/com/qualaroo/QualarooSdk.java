@@ -79,7 +79,7 @@ public interface QualarooSdk {
     interface AbTestBuilder {
 
         /**
-         * @param aliases of surveys that you want to make an AB test out of
+         * @param aliases of surveys that you want to AB test.
          * @return {@link QualarooSdk.AbTestBuilder} for further configuration
          */
         AbTestBuilder fromSurveys(List<String> aliases);
@@ -87,6 +87,23 @@ public interface QualarooSdk {
         /**
          * Shows one of a provided surveys by {@link AbTestBuilder#fromSurveys(List)} call.
          * A survey will be chosen based on a random test group that a user is assigned to.
+         * You can configure a chance of a specific survey to be shown to a user by adjusting percentage of all visitors
+         * in Qualaroo's Dashboard targeting tab.
+         *
+         * Keep in mind that sum of percentages of all surveys that you want to AB test should be no higher than 100.
+         *
+         * An example (invalid):
+         * "my_survey_1" - 50%
+         * "my_survey_2" - 50%
+         * "my_survey_3" - 50%
+         *
+         * With this configuration, only first and second surveys will be taken into an account.
+         * First test group will be in [0-50) range, while the other will be [50,100).
+         *
+         * Correct version of an above example:
+         * "my_survey_1" - 30%
+         * "my_survey_2" - 30%
+         * "my_survey_3" - 40%
          */
         void show();
 
