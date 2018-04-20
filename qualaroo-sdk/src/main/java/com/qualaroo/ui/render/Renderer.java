@@ -33,8 +33,9 @@ public class Renderer {
         this.questionRenderers.put(QuestionType.NPS, new NpsQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.TEXT, new TextQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.TEXT_SINGLE, new TextQuestionRenderer(theme));
-        this.questionRenderers.put(QuestionType.UNKNOWN, new UnknownQuestionTypeRenderer(theme));
         this.questionRenderers.put(QuestionType.DROPDOWN, new DropdownQuestionRenderer(theme));
+        this.questionRenderers.put(QuestionType.BINARY, new BinaryQuestionRenderer(theme));
+        this.questionRenderers.put(QuestionType.UNKNOWN, new UnknownQuestionTypeRenderer(theme));
     }
 
     public View renderMessage(Context context, Message message, OnMessageConfirmedListener onMessageConfirmedListener) {
