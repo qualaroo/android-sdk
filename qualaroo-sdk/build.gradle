@@ -3,13 +3,13 @@
  */
 
 int major = 1
-int minor = 6
-int patch = 3
+int minor = 7
+int patch = 0
 
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
     sdkVersion = "$major.$minor.$patch"
-    sdkVersionMaven = "$sdkVersion-SNAPSHOT"
+    sdkVersionMaven = "$sdkVersion"
 }
 
 apply from: 'quality.gradle'
@@ -65,8 +65,8 @@ repositories {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:27.1.0"
-    implementation "com.android.support:design:27.1.0"
+    implementation "com.android.support:appcompat-v7:27.1.1"
+    implementation "com.android.support:design:27.1.1"
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.2'

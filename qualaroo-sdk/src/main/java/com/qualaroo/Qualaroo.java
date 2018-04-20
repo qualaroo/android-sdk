@@ -281,6 +281,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                                     matchSurveysAsFinished(abTestSurveys, surveyToDisplay);
                                 }
                             }
+                        } else {
+                            QualarooLogger.debug("No surveys found for the AB test.");
                         }
                         requestingForSurvey.set(false);
                     }
