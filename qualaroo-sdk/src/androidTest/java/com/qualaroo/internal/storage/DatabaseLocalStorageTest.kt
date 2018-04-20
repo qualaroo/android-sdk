@@ -152,4 +152,15 @@ class DatabaseLocalStorageTest {
 
         assertNull(localStorage.getUserGroupPercent(survey(id = 4)))
     }
+
+    @Test
+    fun storesAbTestGroupPercent() {
+        val surveys = listOf(survey(id = 1), survey(id = 2), survey(id = 3))
+        localStorage.storeAbTestGroupPercent(surveys, 25)
+
+        assertEquals(25, localStorage.getAbTestGroupPercent(surveys))
+        assertEquals(25, localStorage.getAbTestGroupPercent(surveys.reversed()))
+
+        assertNull(localStorage.getAbTestGroupPercent(listOf(survey(id = 1), survey(id = 2))))
+    }
 }

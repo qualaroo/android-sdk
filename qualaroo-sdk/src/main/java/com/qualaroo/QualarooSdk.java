@@ -3,6 +3,8 @@ package com.qualaroo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.List;
+
 public interface QualarooSdk {
     /**
      * Shows a survey with specified alias if all targeting conditions are met.
@@ -45,6 +47,12 @@ public interface QualarooSdk {
      */
     void setPreferredLanguage(@NonNull String iso2Language);
 
+    /**
+     * Starts a configuration of an AB test.
+     * @return an instance of {@link QualarooSdk.AbTestBuilder}
+     */
+    AbTestBuilder abTest();
+
     interface Builder {
         /**
          * Sets an API key.
@@ -66,5 +74,38 @@ public interface QualarooSdk {
          * This method has an effect only once. Configured instance of QualarooSdk is then stored per application's process.
          */
         void init();
+    }
+
+    interface AbTestBuilder {
+
+        /**
+         * @param aliases of surveys that you want to AB test.
+         * @return {@link QualarooSdk.AbTestBuilder} for further configuration
+         */
+        AbTestBuilder fromSurveys(List<String> aliases);
+
+        /**
+         * Shows one of a provided surveys by {@link AbTestBuilder#fromSurveys(List)} call.
+         * A survey will be chosen based on a random test group that a user is assigned to.
+         * You can configure a chance of a specific survey to be shown to a user by adjusting percentage of all visitors
+         * in Qualaroo's Dashboard targeting tab.
+         *
+         * Keep in mind that sum of percentages of all surveys that you want to AB test should be no higher than 100.
+         *
+         * An example (invalid):
+         * "my_survey_1" - 50%
+         * "my_survey_2" - 50%
+         * "my_survey_3" - 50%
+         *
+         * With this configuration, only first and second surveys will be taken into an account.
+         * First test group will be in [0-50) range, while the other will be [50,100).
+         *
+         * Correct version of an above example:
+         * "my_survey_1" - 30%
+         * "my_survey_2" - 30%
+         * "my_survey_3" - 40%
+         */
+        void show();
+
     }
 }

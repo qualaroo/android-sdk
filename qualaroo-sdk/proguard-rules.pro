@@ -36,6 +36,7 @@
 -keep public class com.qualaroo.Qualaroo$Builder {
     public *;
 }
+-keep interface com.qualaroo.QualarooSdk$AbTestBuilder {*;}
 
 -keep public class com.qualaroo.SurveyOptions {*;}
 -keep public class com.qualaroo.SurveyOptions$Builder {

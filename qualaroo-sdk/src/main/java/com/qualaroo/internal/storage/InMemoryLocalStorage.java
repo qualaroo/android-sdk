@@ -21,6 +21,7 @@ public class InMemoryLocalStorage implements LocalStorage {
     private final Map<Integer, SurveyStatus> surveyStatusMap = new HashMap<>();
     private final Map<String, String> userProperties = new HashMap<>();
     private final Map<Integer, Integer> surveyUserGroupPercents = new HashMap<>();
+    private final Map<String, Integer> abTestGroupPercents = new HashMap<>();
 
     @Override public synchronized void storeFailedReportRequest(String reportRequestUrl) {
         failedRequests.add(reportRequestUrl);
@@ -96,7 +97,18 @@ public class InMemoryLocalStorage implements LocalStorage {
         surveyUserGroupPercents.put(survey.id(), percent);
     }
 
-    @Nullable @Override public Integer getUserGroupPercent(Survey survey) {
+    @Override @Nullable public Integer getUserGroupPercent(Survey survey) {
         return surveyUserGroupPercents.get(survey.id());
     }
+
+    @Override public void storeAbTestGroupPercent(List<Survey> surveys, int percent) {
+        String key = AbTestStorageKeyHelper.build(surveys);
+        abTestGroupPercents.put(key, percent);
+    }
+
+    @Override @Nullable public Integer getAbTestGroupPercent(List<Survey> surveys) {
+        String key = AbTestStorageKeyHelper.build(surveys);
+        return abTestGroupPercents.get(key);
+    }
+
 }

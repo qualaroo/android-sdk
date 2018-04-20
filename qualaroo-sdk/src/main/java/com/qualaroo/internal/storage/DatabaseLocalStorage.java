@@ -45,6 +45,11 @@ public class DatabaseLocalStorage implements LocalStorage {
     private static final String USER_GROUP_PERCENT_SURVEY_TABLE = "userGroupPercentTable";
     private static final String USER_GROUP_PERCENT_SURVEY_ID = "surveyId";
     private static final String USER_GROUP_PERCENT_SURVEY_VALUE = "percent";
+
+    private static final String AB_TEST_GROUP_PERCENT_TABLE = "abTestGroupPercentTable";
+    private static final String AB_TEST_GROUP_PERCENT_KEY = "abTestId";
+    private static final String AB_TEST_GROUP_PERCENT_VALUE = "percent";
+
     private final SQLiteOpenHelper dbHelper;
 
     public DatabaseLocalStorage(Context context) {
@@ -193,6 +198,37 @@ public class DatabaseLocalStorage implements LocalStorage {
         return result;
     }
 
+    @Override public void storeAbTestGroupPercent(List<Survey> surveys, int percent) {
+        String key = AbTestStorageKeyHelper.build(surveys);
+        ContentValues values = new ContentValues();
+        values.put(AB_TEST_GROUP_PERCENT_KEY, key);
+        values.put(AB_TEST_GROUP_PERCENT_VALUE, percent);
+        insertOrUpdate(AB_TEST_GROUP_PERCENT_TABLE, values, AB_TEST_GROUP_PERCENT_KEY + "=?", new String[]{key});
+    }
+
+    @Nullable @Override public Integer getAbTestGroupPercent(List<Survey> surveys) {
+        Cursor cursor = null;
+        Integer result = null;
+        String key = AbTestStorageKeyHelper.build(surveys);
+        try {
+            cursor = writeableDb().query(
+                    AB_TEST_GROUP_PERCENT_TABLE,
+                    new String[]{AB_TEST_GROUP_PERCENT_VALUE},
+                    AB_TEST_GROUP_PERCENT_KEY + "=?", new String[]{key},
+                    null, null, null, String.valueOf(1));
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                result = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            result = null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
 
     private void insertOrUpdate(String tableName, ContentValues values, String whereClause, String[] whereArgs) {
         int affectedRows = writeableDb().update(tableName, values, whereClause, whereArgs);
@@ -210,7 +246,7 @@ public class DatabaseLocalStorage implements LocalStorage {
     }
 
     private static class QualarooSQLiteOpenHelper extends SQLiteOpenHelper {
-        private static final int DB_VERSION = 2;
+        private static final int DB_VERSION = 3;
 
         QualarooSQLiteOpenHelper(Context context, String databaseName) {
             super(context, databaseName, null, DB_VERSION);
@@ -221,11 +257,15 @@ public class DatabaseLocalStorage implements LocalStorage {
             createUserPropertiesTable(db);
             createSurveyStatusTable(db);
             createUserPercentGroupTable(db);
+            createAbTestGroupPercentTable(db);
         }
 
         @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion < 2) {
                 createUserPercentGroupTable(db);
+            }
+            if (oldVersion < 3) {
+                createAbTestGroupPercentTable(db);
             }
         }
 
@@ -237,6 +277,18 @@ public class DatabaseLocalStorage implements LocalStorage {
                     USER_GROUP_PERCENT_SURVEY_TABLE,
                     USER_GROUP_PERCENT_SURVEY_ID,
                     USER_GROUP_PERCENT_SURVEY_VALUE
+            );
+            db.execSQL(userPercentGroupTable);
+        }
+
+        private void createAbTestGroupPercentTable(SQLiteDatabase db) {
+            String userPercentGroupTable = format(
+                    "CREATE TABLE %1$s (" +
+                            "%2$s TEXT PRIMARY KEY," +
+                            "%3$s INTEGER DEFAULT 0);",
+                    AB_TEST_GROUP_PERCENT_TABLE,
+                    AB_TEST_GROUP_PERCENT_KEY,
+                    AB_TEST_GROUP_PERCENT_VALUE
             );
             db.execSQL(userPercentGroupTable);
         }

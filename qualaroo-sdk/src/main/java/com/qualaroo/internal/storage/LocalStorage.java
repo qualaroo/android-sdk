@@ -30,4 +30,7 @@ public interface LocalStorage {
      * @return stored value - null if there is no value stored for survey
      */
     @Nullable Integer getUserGroupPercent(Survey survey);
+
+    void storeAbTestGroupPercent(List<Survey> surveys, int percent);
+    @Nullable Integer getAbTestGroupPercent(List<Survey> surveys);
 }
