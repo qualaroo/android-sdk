@@ -93,6 +93,19 @@ To enable your receiver, register it in your `AndroidManifest.xml` file:
 </application> 
 ```
 
+#### Run AB tests [experimental!]
+You might want to test multiple surveys at once and verify which performs best.
+Out of surveys provided, one will be chosen on a random basis and presented to the user.
+This choice will be stored throught multiple app launches.
+
+To run an AB test out of surveys "A", "B" and "C":
+```java
+Qualaroo.getInstance().abTest()
+       .fromSurveys(Arrays.asList("my_survey_A", "my_survey_B", "my_survey_C"))
+       .show();
+```
+Keep in mind that this is an experimental feature and it's implementation might change in future releases.
+
 ## Debugging
 If you run into any issues while using the Android library, we recommend turning on logging to help you trace the issue. 
 You can do this by setting debug mode to true.
