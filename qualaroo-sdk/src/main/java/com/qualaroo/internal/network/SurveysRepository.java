@@ -99,9 +99,6 @@ public class SurveysRepository {
             if (!SURVEY_SDK_TYPE.equals(survey.type())) {
                 continue;
             }
-            if (!survey.isActive()) {
-                continue;
-            }
             if (surveyContainUnknownQuestionTypes(survey)) {
                 QualarooLogger.error("Survey [%1$d, %2$s] contains questions unsupported by this version of the SDK!", survey.id(), survey.canonicalName());
                 continue;

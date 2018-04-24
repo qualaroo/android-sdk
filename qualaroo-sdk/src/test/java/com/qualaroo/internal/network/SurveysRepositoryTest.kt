@@ -120,7 +120,7 @@ class SurveysRepositoryTest {
     }
 
     @Test
-    fun `filters out surveys that are not active`() {
+    fun `doesn't filters out surveys that are not active`() {
         val surveys = arrayOf(
                 survey(id = 1, active = true),
                 survey(id = 2, active = true),
@@ -131,8 +131,7 @@ class SurveysRepositoryTest {
 
         val result = surveysRepository.surveys
 
-        assertEquals(3, result.size)
-        assertFalse(result.contains(survey(id = 3)))
+        assertEquals(4, result.size)
     }
 
     @Test
