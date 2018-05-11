@@ -165,7 +165,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     private int calculateDimColor(@ColorInt int dimColor, float dimOpacity) {
         int alpha = Color.alpha(dimColor);
-        int newAlpha = (int) (alpha + (255 - alpha) * (1 - dimOpacity));
+        int newAlpha = (int) (alpha * dimOpacity);
         return Color.argb(newAlpha, Color.red(dimColor), Color.green(dimColor), Color.blue(dimColor));
     }
 
