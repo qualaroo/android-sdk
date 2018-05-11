@@ -42,7 +42,8 @@ class SurveyPresenterTest {
                 dimColor = 200,
                 backgroundColor = 400,
                 uiNormal = 300,
-                uiSelected = 200
+                uiSelected = 200,
+                dimOpacity = 0.5f
         )
         val survey = survey(
                 id = 1,
@@ -57,7 +58,7 @@ class SurveyPresenterTest {
         presenter.setView(view)
 
         val expectedSurveyViewModel = SurveyViewModel(
-                100, 400, 300, 200, 200, true, true, null
+                100, 400, 300, 200, 200, 0.5f, true, true, null
         )
 
         verify(view, times(1)).setup(expectedSurveyViewModel)

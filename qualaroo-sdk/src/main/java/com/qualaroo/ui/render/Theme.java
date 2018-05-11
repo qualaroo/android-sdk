@@ -30,6 +30,12 @@ public final class Theme {
         theme.buttonTextDisabled = parseColorSafely(map.buttonTextDisabled());
         theme.uiNormal = parseColorSafely(map.uiNormal());
         theme.uiSelected = parseColorSafely(map.uiSelected());
+        Float dimOpacity = map.dimOpacity();
+        if (dimOpacity != null) {
+            theme.dimOpacity = dimOpacity;
+        } else {
+            theme.dimOpacity = 1.0f;
+        }
         return theme;
     }
 
@@ -44,6 +50,7 @@ public final class Theme {
         theme.buttonTextDisabled = parseColorSafely(map.buttonTextColor());
         theme.uiNormal = parseColorSafely(map.buttonDisabledColor());
         theme.uiSelected = parseColorSafely(map.buttonEnabledColor());
+        theme.dimOpacity = 1.0f;
         return theme;
     }
 
@@ -89,12 +96,13 @@ public final class Theme {
     private int buttonTextDisabled;
     private int uiNormal;
     private int uiSelected;
+    private float dimOpacity;
 
     private Theme() {
         //for static factory method
     }
 
-    @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected) {
+    @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected, float dimOpacity) {
         this.backgroundColor = backgroundColor;
         this.dimColor = dimColor;
         this.textColor = textColor;
@@ -104,6 +112,7 @@ public final class Theme {
         this.buttonTextDisabled = buttonTextDisabled;
         this.uiNormal = uiNormal;
         this.uiSelected = uiSelected;
+        this.dimOpacity = dimOpacity;
     }
 
     @ColorInt public int backgroundColor() {
@@ -140,5 +149,9 @@ public final class Theme {
 
     @ColorInt public int uiSelected() {
         return uiSelected;
+    }
+
+    public float dimOpacity() {
+        return dimOpacity;
     }
 }

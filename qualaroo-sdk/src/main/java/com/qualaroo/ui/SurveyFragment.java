@@ -4,10 +4,12 @@ import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
@@ -140,7 +142,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         ImageViewCompat.setImageTintList(closeButton, ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
-        backgroundView.setBackgroundColor(viewModel.dimColor());
+        int dimColor = calculateDimColor(viewModel.dimColor(), viewModel.dimOpacity());
+        backgroundView.setBackgroundColor(dimColor);
         isFullScreen = viewModel.isFullscreen();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             surveyContainer.getLayoutTransition()
@@ -158,6 +161,12 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 surveyLogo.setImageBitmap(bitmap);
             }
         });
+    }
+
+    private int calculateDimColor(@ColorInt int dimColor, float dimOpacity) {
+        int alpha = Color.alpha(dimColor);
+        int newAlpha = (int) (alpha + (255 - alpha) * (1 - dimOpacity));
+        return Color.argb(newAlpha, Color.red(dimColor), Color.green(dimColor), Color.blue(dimColor));
     }
 
     @Override public void showWithAnimation() {

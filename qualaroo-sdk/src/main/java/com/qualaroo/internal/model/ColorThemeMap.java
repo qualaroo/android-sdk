@@ -1,5 +1,6 @@
 package com.qualaroo.internal.model;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
@@ -20,6 +21,7 @@ public final class ColorThemeMap implements Serializable {
     private final String buttonTextDisabled;
     private final String uiNormal;
     private final String uiSelected;
+    private final Float dimOpacity;
 
     public String dimType() {
         return dimType;
@@ -57,6 +59,11 @@ public final class ColorThemeMap implements Serializable {
         return uiSelected;
     }
 
+    @Nullable
+    public Float dimOpacity() {
+        return dimOpacity;
+    }
+
     @Deprecated public String buttonTextColor() {
         return buttonTextColor;
     }
@@ -69,7 +76,8 @@ public final class ColorThemeMap implements Serializable {
                                      String buttonTextEnabled,
                                      String buttonTextDisabled,
                                      String uiNormal,
-                                     String uiSelected) {
+                                     String uiSelected,
+                                     Float dimOpacity) {
         this.backgroundColor = backgroundColor;
         this.dimType = dimType;
         this.textColor = textColor;
@@ -79,6 +87,7 @@ public final class ColorThemeMap implements Serializable {
         this.buttonTextDisabled = buttonTextDisabled;
         this.uiNormal = uiNormal;
         this.uiSelected = uiSelected;
+        this.dimOpacity = dimOpacity;
         this.buttonTextColor = null;
     }
 
@@ -92,6 +101,7 @@ public final class ColorThemeMap implements Serializable {
         this.buttonTextDisabled = null;
         this.uiNormal = null;
         this.uiSelected = null;
+        this.dimOpacity = null;
         this.buttonTextColor = null;
     }
 }
