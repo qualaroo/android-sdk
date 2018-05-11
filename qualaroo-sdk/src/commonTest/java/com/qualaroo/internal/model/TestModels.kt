@@ -52,9 +52,10 @@ object TestModels {
     fun colorThemeMap(dimType: String = "light", backgroundColor: String = "#FFFFFF", textColor: String = "#000000",
                       buttonEnabledColor: String = "#00A000", buttonDisabledColor: String = "#A00000",
                       buttonTextEnabled: String = "#FFFFFF", buttonTextDisabled: String = "#FFFFFF",
-                      uiNormal: String = "#81D4FA", uiSelected: String = "#01579B"): ColorThemeMap {
+                      uiNormal: String = "#81D4FA", uiSelected: String = "#01579B",
+                      dimOpacity: Float = 1.0f): ColorThemeMap {
         return ColorThemeMap(backgroundColor, dimType, textColor, buttonEnabledColor, buttonDisabledColor,
-                buttonTextEnabled, buttonTextDisabled, uiNormal, uiSelected)
+                buttonTextEnabled, buttonTextDisabled, uiNormal, uiSelected, dimOpacity)
     }
 
     fun message(id: Long, type: MessageType = MessageType.REGULAR, description: String = "",

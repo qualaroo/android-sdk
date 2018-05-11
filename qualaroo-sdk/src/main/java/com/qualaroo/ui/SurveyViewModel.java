@@ -14,16 +14,18 @@ class SurveyViewModel {
     private final @ColorInt int uiNormal;
     private final @ColorInt int uiSelected;
     private final @ColorInt int dimColor;
+    private final float dimOpacity;
     private final boolean cannotBeClosed;
     private final boolean isFullscreen;
     private final @Nullable String logoUrl;
 
-    SurveyViewModel(int textColor, int backgroundColor, int uiNormal, int uiSelected, int dimColor, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
+    SurveyViewModel(int textColor, int backgroundColor, int uiNormal, int uiSelected, int dimColor, float dimOpacity, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.uiNormal = uiNormal;
         this.uiSelected = uiSelected;
         this.dimColor = dimColor;
+        this.dimOpacity = dimOpacity;
         this.cannotBeClosed = cannotBeClosed;
         this.isFullscreen = isFullscreen;
         this.logoUrl = logoUrl;
@@ -47,6 +49,10 @@ class SurveyViewModel {
 
     int dimColor() {
         return dimColor;
+    }
+
+    public float dimOpacity() {
+        return dimOpacity;
     }
 
     public int uiNormal() {
