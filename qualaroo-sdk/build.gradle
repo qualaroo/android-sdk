@@ -125,6 +125,15 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    def tasks = taskGraph.getAllTasks()
+    logging.captureStandardOutput LogLevel.INFO
+    tasks.findAll { it.name == "publish"}.each { task ->
+        String msg = "Please use an appropriate task to make sure that you are pushing either production or staging!"
+        throw new StopActionException(msg)
+    }
+}
+
 artifacts {
     archives sourcesJar
     archives javadocJar
@@ -134,7 +143,15 @@ publishing {
     repositories {
         maven {
             name 'QualarooProduction'
-            url "s3://qualaroo-android-sdk/${project.sdkVersionMaven.endsWith('-SNAPSHOT') ? 'snapshots' : 'libs' }/"
+            url "s3://qualaroo-android-sdk/libs/"
+            credentials(AwsCredentials) {
+                accessKey QUALAROO_S3_ACCESS_KEY
+                secretKey QUALAROO_S3_SECRET_KEY
+            }
+        }
+        maven {
+            name 'QualarooSnapshots'
+            url "s3://qualaroo-android-sdk/snapshots/"
             credentials(AwsCredentials) {
                 accessKey QUALAROO_S3_ACCESS_KEY
                 secretKey QUALAROO_S3_SECRET_KEY
