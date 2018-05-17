@@ -116,6 +116,21 @@ Qualaroo.initializeWith(context)
         .init();
 ```
 You can find more info at our [wiki pages](https://github.com/qualaroo/AndroidSDK/wiki)
+
+## ProGuard configuration
+The SDK comes with pre-defined set of ProGuard rules, so you don't have to modify your own.
+
+However, if you encounter any problems, please report it to us ([new issue](https://github.com/qualaroo/AndroidSDK/issues/new)) and try adding this rule to your configuration:
+
+```
+-keep public class com.qualaroo.internal.model.** {
+    private *;
+    <init>(...);
+}
+```
+
+
+
 ## License
 
 Copyright (c) 2017 Qualaroo
