@@ -36,6 +36,7 @@ class SurveyAliasesRepository(
                 .build()
         return Observable.fromCallable { execute(request) }
                 .flatMap { Observable.fromIterable(it) }
+                .filter { it.alias != null }
                 .map { it.alias }
                 .toList()
     }
