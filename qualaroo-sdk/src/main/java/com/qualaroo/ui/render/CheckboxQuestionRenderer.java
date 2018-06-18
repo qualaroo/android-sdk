@@ -57,6 +57,7 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
             if ((selectedAnswers < minAnswersCount || selectedAnswers == 0)  && question.isRequired()) {
                 button.setEnabled(false);
             } else if (selectedAnswers == maxAnswersCount) {
+                button.setEnabled(true);
                 enableUncheckedAnswers(checkablesContainer, false);
             } else if (selectedAnswers > maxAnswersCount) {
                 button.setEnabled(false);

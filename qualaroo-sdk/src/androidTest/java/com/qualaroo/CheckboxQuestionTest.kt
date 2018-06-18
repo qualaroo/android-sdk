@@ -232,4 +232,36 @@ class CheckboxQuestionTest {
     }
 
 
+    @Test
+    fun minSameAsMax() {
+        val question = TestModels.question(
+                id = 1,
+                type = QuestionType.CHECKBOX,
+                sendText = "go!",
+                isRequired = true,
+                minAnswersCount = 4,
+                maxAnswersCount = 4,
+                answerList = listOf(
+                        answer(1, "first"),
+                        answer(2, "second"),
+                        answer(3, "third"),
+                        answer(4, "fourth")
+                )
+        )
+
+        val rule = rule(question)
+        rule.launchActivity(rule.activityIntent)
+
+        onView(withText("first")).perform(click())
+        onView(withText("second")).perform(click())
+        onView(withText("third")).perform(click())
+        onView(withId(R.id.qualaroo__view_question_checkbox_confirm)).check(matches(not(isEnabled())))
+
+        onView(withText("fourth")).perform(click())
+        onView(withId(R.id.qualaroo__view_question_checkbox_confirm)).check(matches(isEnabled()))
+
+        rule.finishActivity()
+    }
+
+
 }
