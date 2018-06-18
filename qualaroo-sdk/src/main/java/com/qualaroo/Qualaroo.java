@@ -10,6 +10,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualaroo.internal.AbTestGroupPercentageProvider;
+import com.qualaroo.internal.ActiveStatusMatcher;
 import com.qualaroo.internal.Credentials;
 import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ImageProvider;
@@ -388,6 +389,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
                 UserPropertiesInjector userPropertiesInjector = new UserPropertiesInjector(userInfo);
                 SurveyDisplayQualifier surveyDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new ActiveStatusMatcher())
                         .register(new SurveyStatusMatcher(localStorage))
                         .register(new UserPropertiesMatcher(userInfo))
                         .register(new UserIdentityMatcher(userInfo))
@@ -396,6 +398,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                         .build();
 
                 SurveyDisplayQualifier abTestDisplayQualifier = SurveyDisplayQualifier.builder()
+                        .register(new ActiveStatusMatcher())
                         .register(new SurveyStatusMatcher(localStorage))
                         .register(new UserPropertiesMatcher(userInfo))
                         .register(new UserIdentityMatcher(userInfo))
