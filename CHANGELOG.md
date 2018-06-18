@@ -1,3 +1,10 @@
+## 1.7.1
+- support for binary-type questions
+- support for min/max checkbox answers
+- support for custom properties in questions/descriptions
+- support for changing opacity of survey's background
+- [experimental] support for AB testing surveys
+
 ## 1.6.3
 - radio and checkbox improvements for pre-Marshmallow devices
 
