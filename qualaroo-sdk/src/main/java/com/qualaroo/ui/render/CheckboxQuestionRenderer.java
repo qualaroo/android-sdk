@@ -44,27 +44,9 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         button.setEnabled(!question.isRequired());
         ThemeUtils.applyTheme(button, getTheme());
 
-        final int minAnswersCount = question.minAnswersCount();
-        final int maxAnswersCount;
-        if (question.maxAnswersCount() == 0) {
-            maxAnswersCount = question.answerList().size();
-        } else {
-            maxAnswersCount = question.maxAnswersCount();
-        }
-
         CompoundButton.OnCheckedChangeListener listener = (compoundButton, b) -> {
             int selectedAnswers = selectedAnswers(checkablesContainer);
-            if ((selectedAnswers < minAnswersCount || selectedAnswers == 0)  && question.isRequired()) {
-                button.setEnabled(false);
-            } else if (selectedAnswers == maxAnswersCount) {
-                button.setEnabled(true);
-                enableUncheckedAnswers(checkablesContainer, false);
-            } else if (selectedAnswers > maxAnswersCount) {
-                button.setEnabled(false);
-            } else {
-                enableUncheckedAnswers(checkablesContainer, true);
-                button.setEnabled(true);
-            }
+            invalidateViewState(question, checkablesContainer, button, selectedAnswers);
         };
         for (Answer answer : question.answerList()) {
             View checkBox = buildCheckBox(context, answer, listener);
@@ -82,6 +64,20 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
                 .onSaveState(outState -> saveState(outState, checkablesContainer))
                 .onRestoreState(savedState -> restoreState(savedState, checkablesContainer))
                 .build();
+    }
+
+    private void invalidateViewState(Question question, ViewGroup checkablesContainer, Button button, int selectedAnswers) {
+        final int minAnswers = question.minAnswersCount();
+        final int maxAnswers = question.maxAnswersCount() == 0 ?
+                question.answerList().size() :
+                question.maxAnswersCount();
+
+        boolean shouldDisableButton =
+                        question.isRequired() && (selectedAnswers == 0 || selectedAnswers < minAnswers) ||
+                        selectedAnswers > maxAnswers;
+        button.setEnabled(!shouldDisableButton);
+
+        enableUncheckedAnswers(checkablesContainer, selectedAnswers < maxAnswers);
     }
 
     private int selectedAnswers(ViewGroup checkablesContainer) {
