@@ -3,7 +3,6 @@ package com.qualaroo.ui;
 import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -64,6 +63,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private FrameLayout questionsContent;
     private ImageView closeButton;
     private ImageView surveyLogo;
+    private ProgressBarView progressBar;
 
     private boolean isFullScreen;
     private RestorableView restorableView;
@@ -81,6 +81,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
         surveyLogo = view.findViewById(R.id.qualaroo__survey_logo);
+        progressBar = view.findViewById(R.id.qualaroo__progress_bar);
         try {
             Drawable applicationIcon = getContext().getPackageManager().getApplicationIcon(getContext().getPackageName());
             surveyLogo.setImageDrawable(applicationIcon);
@@ -138,7 +139,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     @Override public void setup(SurveyViewModel viewModel) {
         questionsTitleTop.setTextColor(viewModel.textColor());
         questionsTitleBottom.setTextColor(viewModel.textColor());
-        ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
+        surveyContainer.setBackgroundColor(viewModel.backgroundColor());
         ImageViewCompat.setImageTintList(closeButton, ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
@@ -161,6 +162,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 surveyLogo.setImageBitmap(bitmap);
             }
         });
+        progressBar.setColors(viewModel.uiSelected(), viewModel.uiNormal());
     }
 
     private int calculateDimColor(@ColorInt int dimColor, float dimOpacity) {
@@ -254,7 +256,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
         if (viewState != null) {
             restorableView.restoreState(viewState);
         }
+    }
 
+    @Override public void setProgress(float progress) {
+        progressBar.setProgress(progress);
     }
 
     @Override public void forceShowKeyboardWithDelay(long delayInMillis) {

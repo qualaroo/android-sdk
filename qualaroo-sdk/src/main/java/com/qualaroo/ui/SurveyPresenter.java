@@ -84,6 +84,10 @@ class SurveyPresenter {
             isDisplayingQuestion = true;
         }
 
+        @Override public void setProgress(float progress) {
+            surveyView.setProgress(progress);
+        }
+
         @Override public void openUri(@NonNull String stringUri) {
             uriOpener.openUri(stringUri);
         }
