@@ -122,7 +122,7 @@ public class SurveyInteractor {
         this.numOfStepsDisplayed++;
         this.currentNode = node;
         if (currentNode != null) {
-            stepsLeftCalculator.setCurrentStep(node.id(), node.nodeType());
+            stepsLeftCalculator.setCurrentStep(currentNode.id(), currentNode.nodeType());
             int stepsLeft = stepsLeftCalculator.getStepsLeft();
             float progress = (float) numOfStepsDisplayed / (numOfStepsDisplayed + stepsLeft);
             eventsObserver.setProgress(progress);
