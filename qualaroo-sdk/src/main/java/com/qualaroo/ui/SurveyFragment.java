@@ -157,11 +157,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyContainer.setGravity(Gravity.CENTER);
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
-        imageProvider.getImage(viewModel.logoUrl(), new ImageProvider.OnBitmapLoadedListener() {
-            @Override public void onBitmapReady(Bitmap bitmap) {
-                surveyLogo.setImageBitmap(bitmap);
-            }
-        });
+        imageProvider.getImage(viewModel.logoUrl(), bitmap -> surveyLogo.setImageBitmap(bitmap));
         progressBar.setColors(viewModel.uiSelected(), viewModel.uiNormal());
     }
 
