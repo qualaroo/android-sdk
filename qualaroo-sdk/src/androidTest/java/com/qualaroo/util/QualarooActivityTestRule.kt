@@ -8,11 +8,15 @@ import com.qualaroo.QualarooActivity
 import com.qualaroo.internal.model.Survey
 
 class QualarooActivityTestRule(val survey: Survey) : ActivityTestRule<QualarooActivity>(QualarooActivity::class.java) {
+
+    var postQualarooInitialize: (() -> (Unit))? = null
+
     override fun beforeActivityLaunched() {
         Qualaroo.initializeWith(InstrumentationRegistry.getInstrumentation().targetContext)
                 .setApiKey("API_KEY_HERE")
                 .setDebugMode(true)
                 .init()
+        postQualarooInitialize?.invoke()
     }
 
     public override fun getActivityIntent(): Intent {
@@ -20,5 +24,9 @@ class QualarooActivityTestRule(val survey: Survey) : ActivityTestRule<QualarooAc
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             putExtra("com.qualaroo.survey", survey)
         }
+    }
+
+    fun launchActivity() {
+        launchActivity(activityIntent)
     }
 }
