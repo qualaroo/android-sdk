@@ -120,7 +120,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final SurveyComponent.Factory surveyComponentFactory;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
 
-    private Language preferredLanguage = new Language("en");
+    @Nullable private Language preferredLanguage;
 
     @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
                                 SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
@@ -222,8 +222,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         });
     }
 
-    @Override public synchronized void setPreferredLanguage(@NonNull String iso2Language) {
-        this.preferredLanguage = new Language(iso2Language);
+    @Override public synchronized void setPreferredLanguage(@Nullable String iso2Language) {
+        if (iso2Language != null) {
+            this.preferredLanguage = new Language(iso2Language);
+        } else {
+            this.preferredLanguage = null;
+        }
     }
 
     @Override public AbTestBuilder abTest() {
@@ -486,7 +490,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             logErrorMessage();
         }
 
-        @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+        @Override public void setPreferredLanguage(@Nullable String iso2Language) {
             logErrorMessage();
         }
 

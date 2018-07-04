@@ -42,10 +42,11 @@ public interface QualarooSdk {
 
     /**
      * Sets default language for surveys.
-     * Fallbacks to English or the first available language if default is not found in a survey.
+     * Fallbacks to user's locale or the first available language if default is not found in a survey.
      * @param iso2Language ISO 639-1 compatible language code (two lowercase letters)
+     *                     Passing null value will remove preferred language.
      */
-    void setPreferredLanguage(@NonNull String iso2Language);
+    void setPreferredLanguage(@Nullable String iso2Language);
 
     /**
      * Starts a configuration of an AB test.

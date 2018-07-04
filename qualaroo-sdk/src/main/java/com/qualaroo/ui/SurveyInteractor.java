@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +46,7 @@ public class SurveyInteractor {
     private final Survey survey;
     private final LocalStorage localStorage;
     private final ReportManager reportManager;
-    private final Language preferredLanguage;
+    @Nullable private final Language preferredLanguage;
     private final Shuffler shuffler;
     private final SurveyEventPublisher surveyEventPublisher;
     private final Executor backgroundExecutor;
@@ -58,7 +59,7 @@ public class SurveyInteractor {
     private EventsObserver eventsObserver = new StubEventsObserver();
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
-    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
+    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, @Nullable Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
         this.localStorage = localStorage;
         this.reportManager = reportManager;
@@ -299,10 +300,10 @@ public class SurveyInteractor {
         if (map.isEmpty()) {
             return Collections.emptyList();
         }
-        if (map.containsKey(preferredLanguage)) {
+        if (preferredLanguage != null && map.containsKey(preferredLanguage)) {
             return map.get(preferredLanguage);
         }
-        Language defaultLanguage = new Language("en");
+        Language defaultLanguage = new Language(Locale.getDefault().getLanguage());
         if (map.containsKey(defaultLanguage)) {
             return map.get(defaultLanguage);
         }
@@ -314,10 +315,10 @@ public class SurveyInteractor {
         if (map.isEmpty()) {
             return null;
         }
-        if (map.containsKey(preferredLanguage)) {
+        if (preferredLanguage != null && map.containsKey(preferredLanguage)) {
             return map.get(preferredLanguage);
         }
-        Language defaultLanguage = new Language("en");
+        Language defaultLanguage = new Language(Locale.getDefault().getLanguage());
         if (map.containsKey(defaultLanguage)) {
             return map.get(defaultLanguage);
         }
