@@ -300,30 +300,16 @@ public class SurveyInteractor {
         if (map.isEmpty()) {
             return Collections.emptyList();
         }
-        if (preferredLanguage != null && map.containsKey(preferredLanguage)) {
-            return map.get(preferredLanguage);
-        }
-        Language defaultLanguage = new Language(Locale.getDefault().getLanguage());
-        if (map.containsKey(defaultLanguage)) {
-            return map.get(defaultLanguage);
-        }
-        Language firstLanguage = survey.spec().surveyVariations().get(0);
-        return map.get(firstLanguage);
+        Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
+        return map.get(targetLanguage);
     }
 
     private Node selectStartNode(Map<Language, Node> map) {
         if (map.isEmpty()) {
             return null;
         }
-        if (preferredLanguage != null && map.containsKey(preferredLanguage)) {
-            return map.get(preferredLanguage);
-        }
-        Language defaultLanguage = new Language(Locale.getDefault().getLanguage());
-        if (map.containsKey(defaultLanguage)) {
-            return map.get(defaultLanguage);
-        }
-        Language firstLanguage = survey.spec().surveyVariations().get(0);
-        return map.get(firstLanguage);
+        Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
+        return map.get(targetLanguage);
     }
 
     private interface IdExtractor<T> {
