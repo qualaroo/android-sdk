@@ -44,6 +44,7 @@ import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
 import com.qualaroo.ui.SurveyStarter;
+import com.qualaroo.util.LanguageHelper;
 import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
@@ -178,8 +179,9 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private boolean showSurvey(@NonNull final Survey survey, @NonNull final SurveyOptions options, final SurveyDisplayQualifier surveyDisplayQualifier) {
         if (canDisplaySurvey(survey, options, surveyDisplayQualifier)) {
             QualarooLogger.debug("Displaying survey " + survey.canonicalName());
+            Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
             final Survey finalSurveyToDisplay =
-                    userPropertiesInjector.injectCustomProperties(survey, preferredLanguage);
+                    userPropertiesInjector.injectCustomProperties(survey, targetLanguage);
             uiExecutor.execute(new Runnable() {
                 @Override public void run() {
                     surveyStarter.start(finalSurveyToDisplay);
