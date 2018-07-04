@@ -19,13 +19,13 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.internal.storage.LocalStorage;
+import com.qualaroo.util.LanguageHelper;
 import com.qualaroo.util.Shuffler;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
