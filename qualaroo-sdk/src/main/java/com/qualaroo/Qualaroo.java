@@ -44,6 +44,7 @@ import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
 import com.qualaroo.ui.SurveyStarter;
+import com.qualaroo.util.LanguageHelper;
 import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
@@ -120,7 +121,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final SurveyComponent.Factory surveyComponentFactory;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
 
-    private Language preferredLanguage = new Language("en");
+    @Nullable private Language preferredLanguage;
 
     @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
                                 SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
@@ -178,8 +179,9 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private boolean showSurvey(@NonNull final Survey survey, @NonNull final SurveyOptions options, final SurveyDisplayQualifier surveyDisplayQualifier) {
         if (canDisplaySurvey(survey, options, surveyDisplayQualifier)) {
             QualarooLogger.debug("Displaying survey " + survey.canonicalName());
+            Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
             final Survey finalSurveyToDisplay =
-                    userPropertiesInjector.injectCustomProperties(survey, preferredLanguage);
+                    userPropertiesInjector.injectCustomProperties(survey, targetLanguage);
             uiExecutor.execute(new Runnable() {
                 @Override public void run() {
                     surveyStarter.start(finalSurveyToDisplay);
@@ -222,8 +224,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         });
     }
 
-    @Override public synchronized void setPreferredLanguage(@NonNull String iso2Language) {
-        this.preferredLanguage = new Language(iso2Language);
+    @Override public synchronized void setPreferredLanguage(@Nullable String iso2Language) {
+        if (iso2Language != null) {
+            this.preferredLanguage = new Language(iso2Language);
+        } else {
+            this.preferredLanguage = null;
+        }
     }
 
     @Override public AbTestBuilder abTest() {
@@ -486,7 +492,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             logErrorMessage();
         }
 
-        @Override public void setPreferredLanguage(@NonNull String iso2Language) {
+        @Override public void setPreferredLanguage(@Nullable String iso2Language) {
             logErrorMessage();
         }
 

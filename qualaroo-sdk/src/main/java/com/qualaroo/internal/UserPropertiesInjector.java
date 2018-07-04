@@ -33,7 +33,7 @@ public class UserPropertiesInjector {
         return new PropertiesMatcher(userInfo).matches(survey);
     }
 
-    public Survey injectCustomProperties(Survey survey, Language language) {
+    public Survey injectCustomProperties(Survey survey, @Nullable Language language) {
         Map<String, String> userProperties = userInfo.getUserProperties();
 
         Map<Language, List<Question>> questionList = new HashMap<>(survey.spec().questionList());

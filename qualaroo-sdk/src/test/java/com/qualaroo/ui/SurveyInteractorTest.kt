@@ -22,6 +22,7 @@ import com.qualaroo.util.TestExecutors
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.util.*
 import java.util.concurrent.Executor
 
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
@@ -81,7 +82,7 @@ class SurveyInteractorTest {
             withSurvey: Survey = survey,
             withStorage: LocalStorage = localStorage,
             withReportManager: ReportManager = reportManager,
-            withPreferredLanguage: Language = preferredLanguage,
+            withPreferredLanguage: Language? = preferredLanguage,
             withShuffler: Shuffler = shuffler,
             withEventPublisher: SurveyEventPublisher = surveyEventPublisher,
             withBackgroundExecutor: Executor = backgroundExecutor,
@@ -110,31 +111,113 @@ class SurveyInteractorTest {
     }
 
     @Test
-    fun `runs with preffered language`() {
+    fun `runs with preferred language`() {
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                ),
+                                language("pl") to node(
+                                        id = 200,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100,
+                                                answerList = listOf(answer(id = 123), answer(id = 124)),
+                                                nextMap = node(
+                                                        id = 101,
+                                                        nodeType = "question"
+                                                )
+                                        ),
+                                        question(
+                                                id = 101,
+                                                answerList = listOf(answer(id = 1010), answer(id = 1011))
+                                        )
+                                ),
+                                language("pl") to listOf(
+                                        question(
+                                                id = 200
+                                        )
+                                )
+                        ),
+                        msgScreenList = mapOf(),
+                        surveyVariations = listOf(language("en"), language("pl"))
+                )
+        )
+        val interactor = interactor(withSurvey = survey, withPreferredLanguage = Language("pl"))
+        interactor.registerObserver(observer)
         interactor.displaySurvey()
 
         val expectedQuestion = question(
-                id = 100,
+                id = 200,
                 type = QuestionType.TEXT
         )
         verify(observer, times(1)).showQuestion(expectedQuestion)
     }
 
     @Test
-    fun `fallbacks to "en" language when preferred one is not available`() {
-        val interactor = interactor(withPreferredLanguage = language("unknown_language"))
+    fun `fallbacks to locale language when preferred one is not available`() {
+        Locale.setDefault(Locale("pl"))
+        val survey = survey(
+                id = 123,
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                ),
+                                language("pl") to node(
+                                        id = 200,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100,
+                                                answerList = listOf(answer(id = 123), answer(id = 124)),
+                                                nextMap = node(
+                                                        id = 101,
+                                                        nodeType = "question"
+                                                )
+                                        ),
+                                        question(
+                                                id = 101,
+                                                answerList = listOf(answer(id = 1010), answer(id = 1011))
+                                        )
+                                ),
+                                language("pl") to listOf(
+                                        question(
+                                                id = 200
+                                        )
+                                )
+                        ),
+                        msgScreenList = mapOf(),
+                        surveyVariations = listOf(language("en"), language("pl"))
+                )
+        )
+
+
+        val interactor = interactor(withSurvey = survey, withPreferredLanguage = language("de"))
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()
 
         val expectedQuestion = question(
-                id = 100
+                id = 200
         )
         verify(observer, times(1)).showQuestion(expectedQuestion)
     }
 
     @Test
-    fun `fallbacks to first language if no "en" language available`() {
+    fun `fallbacks to first language if one from locale is not available`() {
+        Locale.setDefault(Locale("en"))
         val survey = survey(
                 id = 123,
                 spec = spec(
@@ -164,7 +247,7 @@ class SurveyInteractorTest {
                         surveyVariations = listOf(language("us"), language("pl"))
                 )
         )
-        val interactor = interactor(withSurvey = survey, withPreferredLanguage = language("unknown_language"))
+        val interactor = interactor(withSurvey = survey, withPreferredLanguage = null)
         interactor.registerObserver(observer)
 
         interactor.displaySurvey()

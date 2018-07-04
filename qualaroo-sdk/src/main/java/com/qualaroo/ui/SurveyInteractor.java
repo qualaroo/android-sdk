@@ -19,6 +19,7 @@ import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.internal.storage.LocalStorage;
+import com.qualaroo.util.LanguageHelper;
 import com.qualaroo.util.Shuffler;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class SurveyInteractor {
     private final Survey survey;
     private final LocalStorage localStorage;
     private final ReportManager reportManager;
-    private final Language preferredLanguage;
+    @Nullable private final Language preferredLanguage;
     private final Shuffler shuffler;
     private final SurveyEventPublisher surveyEventPublisher;
     private final Executor backgroundExecutor;
@@ -58,7 +59,7 @@ public class SurveyInteractor {
     private EventsObserver eventsObserver = new StubEventsObserver();
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
-    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
+    SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, @Nullable Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
         this.survey = survey;
         this.localStorage = localStorage;
         this.reportManager = reportManager;
@@ -299,30 +300,16 @@ public class SurveyInteractor {
         if (map.isEmpty()) {
             return Collections.emptyList();
         }
-        if (map.containsKey(preferredLanguage)) {
-            return map.get(preferredLanguage);
-        }
-        Language defaultLanguage = new Language("en");
-        if (map.containsKey(defaultLanguage)) {
-            return map.get(defaultLanguage);
-        }
-        Language firstLanguage = survey.spec().surveyVariations().get(0);
-        return map.get(firstLanguage);
+        Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
+        return map.get(targetLanguage);
     }
 
     private Node selectStartNode(Map<Language, Node> map) {
         if (map.isEmpty()) {
             return null;
         }
-        if (map.containsKey(preferredLanguage)) {
-            return map.get(preferredLanguage);
-        }
-        Language defaultLanguage = new Language("en");
-        if (map.containsKey(defaultLanguage)) {
-            return map.get(defaultLanguage);
-        }
-        Language firstLanguage = survey.spec().surveyVariations().get(0);
-        return map.get(firstLanguage);
+        Language targetLanguage = LanguageHelper.getTargetLanguage(survey, preferredLanguage);
+        return map.get(targetLanguage);
     }
 
     private interface IdExtractor<T> {
