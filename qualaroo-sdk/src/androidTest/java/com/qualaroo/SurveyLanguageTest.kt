@@ -73,7 +73,7 @@ class SurveyLanguageTest {
                                     nodeType = "message"
                             )
                     ),
-                    surveyVariations = listOf(language("en"), language("pl"), language("en"), language("de"))
+                    surveyVariations = listOf(language("en"), language("pl"), language("fi"), language("de"))
             )
     )
 
