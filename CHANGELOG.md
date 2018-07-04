@@ -1,3 +1,7 @@
+## 1.7.2
+- fixed a bug with user's locale being ignored when deciding which version of survey should be displayed
+- fixed a bug related to injecting custom properties
+
 ## 1.7.1
 - support for binary-type questions
 - support for min/max checkbox answers
