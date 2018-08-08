@@ -8,10 +8,6 @@
     android:orientation="vertical"
     android:gravity="bottom">
 
-    <com.qualaroo.ui.ProgressBarView
-        android:id="@+id/qualaroo__progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="6dp" />
 
     <LinearLayout
         android:id="@+id/qualaroo__linearlayout"

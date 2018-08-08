@@ -119,7 +119,9 @@ public class SurveyInteractor {
     }
 
     private void followNode(@Nullable Node node) {
-        this.numOfStepsDisplayed++;
+        if (currentNode != node) {
+            this.numOfStepsDisplayed++;
+        }
         this.currentNode = node;
         if (currentNode != null) {
             stepsLeftCalculator.setCurrentStep(currentNode.id(), currentNode.nodeType());

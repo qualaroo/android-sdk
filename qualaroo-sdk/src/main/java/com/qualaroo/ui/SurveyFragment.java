@@ -56,7 +56,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     Renderer renderer;
     ImageProvider imageProvider;
 
-    private View backgroundView;
+    private ViewGroup backgroundView;
     private LinearLayout surveyContainer;
     private TextView questionsTitleTop;
     private TextView questionsTitleBottom;
@@ -81,7 +81,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent = view.findViewById(R.id.qualaroo__question_content);
         surveyContainer = view.findViewById(R.id.qualaroo__survey_container);
         surveyLogo = view.findViewById(R.id.qualaroo__survey_logo);
-        progressBar = view.findViewById(R.id.qualaroo__progress_bar);
         try {
             Drawable applicationIcon = getContext().getPackageManager().getApplicationIcon(getContext().getPackageName());
             surveyLogo.setImageDrawable(applicationIcon);
@@ -158,7 +157,25 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
         imageProvider.getImage(viewModel.logoUrl(), bitmap -> surveyLogo.setImageBitmap(bitmap));
+        progressBar = new ProgressBarView(getContext(), null);
+        setupProgressBar(progressBar, viewModel);
+    }
+
+    public void setupProgressBar(ProgressBarView progressBar, SurveyViewModel viewModel) {
+        if (viewModel.progressBarPosition() == ProgressBarPosition.NONE) return;
         progressBar.setColors(viewModel.uiSelected(), viewModel.uiNormal());
+        int height = getResources().getDimensionPixelSize(R.dimen.qualaroo__progress_bar_height);
+        progressBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        if (viewModel.isFullscreen()) {
+            int gravity = viewModel.progressBarPosition() == ProgressBarPosition.TOP ? Gravity.TOP : Gravity.BOTTOM;
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(progressBar.getLayoutParams());
+            params.gravity = gravity;
+            progressBar.setLayoutParams(params);
+            backgroundView.addView(progressBar);
+        } else {
+            boolean addAsLast = viewModel.progressBarPosition() == ProgressBarPosition.BOTTOM;
+            surveyContainer.addView(progressBar, addAsLast ? surveyContainer.getChildCount() : 0);
+        }
     }
 
     private int calculateDimColor(@ColorInt int dimColor, float dimOpacity) {
@@ -334,4 +351,5 @@ public class SurveyFragment extends Fragment implements SurveyView {
     public void onBackPressed() {
         surveyPresenter.onCloseClicked();
     }
+
 }

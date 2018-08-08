@@ -18,8 +18,9 @@ class SurveyViewModel {
     private final boolean cannotBeClosed;
     private final boolean isFullscreen;
     private final @Nullable String logoUrl;
+    private final ProgressBarPosition progressBarPosition;
 
-    SurveyViewModel(int textColor, int backgroundColor, int uiNormal, int uiSelected, int dimColor, float dimOpacity, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl) {
+    SurveyViewModel(int textColor, int backgroundColor, int uiNormal, int uiSelected, int dimColor, float dimOpacity, boolean cannotBeClosed, boolean isFullscreen, @Nullable String logoUrl, ProgressBarPosition progressBarPosition) {
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.uiNormal = uiNormal;
@@ -29,6 +30,7 @@ class SurveyViewModel {
         this.cannotBeClosed = cannotBeClosed;
         this.isFullscreen = isFullscreen;
         this.logoUrl = logoUrl;
+        this.progressBarPosition = progressBarPosition;
     }
 
     boolean cannotBeClosed() {
@@ -61,6 +63,10 @@ class SurveyViewModel {
 
     public int uiSelected() {
         return uiSelected;
+    }
+
+    public ProgressBarPosition progressBarPosition() {
+        return progressBarPosition;
     }
 
     @Nullable public String logoUrl() {

@@ -205,6 +205,7 @@ public final class Survey implements Serializable {
         private final boolean mandatory;
         private final boolean showFullScreen;
         private final String logoUrl;
+        private final String progressBar;
 
         public ColorThemeMap colorThemeMap() {
             return colorThemeMap;
@@ -218,16 +219,21 @@ public final class Survey implements Serializable {
             return showFullScreen;
         }
 
+        public String progressBar() {
+            return progressBar;
+        }
+
         @Nullable public String logoUrl() {
             return logoUrl;
         }
 
         @VisibleForTesting OptionMap(ColorThemeMap colorThemeMap, boolean mandatory, boolean showFullScreen,
-                                     String logoUrl) {
+                                     String logoUrl, String progressBar) {
             this.colorThemeMap = colorThemeMap;
             this.mandatory = mandatory;
             this.showFullScreen = showFullScreen;
             this.logoUrl = logoUrl;
+            this.progressBar = progressBar;
         }
 
         @SuppressWarnings("unused") private OptionMap() {
@@ -235,6 +241,7 @@ public final class Survey implements Serializable {
             this.mandatory = false;
             this.showFullScreen = false;
             this.logoUrl = null;
+            this.progressBar = null;
         }
     }
 
