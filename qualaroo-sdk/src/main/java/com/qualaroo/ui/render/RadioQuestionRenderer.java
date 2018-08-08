@@ -78,14 +78,15 @@ final class RadioQuestionRenderer extends QuestionRenderer {
                 })
                 .onRestoreState(new RestorableView.OnRestoreState() {
                     @Override public void onRestoreState(Bundle savedState) {
-                        restoreState(savedState, container);
+                        restoreState(savedState, container, button);
                     }
                 }).build();
     }
 
-    private void restoreState(Bundle savedState, ListeningCheckableGroup radioGroup) {
+    private void restoreState(Bundle savedState, ListeningCheckableGroup radioGroup, Button button) {
         int checkedId = savedState.getInt(KEY_SELECTED_ITEM, ListeningCheckableGroup.NOTHING_SELECTED);
         radioGroup.check(checkedId);
+        button.setEnabled(checkedId != ListeningCheckableGroup.NOTHING_SELECTED);
         SparseArray<FreeformCommentCompoundButton.State> stateList = savedState.getSparseParcelableArray(KEY_FREEFORM_COMMENTS);
         if (stateList == null) {
             return;
