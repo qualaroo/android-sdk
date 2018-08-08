@@ -58,7 +58,7 @@ class SurveyPresenterTest {
         presenter.setView(view)
 
         val expectedSurveyViewModel = SurveyViewModel(
-                100, 400, 300, 200, 200, 0.5f, true, true, null
+                100, 400, 300, 200, 200, 0.5f, true, true, null, ProgressBarPosition.NONE
         )
 
         verify(view, times(1)).setup(expectedSurveyViewModel)

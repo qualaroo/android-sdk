@@ -41,7 +41,7 @@ class SurveyPresenter {
         surveyView.setup(new SurveyViewModel(
                 theme.textColor(), theme.backgroundColor(), theme.uiNormal(), theme.uiSelected(), theme.dimColor(),
                 theme.dimOpacity(), survey.spec().optionMap().isMandatory(), survey.spec().optionMap().isShowFullScreen(),
-                survey.spec().optionMap().logoUrl()));
+                survey.spec().optionMap().logoUrl(), ProgressBarPosition.fromValue(survey.spec().optionMap().progressBar())));
         interactor.registerObserver(eventsObserver);
     }
 
@@ -82,6 +82,10 @@ class SurveyPresenter {
                 surveyView.forceShowKeyboardWithDelay(600);
             }
             isDisplayingQuestion = true;
+        }
+
+        @Override public void setProgress(float progress) {
+            surveyView.setProgress(progress);
         }
 
         @Override public void openUri(@NonNull String stringUri) {

@@ -21,8 +21,8 @@ object TestModels {
     }
 
     fun optionMap(colorThemeMap: ColorThemeMap = colorThemeMap(), mandatory: Boolean = false,
-                  showFullScreen: Boolean = false, logoUrl: String? = null): Survey.OptionMap {
-        return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl)
+                  showFullScreen: Boolean = false, logoUrl: String? = null, progressBarPosition: String? = null): Survey.OptionMap {
+        return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl, progressBarPosition)
     }
 
     fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title",

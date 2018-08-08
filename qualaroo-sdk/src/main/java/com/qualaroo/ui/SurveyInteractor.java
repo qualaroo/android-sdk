@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.util.LongSparseArray;
 
+import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.ReportManager;
 import com.qualaroo.internal.event.SurveyEvent;
 import com.qualaroo.internal.event.SurveyEventPublisher;
@@ -18,6 +19,7 @@ import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
+import com.qualaroo.internal.progress.StepsLeftCalculator;
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.util.LanguageHelper;
 import com.qualaroo.util.Shuffler;
@@ -39,6 +41,7 @@ public class SurveyInteractor {
         void showQuestion(Question question);
         void showMessage(Message message);
         void showLeadGen(QScreen qscreen, List<Question> questions);
+        void setProgress(float progress);
         void openUri(@NonNull String stringUri);
         void closeSurvey();
     }
@@ -54,12 +57,16 @@ public class SurveyInteractor {
     private final LongSparseArray<Question> questions;
     private final LongSparseArray<Message> messages;
     private final LongSparseArray<QScreen> qscreens;
+    private final StepsLeftCalculator stepsLeftCalculator;
 
     private Node currentNode;
     private EventsObserver eventsObserver = new StubEventsObserver();
     private AtomicBoolean isStoppingSurvey = new AtomicBoolean(false);
 
+    private int numOfStepsDisplayed;
+
     SurveyInteractor(Survey survey, LocalStorage localStorage, ReportManager reportManager, @Nullable Language preferredLanguage, Shuffler shuffler, SurveyEventPublisher surveyEventPublisher, Executor backgroundExecutor, Executor uiExecutor) {
+
         this.survey = survey;
         this.localStorage = localStorage;
         this.reportManager = reportManager;
@@ -69,16 +76,9 @@ public class SurveyInteractor {
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
-        this.messages = prepareData(survey.spec().msgScreenList(), new IdExtractor<Message>() {
-            @Override public long getId(Message message) {
-                return message.id();
-            }
-        });
-        this.qscreens = prepareData(survey.spec().qscreenList(), new IdExtractor<QScreen>() {
-            @Override public long getId(QScreen qScreen) {
-                return qScreen.id();
-            }
-        });
+        this.messages = prepareData(survey.spec().msgScreenList(), Message::id);
+        this.qscreens = prepareData(survey.spec().qscreenList(), QScreen::id);
+        this.stepsLeftCalculator = new StepsLeftCalculator(questions, messages, qscreens);
     }
 
     public void displaySurvey() {
@@ -119,7 +119,17 @@ public class SurveyInteractor {
     }
 
     private void followNode(@Nullable Node node) {
+        if (currentNode != node) {
+            this.numOfStepsDisplayed++;
+        }
         this.currentNode = node;
+        if (currentNode != null) {
+            stepsLeftCalculator.setCurrentStep(currentNode.id(), currentNode.nodeType());
+            int stepsLeft = stepsLeftCalculator.getStepsLeft();
+            float progress = (float) numOfStepsDisplayed / (numOfStepsDisplayed + stepsLeft);
+            eventsObserver.setProgress(progress);
+            QualarooLogger.debug("Steps left: " + stepsLeftCalculator.getStepsLeft());
+        }
         if (node == null) {
             markSurveyAsFinished();
             eventsObserver.closeSurvey();
@@ -175,20 +185,12 @@ public class SurveyInteractor {
 
     private void markSurveyAsSeen() {
         surveyEventPublisher.publish(SurveyEvent.shown(survey.canonicalName()));
-        backgroundExecutor.execute(new Runnable() {
-            @Override public void run() {
-                localStorage.markSurveyAsSeen(survey);
-            }
-        });
+        backgroundExecutor.execute(() -> localStorage.markSurveyAsSeen(survey));
     }
 
     private void markSurveyAsFinished() {
         surveyEventPublisher.publish(SurveyEvent.finished(survey.canonicalName()));
-        backgroundExecutor.execute(new Runnable() {
-            @Override public void run() {
-                localStorage.markSurveyFinished(survey);
-            }
-        });
+        backgroundExecutor.execute(() -> localStorage.markSurveyFinished(survey));
     }
 
     private static class UiThreadEventsObserverDelegate implements EventsObserver {
@@ -206,43 +208,27 @@ public class SurveyInteractor {
         }
 
         @Override public void showQuestion(final Question question) {
-            executor.execute(new Runnable() {
-                @Override public void run() {
-                    eventsObserver.showQuestion(question);
-                }
-            });
+            executor.execute(() -> eventsObserver.showQuestion(question));
         }
 
         @Override public void showMessage(final Message message) {
-            executor.execute(new Runnable() {
-                @Override public void run() {
-                    eventsObserver.showMessage(message);
-                }
-            });
+            executor.execute(() -> eventsObserver.showMessage(message));
         }
 
         @Override public void showLeadGen(final QScreen qScreen, final List<Question> questionList) {
-            executor.execute(new Runnable() {
-                @Override public void run() {
-                    eventsObserver.showLeadGen(qScreen, questionList);
-                }
-            });
+            executor.execute(() -> eventsObserver.showLeadGen(qScreen, questionList));
+        }
+
+        @Override public void setProgress(float progress) {
+            executor.execute(() -> eventsObserver.setProgress(progress));
         }
 
         @Override public void openUri(@NonNull final String stringUri) {
-            executor.execute(new Runnable() {
-                @Override public void run() {
-                    eventsObserver.openUri(stringUri);
-                }
-            });
+            executor.execute(() -> eventsObserver.openUri(stringUri));
         }
 
         @Override public void closeSurvey() {
-            executor.execute(new Runnable() {
-                @Override public void run() {
-                    eventsObserver.closeSurvey();
-                }
-            });
+            executor.execute(eventsObserver::closeSurvey);
         }
     }
 
@@ -250,6 +236,7 @@ public class SurveyInteractor {
         @Override public void showQuestion(Question question) {}
         @Override public void showMessage(Message message) {}
         @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {}
+        @Override public void setProgress(float progress) {}
         @Override public void openUri(@NonNull String stringUri) {}
         @Override public void closeSurvey() {}
     }

@@ -20,5 +20,6 @@
     <dimen name="qualaroo__dropdown_item_padding">8dp</dimen>
 
     <dimen name="qualaroo__message_text_size">22dp</dimen>
+    <dimen name="qualaroo__progress_bar_height">6dp</dimen>
 
 </resources>

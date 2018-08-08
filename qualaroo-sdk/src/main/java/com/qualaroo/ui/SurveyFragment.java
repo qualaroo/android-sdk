@@ -3,7 +3,6 @@ package com.qualaroo.ui;
 import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -57,13 +56,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
     Renderer renderer;
     ImageProvider imageProvider;
 
-    private View backgroundView;
+    private ViewGroup backgroundView;
     private LinearLayout surveyContainer;
     private TextView questionsTitleTop;
     private TextView questionsTitleBottom;
     private FrameLayout questionsContent;
     private ImageView closeButton;
     private ImageView surveyLogo;
+    private ProgressBarView progressBar;
 
     private boolean isFullScreen;
     private RestorableView restorableView;
@@ -138,7 +138,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     @Override public void setup(SurveyViewModel viewModel) {
         questionsTitleTop.setTextColor(viewModel.textColor());
         questionsTitleBottom.setTextColor(viewModel.textColor());
-        ((View) questionsContent.getParent()).setBackgroundColor(viewModel.backgroundColor());
+        surveyContainer.setBackgroundColor(viewModel.backgroundColor());
         ImageViewCompat.setImageTintList(closeButton, ColorStateListUtils.enabledButton(viewModel.uiNormal(), viewModel.uiSelected()));
         closeButton.setVisibility(viewModel.cannotBeClosed() ? View.INVISIBLE : View.VISIBLE);
         backgroundView.setAlpha(0.0f);
@@ -156,11 +156,26 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyContainer.setGravity(Gravity.CENTER);
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
-        imageProvider.getImage(viewModel.logoUrl(), new ImageProvider.OnBitmapLoadedListener() {
-            @Override public void onBitmapReady(Bitmap bitmap) {
-                surveyLogo.setImageBitmap(bitmap);
-            }
-        });
+        imageProvider.getImage(viewModel.logoUrl(), bitmap -> surveyLogo.setImageBitmap(bitmap));
+        progressBar = new ProgressBarView(getContext(), null);
+        setupProgressBar(progressBar, viewModel);
+    }
+
+    public void setupProgressBar(ProgressBarView progressBar, SurveyViewModel viewModel) {
+        if (viewModel.progressBarPosition() == ProgressBarPosition.NONE) return;
+        progressBar.setColors(viewModel.uiSelected(), viewModel.uiNormal());
+        int height = getResources().getDimensionPixelSize(R.dimen.qualaroo__progress_bar_height);
+        progressBar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        if (viewModel.isFullscreen()) {
+            int gravity = viewModel.progressBarPosition() == ProgressBarPosition.TOP ? Gravity.TOP : Gravity.BOTTOM;
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(progressBar.getLayoutParams());
+            params.gravity = gravity;
+            progressBar.setLayoutParams(params);
+            backgroundView.addView(progressBar);
+        } else {
+            boolean addAsLast = viewModel.progressBarPosition() == ProgressBarPosition.BOTTOM;
+            surveyContainer.addView(progressBar, addAsLast ? surveyContainer.getChildCount() : 0);
+        }
     }
 
     private int calculateDimColor(@ColorInt int dimColor, float dimOpacity) {
@@ -254,7 +269,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
         if (viewState != null) {
             restorableView.restoreState(viewState);
         }
+    }
 
+    @Override public void setProgress(float progress) {
+        progressBar.setProgress(progress);
     }
 
     @Override public void forceShowKeyboardWithDelay(long delayInMillis) {
@@ -333,4 +351,5 @@ public class SurveyFragment extends Fragment implements SurveyView {
     public void onBackPressed() {
         surveyPresenter.onCloseClicked();
     }
+
 }

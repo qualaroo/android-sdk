@@ -355,11 +355,7 @@ class SurveyInteractorTest {
                                                 )
                                         ),
                                         question(
-                                                id = 300,
-                                                nextMap = node(
-                                                        id = 300,
-                                                        nodeType = "question"
-                                                )
+                                                id = 300
                                         )
                                 )
                         )
@@ -397,11 +393,7 @@ class SurveyInteractorTest {
                                                 answerList = listOf(answer(id = 101))
                                         ),
                                         question(
-                                                id = 200,
-                                                nextMap = node(
-                                                        id = 300,
-                                                        nodeType = "question"
-                                                )
+                                                id = 200
                                         )
                                 )
                         ),
@@ -457,7 +449,7 @@ class SurveyInteractorTest {
                         startMap = mapOf(
                                 language("en") to node(
                                         id = 1,
-                                        nodeType = "qspec"
+                                        nodeType = "qscreen"
                                 )
                         ),
                         questionList = mapOf(
@@ -505,7 +497,7 @@ class SurveyInteractorTest {
                         startMap = mapOf(
                                 language("en") to node(
                                         id = 1,
-                                        nodeType = "qspec"
+                                        nodeType = "qscreen"
                                 )
                         ),
                         questionList = mapOf(
@@ -1245,6 +1237,9 @@ class SurveyInteractorTest {
         }
 
         override fun closeSurvey() {
+        }
+
+        override fun setProgress(progress: Float) {
         }
     }
 }
