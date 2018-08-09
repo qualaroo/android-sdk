@@ -41,19 +41,15 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         button.setText(question.sendText());
         ThemeUtils.applyTheme(button, getTheme());
         final ListeningCheckableGroup container = view.findViewById(R.id.qualaroo__question_radio_options);
-        ListeningCheckableGroup.OnCheckedChangeListener listener = new ListeningCheckableGroup.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(ListeningCheckableGroup group, final int answerId) {
-                if (question.alwaysShowSend()) {
-                    button.setEnabled(true);
-                } else {
-                    container.setOnCheckedChangeListener(null);
-                    container.postDelayed(new Runnable() {
-                        @Override public void run() {
-                            UserResponse userResponse = buildUserResponse(question.id(), container);
-                            onAnsweredListener.onResponse(userResponse);
-                        }
-                    }, 300);
-                }
+        ListeningCheckableGroup.OnCheckedChangeListener listener = (group, answerId) -> {
+            if (question.alwaysShowSend()) {
+                button.setEnabled(true);
+            } else {
+                container.setOnCheckedChangeListener(null);
+                container.postDelayed(() -> {
+                    UserResponse userResponse = buildUserResponse(question.id(), container);
+                    onAnsweredListener.onResponse(userResponse);
+                }, 300);
             }
         };
         container.setOnCheckedChangeListener(listener);
@@ -71,16 +67,8 @@ final class RadioQuestionRenderer extends QuestionRenderer {
         });
         return RestorableView.withId(question.id())
                 .view(view)
-                .onSaveState(new RestorableView.OnSaveState() {
-                    @Override public void onSaveState(Bundle outState) {
-                        saveState(outState, container);
-                    }
-                })
-                .onRestoreState(new RestorableView.OnRestoreState() {
-                    @Override public void onRestoreState(Bundle savedState) {
-                        restoreState(savedState, container, button);
-                    }
-                }).build();
+                .onSaveState(outState -> saveState(outState, container))
+                .onRestoreState(savedState -> restoreState(savedState, container, button)).build();
     }
 
     private void restoreState(Bundle savedState, ListeningCheckableGroup radioGroup, Button button) {
