@@ -3,8 +3,10 @@ package com.qualaroo.ui;
 import android.content.Context;
 import android.support.annotation.RestrictTo;
 
+import com.qualaroo.internal.DeviceTypeMatcher;
 import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.ReportManager;
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveySession;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.event.SurveyEventPublisher;
@@ -66,7 +68,8 @@ public class SurveyComponent {
 
         public SurveyComponent create(Survey survey, Language preferredLanguage) {
             ApiConfig apiConfig = new ApiConfig();
-            ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo, new SurveySession());
+            SdkSession sdkSession = new SdkSession(context, new DeviceTypeMatcher.AndroidDeviceTypeProvider(context));
+            ReportClient reportClient = new ReportClient(restClient, apiConfig, localStorage, userInfo, new SurveySession(), sdkSession);
             ReportManager reportManager = new ReportManager(reportClient, executorSet.backgroundExecutor());
             SurveyEventPublisher surveyEventPublisher = new SurveyEventPublisher(context);
             Shuffler shuffler = new Shuffler();

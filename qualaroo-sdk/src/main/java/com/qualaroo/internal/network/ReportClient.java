@@ -3,6 +3,7 @@ package com.qualaroo.internal.network;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 
+import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveySession;
 import com.qualaroo.internal.UserInfo;
 import com.qualaroo.internal.model.Survey;
@@ -26,13 +27,15 @@ public class ReportClient {
     private final LocalStorage localStorage;
     private final UserInfo userInfo;
     private final SurveySession surveySession;
+    private final SdkSession sdkSession;
 
-    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo, SurveySession surveySession) {
+    public ReportClient(RestClient restClient, ApiConfig apiConfig, LocalStorage localStorage, UserInfo userInfo, SurveySession surveySession, SdkSession sdkSession) {
         this.restClient = restClient;
         this.apiConfig = apiConfig;
         this.localStorage = localStorage;
         this.userInfo = userInfo;
         this.surveySession = surveySession;
+        this.sdkSession = sdkSession;
     }
 
     public void reportImpression(Survey survey) {
@@ -119,7 +122,15 @@ public class ReportClient {
     }
 
     private void injectSessionParam(HttpUrl.Builder httpUrlBuilder) {
-        httpUrlBuilder.addQueryParameter("u", surveySession.uuid());
+        httpUrlBuilder.addQueryParameter("u", surveySession.uuid())
+                .addQueryParameter("sdk_version", sdkSession.sdkVersion())
+                .addQueryParameter("app_id", sdkSession.appName())
+                .addQueryParameter("device_model", sdkSession.deviceModel())
+                .addQueryParameter("os_version", sdkSession.androidVersion())
+                .addQueryParameter("os", sdkSession.os())
+                .addQueryParameter("resolution", sdkSession.resolution())
+                .addQueryParameter("device_type", sdkSession.deviceType())
+                .addQueryParameter("language", sdkSession.language());
     }
 
     private static String format(String format, Object... args) {
