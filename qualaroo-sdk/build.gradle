@@ -62,6 +62,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    flavorDimensions 'api'
+    productFlavors {
+        staging {
+            dimension 'api'
+        }
+
+        production {
+            dimension 'api'
+        }
+    }
 }
 
 repositories {

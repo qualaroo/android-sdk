@@ -7,7 +7,6 @@ import io.reactivex.Single
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import qualaroo.com.QualarooMobileDemo.BuildConfig
 import java.io.IOException
 import java.io.Reader
 
@@ -19,13 +18,12 @@ class SurveyAliasesRepository(
 
     companion object {
         const val PARAM_APP_ID = "app_id"
-        val API_URL = if (BuildConfig.DEBUG) "staging-app.qualaroo.com" else "api.qualaroo.com"
     }
 
     fun fetchAliases(): Single<List<String>> {
         val url = HttpUrl.Builder()
                 .scheme("https")
-                .host(API_URL)
+                .host(Config.ALIASES_URL)
                 .addPathSegments("api/v1.5/showcases")
                 .addQueryParameter(PARAM_APP_ID, credentials.siteId)
                 .build()
