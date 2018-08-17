@@ -98,7 +98,7 @@ task findbugs(type: FindBugs) {
 }
 
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testStagingDebugUnitTest']) {
 
     reports {
         xml.enabled = false
