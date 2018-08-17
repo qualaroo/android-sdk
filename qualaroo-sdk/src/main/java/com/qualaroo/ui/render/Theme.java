@@ -13,23 +13,27 @@ import static android.support.annotation.RestrictTo.Scope.LIBRARY;
 public final class Theme {
 
     public static Theme create(ColorThemeMap map) {
-        if (isLegacyColorThemeMap(map)) {
-            return parseLegacy(map);
+        try {
+            if (isLegacyColorThemeMap(map)) {
+                return parseLegacy(map);
+            }
+            return parse(map);
+        } catch (Exception e) {
+            return fallbackTheme();
         }
-        return parse(map);
     }
 
     private static Theme parse(ColorThemeMap map) {
         Theme theme = new Theme();
-        theme.backgroundColor = parseColorSafely(map.backgroundColor());
+        theme.backgroundColor = Color.parseColor(map.backgroundColor());
         theme.dimColor = parseDimType(map.dimType());
-        theme.textColor = parseColorSafely(map.textColor());
-        theme.buttonEnabledColor = parseColorSafely(map.buttonEnabledColor());
-        theme.buttonDisabledColor = parseColorSafely(map.buttonDisabledColor());
-        theme.buttonTextEnabled = parseColorSafely(map.buttonTextEnabled());
-        theme.buttonTextDisabled = parseColorSafely(map.buttonTextDisabled());
-        theme.uiNormal = parseColorSafely(map.uiNormal());
-        theme.uiSelected = parseColorSafely(map.uiSelected());
+        theme.textColor = Color.parseColor(map.textColor());
+        theme.buttonEnabledColor = Color.parseColor(map.buttonEnabledColor());
+        theme.buttonDisabledColor = Color.parseColor(map.buttonDisabledColor());
+        theme.buttonTextEnabled = Color.parseColor(map.buttonTextEnabled());
+        theme.buttonTextDisabled = Color.parseColor(map.buttonTextDisabled());
+        theme.uiNormal = Color.parseColor(map.uiNormal());
+        theme.uiSelected = Color.parseColor(map.uiSelected());
         Float dimOpacity = map.dimOpacity();
         if (dimOpacity != null) {
             theme.dimOpacity = dimOpacity;
@@ -41,25 +45,33 @@ public final class Theme {
 
     private static Theme parseLegacy(ColorThemeMap map) {
         Theme theme = new Theme();
-        theme.backgroundColor = parseColorSafely(map.backgroundColor());
+        theme.backgroundColor = Color.parseColor(map.backgroundColor());
         theme.dimColor = parseDimType(map.dimType());
-        theme.textColor = parseColorSafely(map.textColor());
-        theme.buttonEnabledColor = parseColorSafely(map.buttonEnabledColor());
-        theme.buttonDisabledColor = parseColorSafely(map.buttonDisabledColor());
-        theme.buttonTextEnabled = parseColorSafely(map.buttonTextColor());
-        theme.buttonTextDisabled = parseColorSafely(map.buttonTextColor());
-        theme.uiNormal = parseColorSafely(map.buttonDisabledColor());
-        theme.uiSelected = parseColorSafely(map.buttonEnabledColor());
+        theme.textColor = Color.parseColor(map.textColor());
+        theme.buttonEnabledColor = Color.parseColor(map.buttonEnabledColor());
+        theme.buttonDisabledColor = Color.parseColor(map.buttonDisabledColor());
+        theme.buttonTextEnabled = Color.parseColor(map.buttonTextColor());
+        theme.buttonTextDisabled = Color.parseColor(map.buttonTextColor());
+        theme.uiNormal = Color.parseColor(map.buttonDisabledColor());
+        theme.uiSelected = Color.parseColor(map.buttonEnabledColor());
         theme.dimOpacity = 1.0f;
         return theme;
     }
 
-    private static @ColorInt int parseColorSafely(String color) {
-        try {
-            return Color.parseColor(color);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return Color.BLACK;
-        }
+
+    private static Theme fallbackTheme() {
+        Theme theme = new Theme();
+        theme.backgroundColor = Color.WHITE;
+        theme.dimColor = Color.parseColor(DARK_DIM_COLOR);
+        theme.textColor = Color.BLACK;
+        theme.buttonEnabledColor = Color.DKGRAY;
+        theme.buttonDisabledColor = Color.LTGRAY;
+        theme.buttonTextEnabled = Color.BLACK;
+        theme.buttonTextDisabled = Color.BLACK;
+        theme.uiNormal = Color.DKGRAY;
+        theme.uiSelected = Color.BLACK;
+        theme.dimOpacity = 1.0f;
+        return theme;
     }
 
     private static final String LIGHT_DIM_COLOR = "#D4CACED6";
@@ -99,7 +111,7 @@ public final class Theme {
     private float dimOpacity;
 
     private Theme() {
-        //for static factory method
+        //for static factory methods
     }
 
     @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected, float dimOpacity) {
