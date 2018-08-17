@@ -1,6 +1,7 @@
 package com.qualaroo.internal.network
 
 import com.nhaarman.mockito_kotlin.*
+import com.qualaroo.internal.SdkSession
 import com.qualaroo.internal.SurveySession
 import com.qualaroo.internal.UserInfo
 import com.qualaroo.internal.model.Survey
@@ -33,7 +34,9 @@ class ReportClientTest {
         on { uuid() } doReturn "mocked_session_id"
     }
 
-    val client = ReportClient(restClient, apiConfig, localStorage, userInfo, session)
+    val sdkSession = mock<SdkSession>()
+
+    val client = ReportClient(restClient, apiConfig, localStorage, userInfo, session, sdkSession)
 
     @Test
     fun `builds proper url for impressions`() {

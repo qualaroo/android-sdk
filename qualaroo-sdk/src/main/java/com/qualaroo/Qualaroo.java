@@ -384,7 +384,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 ImageRepository imageRepository = new ImageRepository(okHttpClient, context.getCacheDir());
                 ImageProvider imageProvider = new ImageProvider(context, imageRepository, executorSet.backgroundExecutor(), executorSet.uiThreadExecutor());
                 SurveyComponent.Factory componentFactory = new SurveyComponent.Factory(context, restClient, localStorage, userInfo, executorSet, uriOpener, imageProvider);
-                SdkSession sdkSession = new SdkSession(this.context);
+                SdkSession sdkSession = new SdkSession(this.context, new DeviceTypeMatcher.AndroidDeviceTypeProvider(context));
                 SurveyStarter surveyStarter = new SurveyStarter(context);
 
                 Cache<List<Survey>> cache = BuildConfig.DEBUG ?

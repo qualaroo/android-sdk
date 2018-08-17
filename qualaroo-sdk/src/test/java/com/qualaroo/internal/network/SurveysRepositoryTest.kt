@@ -26,7 +26,7 @@ class SurveysRepositoryTest {
     val sessionInfo = mock<SdkSession> {
         on { appName() } doReturn "com.qualaroo.test"
         on { androidVersion() } doReturn "27"
-        on { deviceType() } doReturn "GF3210"
+        on { deviceModel() } doReturn "GF3210"
         on { sdkVersion() } doReturn "1.0.0"
     }
     val userInfo = mock<UserInfo> {
@@ -57,7 +57,7 @@ class SurveysRepositoryTest {
         assertEquals("1", url.queryParameter("no_superpack"))
         assertEquals("1.0.0", url.queryParameter("sdk_version"))
         assertEquals("27", url.queryParameter("os_version"))
-        assertEquals("GF3210", url.queryParameter("device_type"))
+        assertEquals("GF3210", url.queryParameter("device_model"))
         assertEquals("abcd1", url.queryParameter("device_id"))
         assertEquals("com.qualaroo.test", url.queryParameter("client_app"))
         assertEquals("Android", url.queryParameter("os"))

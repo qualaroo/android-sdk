@@ -134,7 +134,7 @@ public class SurveysRepository {
         httpUrlBuilder
                 .addQueryParameter("sdk_version", sdkSession.sdkVersion())
                 .addQueryParameter("client_app", sdkSession.appName())
-                .addQueryParameter("device_type", sdkSession.deviceType())
+                .addQueryParameter("device_model", sdkSession.deviceModel())
                 .addQueryParameter("os_version", sdkSession.androidVersion())
                 .addQueryParameter("os", "Android")
                 .addQueryParameter("device_id", userInfo.getDeviceId());
