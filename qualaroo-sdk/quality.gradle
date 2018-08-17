@@ -8,7 +8,7 @@ checkstyle {
 }
 
 jacoco {
-    toolVersion = '0.7.9'
+    toolVersion = '0.8.1'
 }
 
 findbugs {
@@ -98,7 +98,7 @@ task findbugs(type: FindBugs) {
 }
 
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testStagingDebugUnitTest']) {
 
     reports {
         xml.enabled = false
