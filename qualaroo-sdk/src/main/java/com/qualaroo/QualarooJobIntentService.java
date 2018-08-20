@@ -40,8 +40,10 @@ public class QualarooJobIntentService extends JobIntentService {
             QualarooLogger.error("Invalid Qualaroo's Service action.");
             return;
         }
-        QualarooBase qualaroo = getQualarooInstance();
-        if (qualaroo == null) {
+        QualarooBase qualaroo;
+        try {
+            qualaroo = getQualarooInstance();
+        } catch (QualarooSdkNotProperlyInitializedException e) {
             QualarooLogger.error("Qualaroo instance is not available to Qularoo's Service");
             return;
         }
@@ -86,7 +88,13 @@ public class QualarooJobIntentService extends JobIntentService {
         return false;
     }
     
-    @VisibleForTesting QualarooBase getQualarooInstance() {
-        return (Qualaroo) Qualaroo.getInstance();
+    @VisibleForTesting @NonNull QualarooBase getQualarooInstance() throws QualarooSdkNotProperlyInitializedException {
+        QualarooSdk instance = Qualaroo.getInstance();
+        if (instance instanceof QualarooBase) {
+            return (QualarooBase) instance;
+        }
+        throw new QualarooSdkNotProperlyInitializedException();
     }
+
+    private static class QualarooSdkNotProperlyInitializedException extends Exception {}
 }
