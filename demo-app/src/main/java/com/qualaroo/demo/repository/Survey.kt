@@ -1,3 +1,5 @@
 package com.qualaroo.demo.repository
 
-data class Survey(val alias: String)
+import com.google.gson.annotations.SerializedName
+
+data class Survey(@SerializedName("alias") val alias: String)
