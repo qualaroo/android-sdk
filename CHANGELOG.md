@@ -1,3 +1,9 @@
+## 1.8.0
+- support for displaying progress bars on surveys
+- the SDK does no longer require desugar process to run - an app is no longer required to have a `compileOptions{}` clause to support Java 1.8 features
+- the SDK won't longer crash when you provide an invalid API key - please check a device's logcat output to find out more info in case of any issus 
+- couple of minor fixes for saving the state of some questions when configChanges happen
+
 ## 1.7.2
 - fixed a bug with user's locale being ignored when deciding which version of survey should be displayed
 - fixed a bug related to injecting custom properties
