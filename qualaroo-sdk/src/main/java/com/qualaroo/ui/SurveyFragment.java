@@ -3,6 +3,7 @@ package com.qualaroo.ui;
 import android.animation.LayoutTransition;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -156,7 +157,11 @@ public class SurveyFragment extends Fragment implements SurveyView {
             surveyContainer.setGravity(Gravity.CENTER);
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
-        imageProvider.getImage(viewModel.logoUrl(), bitmap -> surveyLogo.setImageBitmap(bitmap));
+        imageProvider.getImage(viewModel.logoUrl(), new ImageProvider.OnBitmapLoadedListener() {
+            @Override public void onBitmapReady(Bitmap bitmap) {
+                surveyLogo.setImageBitmap(bitmap);
+            }
+        });
         progressBar = new ProgressBarView(getContext(), null);
         setupProgressBar(progressBar, viewModel);
     }

@@ -76,8 +76,16 @@ public class SurveyInteractor {
         this.backgroundExecutor = backgroundExecutor;
         this.uiExecutor = uiExecutor;
         this.questions = prepareQuestions();
-        this.messages = prepareData(survey.spec().msgScreenList(), Message::id);
-        this.qscreens = prepareData(survey.spec().qscreenList(), QScreen::id);
+        this.messages = prepareData(survey.spec().msgScreenList(), new IdExtractor<Message>() {
+            @Override public long getId(Message message) {
+                return message.id();
+            }
+        });
+        this.qscreens = prepareData(survey.spec().qscreenList(), new IdExtractor<QScreen>() {
+            @Override public long getId(QScreen qScreen) {
+                return qScreen.id();
+            }
+        });
         this.stepsLeftCalculator = new StepsLeftCalculator(questions, messages, qscreens);
     }
 
@@ -185,12 +193,20 @@ public class SurveyInteractor {
 
     private void markSurveyAsSeen() {
         surveyEventPublisher.publish(SurveyEvent.shown(survey.canonicalName()));
-        backgroundExecutor.execute(() -> localStorage.markSurveyAsSeen(survey));
+        backgroundExecutor.execute(new Runnable() {
+            @Override public void run() {
+                localStorage.markSurveyAsSeen(survey);
+            }
+        });
     }
 
     private void markSurveyAsFinished() {
         surveyEventPublisher.publish(SurveyEvent.finished(survey.canonicalName()));
-        backgroundExecutor.execute(() -> localStorage.markSurveyFinished(survey));
+        backgroundExecutor.execute(new Runnable() {
+            @Override public void run() {
+                localStorage.markSurveyFinished(survey);
+            }
+        });
     }
 
     private static class UiThreadEventsObserverDelegate implements EventsObserver {
@@ -208,27 +224,51 @@ public class SurveyInteractor {
         }
 
         @Override public void showQuestion(final Question question) {
-            executor.execute(() -> eventsObserver.showQuestion(question));
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.showQuestion(question);
+                }
+            });
         }
 
         @Override public void showMessage(final Message message) {
-            executor.execute(() -> eventsObserver.showMessage(message));
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.showMessage(message);
+                }
+            });
         }
 
         @Override public void showLeadGen(final QScreen qScreen, final List<Question> questionList) {
-            executor.execute(() -> eventsObserver.showLeadGen(qScreen, questionList));
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.showLeadGen(qScreen, questionList);
+                }
+            });
         }
 
-        @Override public void setProgress(float progress) {
-            executor.execute(() -> eventsObserver.setProgress(progress));
+        @Override public void setProgress(final float progress) {
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.setProgress(progress);
+                }
+            });
         }
 
         @Override public void openUri(@NonNull final String stringUri) {
-            executor.execute(() -> eventsObserver.openUri(stringUri));
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.openUri(stringUri);
+                }
+            });
         }
 
         @Override public void closeSurvey() {
-            executor.execute(eventsObserver::closeSurvey);
+            executor.execute(new Runnable() {
+                @Override public void run() {
+                    eventsObserver.closeSurvey();
+                }
+            });
         }
     }
 
