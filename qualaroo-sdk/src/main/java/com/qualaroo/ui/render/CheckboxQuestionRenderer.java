@@ -44,9 +44,11 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         button.setEnabled(!question.isRequired());
         ThemeUtils.applyTheme(button, getTheme());
 
-        CompoundButton.OnCheckedChangeListener listener = (compoundButton, b) -> {
-            int selectedAnswers = selectedAnswers(checkablesContainer);
-            invalidateViewState(question, checkablesContainer, button, selectedAnswers);
+        CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener() {
+            @Override public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                int selectedAnswers = CheckboxQuestionRenderer.this.selectedAnswers(checkablesContainer);
+                CheckboxQuestionRenderer.this.invalidateViewState(question, checkablesContainer, button, selectedAnswers);
+            }
         };
         for (Answer answer : question.answerList()) {
             View checkBox = buildCheckBox(context, answer, listener);
@@ -61,8 +63,16 @@ public final class CheckboxQuestionRenderer extends QuestionRenderer {
         });
         return RestorableView.withId(question.id())
                 .view(view)
-                .onSaveState(outState -> saveState(outState, checkablesContainer))
-                .onRestoreState(savedState -> restoreState(savedState, checkablesContainer))
+                .onSaveState(new RestorableView.OnSaveState() {
+                    @Override public void onSaveState(Bundle outState) {
+                        CheckboxQuestionRenderer.this.saveState(outState, checkablesContainer);
+                    }
+                })
+                .onRestoreState(new RestorableView.OnRestoreState() {
+                    @Override public void onRestoreState(Bundle savedState) {
+                        CheckboxQuestionRenderer.this.restoreState(savedState, checkablesContainer);
+                    }
+                })
                 .build();
     }
 

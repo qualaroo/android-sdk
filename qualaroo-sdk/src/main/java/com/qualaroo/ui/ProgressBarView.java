@@ -23,9 +23,11 @@ public class ProgressBarView extends View {
 
     public ProgressBarView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        animator.addUpdateListener(animation -> {
-            this.currentProgress = (float) animation.getAnimatedValue();
-            invalidate();
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override public void onAnimationUpdate(ValueAnimator animation) {
+                ProgressBarView.this.currentProgress = (float) animation.getAnimatedValue();
+                ProgressBarView.this.invalidate();
+            }
         });
         animator.setDuration(300);
     }

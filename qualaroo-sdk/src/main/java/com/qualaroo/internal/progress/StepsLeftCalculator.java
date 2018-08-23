@@ -34,9 +34,9 @@ public class StepsLeftCalculator {
         this.messages = messages;
         this.qScreens = qScreens;
         this.nodes = new HashMap<>();
-        this.nodes.put(TYPE_QUESTION, new HashMap<>());
-        this.nodes.put(TYPE_MESSAGE, new HashMap<>());
-        this.nodes.put(TYPE_QSCREEN, new HashMap<>());
+        this.nodes.put(TYPE_QUESTION, new HashMap<Long, GraphNode>());
+        this.nodes.put(TYPE_MESSAGE, new HashMap<Long, GraphNode>());
+        this.nodes.put(TYPE_QSCREEN, new HashMap<Long, GraphNode>());
 
         initialize();
     }
@@ -67,7 +67,7 @@ public class StepsLeftCalculator {
         if (node != null) {
             return node;
         }
-        GraphNode messageNode = new GraphNode(message.id(), TYPE_MESSAGE, Collections.emptyList());
+        GraphNode messageNode = new GraphNode(message.id(), TYPE_MESSAGE, Collections.<GraphNode>emptyList());
         nodes.get(TYPE_MESSAGE).put(message.id(), messageNode);
         return messageNode;
     }

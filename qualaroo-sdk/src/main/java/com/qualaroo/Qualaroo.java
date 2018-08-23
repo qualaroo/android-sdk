@@ -45,6 +45,7 @@ import com.qualaroo.internal.storage.Settings;
 import com.qualaroo.ui.SurveyComponent;
 import com.qualaroo.ui.SurveyStarter;
 import com.qualaroo.util.LanguageHelper;
+import com.qualaroo.util.TimeProvider;
 import com.qualaroo.util.UriOpener;
 
 import java.io.IOException;
@@ -386,10 +387,14 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 SurveyComponent.Factory componentFactory = new SurveyComponent.Factory(context, restClient, localStorage, userInfo, executorSet, uriOpener, imageProvider);
                 SdkSession sdkSession = new SdkSession(this.context, new DeviceTypeMatcher.AndroidDeviceTypeProvider(context));
                 SurveyStarter surveyStarter = new SurveyStarter(context);
-
+                TimeProvider timeProvider = new TimeProvider() {
+                    @Override public long currentTimeMillis() {
+                        return System.currentTimeMillis();
+                    }
+                };
                 Cache<List<Survey>> cache = BuildConfig.DEBUG ?
-                        new NonWorkingCache<>() :
-                        new Cache<>(System::currentTimeMillis, TimeUnit.HOURS.toMillis(1));
+                        new NonWorkingCache<List<Survey>>() :
+                        new Cache<List<Survey>>(timeProvider, TimeUnit.HOURS.toMillis(1));
                 ApiConfig apiConfig = new ApiConfig();
                 SurveysRepository surveysRepository = new SurveysRepository(credentials.siteId(), restClient, apiConfig, sdkSession, userInfo, cache);
 
