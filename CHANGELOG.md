@@ -1,3 +1,6 @@
+## 1.8.1
+- [hotfix] fixed the bytecode after removing the need for desugaring process
+
 ## 1.8.0
 - support for displaying progress bars on surveys
 - the SDK does no longer require desugar process to run - an app is no longer required to have a `compileOptions{}` clause to support Java 1.8 features
