@@ -4,7 +4,7 @@
 
 int major = 1
 int minor = 8
-int patch = 0
+int patch = 1
 
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
@@ -171,7 +171,7 @@ publishing {
             groupId 'com.qualaroo'
             artifactId 'qualaroo-sdk'
             version project.sdkVersionMaven
-            artifact("$buildDir/outputs/aar/qualaroo-sdk-release.aar")
+            artifact("$buildDir/outputs/aar/qualaroo-sdk-production-release.aar")
             artifact sourcesJar
             artifact javadocJar
             pom.withXml {
