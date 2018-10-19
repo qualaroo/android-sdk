@@ -1,0 +1,860 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+options
+{
+   MULTI=true;
+   STATIC=false;
+   VISITOR=true;
+   NODE_SCOPE_HOOK=true;
+   NODE_CLASS="JexlNode";
+   UNICODE_INPUT=true;
+   KEEP_LINE_COLUMN=true;
+   TRACK_TOKENS=true;
+   //DEBUG_PARSER=true;
+   //DEBUG_TOKEN_MANAGER=true;
+}
+
+PARSER_BEGIN(Parser)
+
+package org.apache.commons.jexl3.parser;
+
+import java.util.Collections;
+import java.util.LinkedList;
+
+import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.internal.Scope;
+
+public final class Parser extends JexlParser
+{
+    private int loopCount = 0;
+
+    public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers, boolean expr) {
+        try {
+            // If registers are allowed, the default parser state has to be REGISTERS.
+            if (registers || ALLOW_REGISTERS) {
+                token_source.defaultLexState = REGISTERS;
+            }
+            // lets do the 'Unique Init' in here to be safe - it's a pain to remember
+            source = jexlSrc;
+            pragmas = null;
+            ReInit(new java.io.StringReader(jexlSrc));
+            frame = scope;
+            ASTJexlScript script = expr? JexlExpression(scope) : JexlScript(scope) ;
+            script.pragmas = pragmas != null
+                             ? Collections.<String,Object>unmodifiableMap(pragmas)
+                             : Collections.<String,Object>emptyMap();
+            pragmas = null;
+            script.jjtSetValue(info);
+            return script;
+        } catch (TokenMgrError xtme) {
+            throw new JexlException.Tokenization(info, xtme).clean();
+        } catch (ParseException xparse) {
+            throw new JexlException.Parsing(info, xparse).clean();
+        } finally {
+            source = null;
+            frame = null;
+            token_source.defaultLexState = DEFAULT;
+        }
+    }
+}
+
+PARSER_END(Parser)
+
+TOKEN_MGR_DECLS : {
+    /**
+     *   A stack of 1 for keeping state to deal with doted identifiers
+     */
+    int dotLexState = DEFAULT;
+
+    public void pushDot() {
+        dotLexState = curLexState;
+        curLexState = DOT_ID;
+    }
+
+    public void popDot() {
+        if (curLexState == DOT_ID) {
+            curLexState = dotLexState;
+            dotLexState = defaultLexState;
+        }
+    }
+}
+/***************************************
+ *     Skip & Number literal tokens
+ ***************************************/
+
+<*> SKIP : /* WHITE SPACE */
+{
+      <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+    | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+    | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+    | " "
+    | "\t"
+    | "\n"
+    | "\r"
+    | "\f"
+}
+
+<*> TOKEN : /* KEYWORDS */
+{
+      < IF : "if" >
+    | < ELSE : "else" >
+    | < FOR : "for" >
+    | < WHILE : "while" >
+    | < NEW : "new" >
+    | < VAR : "var" >
+    | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
+    | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
+    | < NULL : "null" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+    | < RETURN : "return" >
+    | < FUNCTION : "function" >
+    | < LAMBDA : "->" >
+    | < BREAK : "break" >
+    | < CONTINUE : "continue" >
+    | < PRAGMA : "#pragma" >
+}
+
+<*> TOKEN : { /* SEPARATORS */
+      < LPAREN : "(" >
+    | < RPAREN : ")" >
+    | < LCURLY : "{" >
+    | < RCURLY : "}" >
+    | < LBRACKET : "[" >
+    | < RBRACKET : "]" >
+    | < SEMICOL : ";" >
+    | < COLON : ":" >
+    | < COMMA : "," >
+    | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
+    | < ELIPSIS : "..." >
+}
+
+<*> TOKEN : { /* CONDITIONALS */
+      < QMARK : "?" >
+    | < ELVIS : "?:" >
+    | < AND : "&&" | "and" >
+    | < OR : "||" | "or" >
+}
+
+<*> TOKEN : { /* COMPARISONS */
+      < eq : "==" | "eq" >
+    | < ne : "!=" | "ne" >
+    | < req : "=~" > // regexp equal
+    | < rne : "!~" > // regexp not equal
+    | < seq : "=^" > // starts equal
+    | < eeq : "=$" > // ends equal
+    | < sne : "!^" > // start not equal
+    | < ene : "!$" > // ends not equal
+    | < gt : ">" | "gt" >
+    | < ge : ">=" | "ge" >
+    | < lt : "<" | "lt" >
+    | < le : "<=" | "le" >
+}
+
+<*> TOKEN : { /* OPERATORS */
+      < plus_assign : "+=" >
+    | < minus_assign : "-=" >
+    | < mult_assign : "*=" >
+    | < div_assign : "/=" >
+    | < mod_assign : "%=" >
+    | < and_assign : "&=" >
+    | < or_assign : "|=" >
+    | < xor_assign : "^=" >
+
+    | < assign : "=" >
+    | < plus : "+" >
+    | < minus : "-" >
+    | < mult : "*" >
+    | < div : "/" | "div" >
+    | < mod : "%" | "mod" >
+    | < not : "!" | "not" >
+    | < and : "&" >
+    | < or : "|" >
+    | < xor : "^" >
+
+    | < tilda : "~" >
+    | < range : ".." >
+}
+
+/***************************************
+ *     Identifier & String tokens
+ ***************************************/
+<*> TOKEN :  /* NaN */
+{
+    < NAN_LITERAL : "NaN" >
+}
+
+<*> TOKEN : /* ANNOTATION */
+{
+  < ANNOTATION: "@" ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$" ])+ >
+}
+
+<DOT_ID> TOKEN : /* IDENTIFIERS */
+{
+  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ > { popDot(); } /* Revert state to default. */
+}
+
+<DEFAULT, REGISTERS> TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$", "@" ] >
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+<REGISTERS> TOKEN : /* REGISTERS: parser.ALLOW_REGISTER must be set to true before calling parse */
+{
+  < REGISTER: "#" (["0"-"9"])+ >
+}
+
+<DEFAULT, REGISTERS> TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL:
+      ( "0" (["0"-"7"])* | ["1"-"9"] (["0"-"9"])* | "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ )
+      (["l","L","h","H"])?
+  >
+ |
+  < FLOAT_LITERAL:
+    "#NaN"
+    |
+    (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])?
+    |
+    (<DIGIT>)+ (".")? ((["e","E"])(["+","-"])?(<DIGIT>)+)? ["d","D","f","F","b","B"]
+  >
+}
+
+<*> TOKEN :
+{
+  < STRING_LITERAL:
+    "\"" (~["\"","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "\""
+  |
+    "'" (~["'","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "'"
+  > { popDot(); } /* Revert state to default if was DOT_ID. */
+}
+
+<*> TOKEN :
+{
+  < JXLT_LITERAL:
+    "`" (~["`","\\"] | "\\" ~["\u0000"])* "`"
+  >
+}
+
+/***************************************
+ *      Statements
+ ***************************************/
+
+ASTJexlScript JexlScript(Scope frame) : {
+    jjtThis.setScope(frame);
+}
+{
+   ( ( Statement() )*) <EOF>
+   {
+        return jjtThis.script();
+   }
+}
+
+ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
+    jjtThis.setScope(frame);
+}
+{
+   ( Expression() )? <EOF>
+   {
+        return jjtThis.script();
+   }
+}
+
+void Annotation() #Annotation :
+{
+    Token t;
+}
+{
+    t=<ANNOTATION> (LOOKAHEAD(<LPAREN>) Arguments() )? { jjtThis.setName(t.image); }
+}
+
+void AnnotatedStatement() #AnnotatedStatement() : {}
+{
+    (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(<VAR>) Var() | LOOKAHEAD(1) Block() | Expression())
+}
+
+void Statement() #void : {}
+{
+    <SEMICOL>
+    | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
+    | LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() // to disambiguate the set literals
+    | LOOKAHEAD(<LCURLY> Statement() <SEMICOL>) Block() //  to disambiguate the set literals
+    | IfStatement()
+    | ForeachStatement()
+    | WhileStatement()
+    | ExpressionStatement()
+    | ReturnStatement()
+    | Continue()
+    | Break()
+    | Var()
+    | Pragma()
+}
+
+void Block() #Block : {}
+{
+    <LCURLY> ( Statement() )* <RCURLY>
+}
+
+
+void ExpressionStatement() #void : {}
+{
+    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) <SEMICOL>)?
+}
+
+
+void IfStatement() : {}
+{
+    <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement()) ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
+}
+
+
+void WhileStatement() : {}
+{
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+}
+
+void ReturnStatement() : {}
+{
+    <RETURN> Expression()
+}
+
+void Continue() #Continue : {}
+{
+    <CONTINUE> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+}
+
+void Break() #Break : {}
+{
+    <BREAK> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+}
+
+void ForeachStatement() : {}
+{
+    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+}
+
+void ForEachVar() #Reference : {}
+{
+    <VAR> DeclareVar()
+|
+    Identifier()
+}
+
+void Var() #void : {}
+{
+    <VAR> DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+}
+
+void DeclareVar() #Var :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareVariable(jjtThis, t.image); }
+}
+
+void Pragma() #void :
+{
+    LinkedList<String> lstr = new LinkedList<String>();
+    Object value;
+}
+{
+<PRAGMA> pragmaKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
+}
+
+void pragmaKey(LinkedList<String> lstr) #void :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> (LOOKAHEAD(2) <DOT> pragmaKey(lstr) )* { lstr.addFirst(t.image); }
+}
+
+Object pragmaValue() #void :
+{
+Token v;
+LinkedList<String> lstr = new LinkedList<String>();
+}
+{
+      LOOKAHEAD(1) v=<INTEGER_LITERAL> { return NumberParser.parseInteger(v.image); }
+    | LOOKAHEAD(1) v=<FLOAT_LITERAL> { return NumberParser.parseDouble(v.image); }
+    | LOOKAHEAD(1) v=<STRING_LITERAL> { return Parser.buildString(v.image, true); }
+    | LOOKAHEAD(1)  pragmaKey(lstr) { return stringify(lstr); }
+    | LOOKAHEAD(1) <TRUE> { return true; }
+    | LOOKAHEAD(1) <FALSE> { return false; }
+    | LOOKAHEAD(1) <NULL> { return null; }
+    | LOOKAHEAD(1) <NAN_LITERAL> { return Double.NaN; }
+}
+
+
+/***************************************
+ *      Expression syntax
+ ***************************************/
+
+void Expression() #void : {}
+{
+      AssignmentExpression()
+}
+
+void AssignmentExpression() #void : {}
+{
+  ConditionalExpression()
+  ( LOOKAHEAD(2) (
+    <plus_assign>  Expression() #SetAddNode(2)
+  |
+    <mult_assign>  Expression() #SetMultNode(2)
+  |
+    <div_assign>  Expression() #SetDivNode(2)
+  |
+    <mod_assign>  Expression() #SetModNode(2)
+  |
+    <and_assign>  Expression() #SetAndNode(2)
+  |
+    <or_assign>  Expression() #SetOrNode(2)
+  |
+    <xor_assign> Expression() #SetXorNode(2)
+  |
+    <minus_assign>  Expression() #SetSubNode(2)
+  |
+    <assign> Expression() #Assignment(2)
+  ) )*
+}
+
+/***************************************
+ *      Conditional & relational
+ ***************************************/
+
+void ConditionalExpression() #void : {}
+{
+  ConditionalOrExpression()
+  (
+    <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
+  |
+    <ELVIS> Expression() #TernaryNode(2)
+  )?
+}
+
+void ConditionalOrExpression() #void : {}
+{
+  ConditionalAndExpression()
+  ( <OR> ConditionalAndExpression() #OrNode(2) )*
+}
+
+void ConditionalAndExpression() #void : {}
+{
+  InclusiveOrExpression()
+  ( <AND> InclusiveOrExpression() #AndNode(2) )*
+}
+
+void InclusiveOrExpression() #void : {}
+{
+  ExclusiveOrExpression()
+  ( <or> ExclusiveOrExpression() #BitwiseOrNode(2) )*
+}
+
+void ExclusiveOrExpression() #void : {}
+{
+  AndExpression()
+  ( <xor> AndExpression() #BitwiseXorNode(2) )*
+}
+
+void AndExpression() #void : {}
+{
+  EqualityExpression()
+  ( <and> EqualityExpression() #BitwiseAndNode(2) )*
+}
+
+void EqualityExpression() #void : {}
+{
+  RelationalExpression()
+  (
+     <eq> RelationalExpression() #EQNode(2)
+   |
+     <ne> RelationalExpression() #NENode(2)
+   |
+     <range> RelationalExpression() #RangeNode(2) // range
+  )?
+}
+
+void RelationalExpression() #void : {}
+{
+  AdditiveExpression()
+  (
+    <lt> AdditiveExpression() #LTNode(2)
+   |
+    <gt> AdditiveExpression() #GTNode(2)
+   |
+    <le> AdditiveExpression() #LENode(2)
+   |
+    <ge> AdditiveExpression() #GENode(2)
+   |
+    <req> AdditiveExpression() #ERNode(2) // equals regexp
+   |
+    <rne> AdditiveExpression() #NRNode(2) // not equals regexp
+   |
+    <seq> AdditiveExpression() #SWNode(2) // starts with
+   |
+    <sne> AdditiveExpression() #NSWNode(2) // not starts with
+   |
+    <eeq> AdditiveExpression() #EWNode(2) // ends with
+   |
+    <ene> AdditiveExpression() #NEWNode(2) // not ends with
+  )?
+}
+
+/***************************************
+ *      Arithmetic
+ ***************************************/
+
+void AdditiveExpression() #void : {}
+{
+  MultiplicativeExpression()
+  ( LOOKAHEAD(2) (
+    <plus> MultiplicativeExpression() #AddNode(2)
+  |
+    <minus> MultiplicativeExpression() #SubNode(2)
+  ) )*
+}
+
+void MultiplicativeExpression() #void : {}
+{
+  UnaryExpression()
+  (
+    <mult> UnaryExpression() #MulNode(2)
+  |
+    <div> UnaryExpression() #DivNode(2)
+  |
+    <mod> UnaryExpression() #ModNode(2)
+  )*
+}
+
+void UnaryExpression() #void : {}
+{
+    <minus> UnaryExpression() #UnaryMinusNode(1)
+  |
+    <tilda> UnaryExpression() #BitwiseComplNode(1)
+  |
+    <not> UnaryExpression() #NotNode(1)
+  |
+    <EMPTY> UnaryExpression() #EmptyFunction(1)
+  |
+    <SIZE> UnaryExpression() #SizeFunction(1)
+  |
+    ValueExpression()
+}
+
+
+/***************************************
+ *      Identifier & Literals
+ ***************************************/
+
+void Identifier(boolean top) :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { jjtThis.setSymbol(top? checkVariable(jjtThis, t.image) : t.image); }
+|
+    t=<REGISTER> { jjtThis.setSymbol(t.image); }
+}
+
+void StringIdentifier() #Identifier :
+{
+    Token t;
+}
+{
+  t=<STRING_LITERAL>
+  {
+    jjtThis.setSymbol(Parser.buildString(t.image, true));
+  }
+}
+
+void Literal() #void :
+{
+   Token t;
+}
+{
+  IntegerLiteral()
+|
+  FloatLiteral()
+|
+  BooleanLiteral()
+|
+  JxltLiteral()
+|
+  StringLiteral()
+|
+  NullLiteral()
+|
+  NaNLiteral()
+}
+
+void NaNLiteral() #NumberLiteral :
+{}
+{
+    <NAN_LITERAL> { jjtThis.setReal("NaN"); }
+}
+
+void NullLiteral() : {}
+{
+    <NULL>
+}
+
+void BooleanLiteral() #void :
+{}
+{
+  <TRUE> #TrueNode
+|
+  <FALSE> #FalseNode
+}
+
+void IntegerLiteral() #NumberLiteral :
+{
+  Token t;
+}
+{
+  t=<INTEGER_LITERAL>
+  { jjtThis.setNatural(t.image); }
+}
+
+
+void FloatLiteral() #NumberLiteral:
+{
+  Token t;
+}
+{
+  t=<FLOAT_LITERAL>
+  { jjtThis.setReal(t.image); }
+}
+
+void StringLiteral() :
+{
+   Token t;
+}
+{
+  t=<STRING_LITERAL>
+  { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
+}
+
+
+void JxltLiteral() #JxltLiteral :
+{
+   Token t;
+}
+{
+   t=<JXLT_LITERAL>
+   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
+}
+
+void ExtendedLiteral() #ExtendedLiteral() : {}
+{
+   <ELIPSIS>
+}
+
+void ArrayLiteral() : {}
+{
+   <LBRACKET>
+   (
+        LOOKAHEAD(1) ExtendedLiteral()
+    |
+        (Expression() (LOOKAHEAD(2) <COMMA> Expression() )*)? (<COMMA> ExtendedLiteral())?
+   )
+   <RBRACKET>
+}
+
+void MapLiteral() : {}
+{
+    <LCURLY>
+    (
+        MapEntry() ( <COMMA> MapEntry() )*
+    |
+        <COLON>
+    ) <RCURLY>
+}
+
+void MapEntry() : {}
+{
+    Expression() <COLON> Expression()
+}
+
+void SetLiteral() : {}
+{
+    <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
+}
+
+/***************************************
+ *      Functions & Methods
+ ***************************************/
+
+void EmptyMethod() #EmptyMethod() : {}
+{
+    <EMPTY> <LPAREN> <RPAREN>
+}
+
+void SizeMethod() #SizeMethod() : {}
+{
+    <SIZE> <LPAREN> <RPAREN>
+}
+
+void Arguments() #Arguments : {}
+{
+     <LPAREN> (Expression() (<COMMA> Expression())* )? <RPAREN>
+}
+
+void FunctionCallLookahead() #void : {}
+{
+    LOOKAHEAD(4) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
+    |
+    LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
+    |
+    LOOKAHEAD(2) <REGISTER> <LPAREN>
+}
+
+void FunctionCall() #void : {}
+{
+      LOOKAHEAD(2) Identifier() <COLON> Identifier() Arguments() #FunctionNode(3)
+    |
+      LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+}
+
+void Constructor() #ConstructorNode() : {}
+{
+  <NEW> <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void Parameter() #void :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareParameter(t.image); }
+}
+
+void Parameters() #void : {}
+{
+     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
+}
+
+
+void LambdaLookahead() #void() : {}
+{
+  <FUNCTION> Parameters()
+  |
+  Parameters() <LAMBDA>
+  |
+  Parameter() <LAMBDA>
+}
+
+void Lambda() #JexlLambda() :
+{
+   pushFrame();
+}
+{
+  <FUNCTION> Parameters() Block()
+  |
+  Parameters() <LAMBDA> Block()
+  |
+  Parameter() <LAMBDA> Block()
+}
+
+
+
+/***************************************
+ *     References
+ ***************************************/
+
+void IdentifierAccess() :
+{
+    Token t;
+}
+{
+    <DOT> (
+        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); }
+    |
+        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); }
+    )
+}
+
+void ArrayAccess() : {}
+{
+    (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
+}
+
+void MemberAccess() #void : {}
+{
+    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    |
+    LOOKAHEAD(<DOT>) IdentifierAccess()
+}
+
+void ReferenceExpression() #MethodNode(>1) : {}
+{
+    ( <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
+}
+
+void PrimaryExpression() #void : {}
+{
+       LOOKAHEAD( LambdaLookahead() ) Lambda()
+    |
+       LOOKAHEAD( <LPAREN> ) ReferenceExpression()
+    |
+       LOOKAHEAD( <LCURLY> Expression() <COLON>) MapLiteral()
+    |
+       LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
+    |
+       LOOKAHEAD( <LCURLY> Expression() ) SetLiteral()
+    |
+       LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
+    |
+       LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
+    |
+       LOOKAHEAD( <NEW> ) Constructor()
+    |
+       LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
+    |
+       Identifier(true)
+    |
+       Literal()
+}
+
+void MethodCall() #void : {}
+{
+    LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
+    |
+    LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
+    |
+    (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
+}
+
+
+void MemberExpression() #void : {}
+{
+    LOOKAHEAD(MethodCall()) MethodCall() | MemberAccess()
+}
+
+void ValueExpression() #void : {}
+{
+    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
+}
+
