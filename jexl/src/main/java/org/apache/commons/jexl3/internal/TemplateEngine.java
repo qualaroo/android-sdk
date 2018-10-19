@@ -296,7 +296,6 @@ public final class TemplateEngine extends JxltEngine {
             } catch (JexlException xjexl) {
                 JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
                 if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
                 }
                 throw xuel;
@@ -332,7 +331,6 @@ public final class TemplateEngine extends JxltEngine {
             } catch (JexlException xjexl) {
                 JexlException xuel = createException(xjexl.getInfo(), "evaluate", this, xjexl);
                 if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
                 }
                 throw xuel;
@@ -669,7 +667,6 @@ public final class TemplateEngine extends JxltEngine {
         }
         if (xuel != null) {
             if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                 stmt = null;
             } else {
                 throw xuel;

@@ -48,9 +48,6 @@ import java.util.Set;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * A JexlEngine implementation.
  * @since 2.0
@@ -67,7 +64,7 @@ public class Engine extends JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT =
-                new Uberspect(LogFactory.getLog(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
+                new Uberspect(JexlUberspect.JEXL_STRATEGY);
 
         /** Non-instantiable. */
         private UberspectHolder() {}
@@ -80,10 +77,6 @@ public class Engine extends JexlEngine {
      * The {@link JexlArithmetic} instance.
      */
     protected final JexlArithmetic arithmetic;
-    /**
-     * The Log to which all JexlEngine messages will be logged.
-     */
-    protected final Log logger;
     /**
      * The atomic parsing flag; true whilst parsing.
      */
@@ -146,7 +139,7 @@ public class Engine extends JexlEngine {
      */
     public Engine(JexlBuilder conf) {
         JexlSandbox sandbox = conf.sandbox();
-        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
+        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.strategy()) : conf.uberspect();
         ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
@@ -156,7 +149,6 @@ public class Engine extends JexlEngine {
         } else {
             this.uberspect = new SandboxUberspect(uber, sandbox);
         }
-        this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         this.strict = conf.strict() == null ? true : conf.strict();
         this.silent = conf.silent() == null ? false : conf.silent();
@@ -177,16 +169,14 @@ public class Engine extends JexlEngine {
      * is no use for it. The main reason for not using the default Uberspect instance is to
      * be able to use a (low level) introspector created with a given logger
      * instead of the default one.</p>
-     * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @return Uberspect the default uberspector instance.
      */
-    public static Uberspect getUberspect(Log logger, JexlUberspect.ResolverStrategy strategy) {
-        if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
-            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)) {
+    public static Uberspect getUberspect(JexlUberspect.ResolverStrategy strategy) {
+        if (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY) {
             return UberspectHolder.UBERSPECT;
         }
-        return new Uberspect(logger, strategy);
+        return new Uberspect(strategy);
     }
 
     @Override
@@ -294,7 +284,6 @@ public class Engine extends JexlEngine {
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
             throw xjexl.clean();
@@ -323,7 +312,6 @@ public class Engine extends JexlEngine {
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return;
             }
             throw xjexl.clean();
@@ -352,7 +340,6 @@ public class Engine extends JexlEngine {
         }
         if (xjexl != null) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 result = null;
             } else {
                 throw xjexl.clean();
@@ -399,7 +386,6 @@ public class Engine extends JexlEngine {
         }
         if (xjexl != null) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
             throw xjexl.clean();

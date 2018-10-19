@@ -38,8 +38,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the JEXL ScriptEngine for JSF-223.
@@ -62,9 +60,6 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
-
-    /** The logger. */
-    private static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
 
     /** The shared expression cache size. */
     private static final int CACHE_SIZE = 512;
@@ -174,14 +169,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             return System.class;
         }
 
-        /**
-         * Gives access to the engine logger.
-         * 
-         * @return the JexlScriptEngine logger
-         */
-        public Log getLogger() {
-            return LOG;
-        }
     }
 
 
@@ -306,7 +293,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         private EngineSingletonHolder() {}
 
         /** The JEXL engine singleton instance. */
-        private static final JexlEngine DEFAULT_ENGINE = new JexlBuilder().logger(LOG).cache(CACHE_SIZE).create();
+        private static final JexlEngine DEFAULT_ENGINE = new JexlBuilder().cache(CACHE_SIZE).create();
     }
 
     /**
@@ -331,9 +318,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         public Object get(final String name) {
             final Object o = scriptContext.getAttribute(name);
             if (JEXL_OBJECT_KEY.equals(name)) {
-                if (o != null) {
-                    LOG.warn("JEXL is a reserved variable name, user defined value is ignored");
-                }
                 return jexlObject;
             }
             return o;

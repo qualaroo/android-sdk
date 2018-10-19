@@ -28,8 +28,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 
-import org.apache.commons.logging.Log;
-
 /**
  * The helper base of an interpreter of JEXL syntax.
  * @since 3.0
@@ -37,8 +35,6 @@ import org.apache.commons.logging.Log;
 public abstract class InterpreterBase extends ParserVisitor {
     /** The JEXL engine. */
     protected final Engine jexl;
-    /** The logger. */
-    protected final Log logger;
     /** The uberspect. */
     protected final JexlUberspect uberspect;
     /** The arithmetic handler. */
@@ -57,16 +53,10 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected InterpreterBase(Engine engine, JexlContext aContext) {
         this.jexl = engine;
-        this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         JexlArithmetic jexla = jexl.arithmetic;
         this.arithmetic = jexla.options(context);
-        if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
-            logger.warn("expected arithmetic to be " + jexla.getClass().getSimpleName()
-                          + ", got " + arithmetic.getClass().getSimpleName()
-            );
-        }
     }
 
     /**
@@ -76,7 +66,6 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected InterpreterBase(InterpreterBase ii, JexlArithmetic jexla) {
         jexl = ii.jexl;
-        logger = ii.logger;
         uberspect = ii.uberspect;
         context = ii.context;
         arithmetic = ii.arithmetic;
@@ -108,7 +97,6 @@ public abstract class InterpreterBase extends ParserVisitor {
                 try {
                     mclose.invoke(closeable, EMPTY_PARAMS);
                 } catch (Exception xignore) {
-                    logger.warn(xignore);
                 }
             }
             //}
@@ -187,8 +175,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableVariable(JexlNode node, String var, boolean undef) {
         if (isStrictEngine() && (undef || arithmetic.isStrict())) {
             throw new JexlException.Variable(node, var, undef);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.variableError(node, var, undef));
         }
         return null;
     }
@@ -202,8 +188,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableMethod(JexlNode node, String method) {
         if (isStrictEngine()) {
             throw new JexlException.Method(node, method);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.methodError(node, method));
         }
         return null;
     }
@@ -218,8 +202,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableProperty(JexlNode node, String var, Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Property(node, var, cause);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.propertyError(node, var), cause);
         }
         return null;
     }
@@ -234,8 +216,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object operatorError(JexlNode node, JexlOperator operator, Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
         }
         return null;
     }
@@ -250,8 +230,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object annotationError(JexlNode node, String annotation, Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Annotation(node, annotation, cause);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.annotationError(node, annotation), cause);
         }
         return null;
     }

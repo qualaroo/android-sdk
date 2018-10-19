@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.logging.Log;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -60,10 +58,6 @@ public final class Introspector {
      */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
     /**
-     * the logger.
-     */
-    protected final Log rlog;
-    /**
      * The class loader used to solve constructors if needed.
      */
     private ClassLoader loader;
@@ -86,11 +80,9 @@ public final class Introspector {
 
     /**
      * Create the introspector.
-     * @param log     the logger to use
      * @param cloader the class loader
      */
-    public Introspector(Log log, ClassLoader cloader) {
-        this.rlog = log;
+    public Introspector(ClassLoader cloader) {
         loader = cloader;
     }
 
@@ -132,11 +124,6 @@ public final class Introspector {
             return getMap(c).getMethod(key);
         } catch (MethodKey.AmbiguousException xambiguous) {
             // whoops.  Ambiguous.  Make a nice log message and return null...
-            if (rlog != null && rlog.isInfoEnabled()) {
-                rlog.info("ambiguous method invocation: "
-                        + c.getName() + "."
-                        + key.debugString(), xambiguous);
-            }
             return null;
         }
     }
@@ -259,18 +246,8 @@ public final class Introspector {
                     constructorsMap.put(key, CTOR_MISS);
                 }
             } catch (ClassNotFoundException xnotfound) {
-                if (rlog != null && rlog.isInfoEnabled()) {
-                    rlog.info("unable to find class: "
-                            + cname + "."
-                            + key.debugString(), xnotfound);
-                }
                 ctor = null;
             } catch (MethodKey.AmbiguousException xambiguous) {
-                if (rlog != null && rlog.isInfoEnabled()) {
-                    rlog.info("ambiguous constructor invocation: "
-                            + cname + "."
-                            + key.debugString(), xambiguous);
-                }
                 ctor = null;
             }
             return ctor;
@@ -298,7 +275,7 @@ public final class Introspector {
                 // try again
                 classMap = classMethodMaps.get(c);
                 if (classMap == null) {
-                    classMap = new ClassMap(c, rlog);
+                    classMap = new ClassMap(c);
                     classMethodMaps.put(c, classMap);
                 }
             } finally {

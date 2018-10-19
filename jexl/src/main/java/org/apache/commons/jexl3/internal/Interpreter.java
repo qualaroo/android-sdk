@@ -195,9 +195,6 @@ public class Interpreter extends InterpreterBase {
             if (!isSilent()) {
                 throw xjexl.clean();
             }
-            if (logger.isWarnEnabled()) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
-            }
         } finally {
             synchronized(this) {
                 if (functors != null) {
@@ -1849,11 +1846,6 @@ public class Interpreter extends InterpreterBase {
             // if the context has changed, might need a new interpreter
             final JexlArithmetic jexla = arithmetic.options(context);
             if (jexla != arithmetic) {
-                if (!arithmetic.getClass().equals(jexla.getClass())) {
-                    logger.warn("expected arithmetic to be " + arithmetic.getClass().getSimpleName()
-                            + ", got " + jexla.getClass().getSimpleName()
-                    );
-                }
                 Interpreter ii = new Interpreter(Interpreter.this, jexla);
                 Object r = block.jjtAccept(ii, data);
                 if (ii.isCancelled()) {
