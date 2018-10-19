@@ -1,3 +1,6 @@
+## 1.8.2
+- [fix] removed dependency of `commons-logging` to avoid crashes on Android Pie
+
 ## 1.8.1
 - [hotfix] fixed the bytecode after removing the need for desugaring process
 
