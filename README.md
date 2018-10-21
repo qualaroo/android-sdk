@@ -16,7 +16,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:1.8.3` dependency to your app's `build.gradle` file:
+Simply add the `com.qualaroo:qualaroo-sdk:1.8.4` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -25,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'com.qualaroo:qualaroo-sdk:1.8.3'
+    implementation 'com.qualaroo:qualaroo-sdk:1.8.4'
 }
 ```
 ## Step 2. Code Integration

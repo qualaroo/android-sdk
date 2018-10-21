@@ -1,3 +1,6 @@
+## 1.8.4
+- support for running in multiple-process environment
+
 ## 1.8.3
 - [hotfix] fixed invalid dependency on `jexl` module which was preventing building the library
 
