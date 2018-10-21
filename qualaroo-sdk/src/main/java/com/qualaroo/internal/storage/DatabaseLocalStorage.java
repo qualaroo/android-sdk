@@ -7,6 +7,7 @@ import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -54,6 +55,9 @@ public class DatabaseLocalStorage implements LocalStorage {
 
     public DatabaseLocalStorage(Context context) {
         this.dbHelper = new QualarooSQLiteOpenHelper(context, DB_NAME);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            this.dbHelper.setWriteAheadLoggingEnabled(true);
+        }
     }
 
     @Override public void storeFailedReportRequest(String reportRequestUrl) {
