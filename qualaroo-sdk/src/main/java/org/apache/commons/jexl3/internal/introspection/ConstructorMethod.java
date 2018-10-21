@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.beans.IntrospectionException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.jexl3.introspection.JexlMethod;
@@ -75,7 +74,7 @@ public final class ConstructorMethod implements JexlMethod {
         if (invoke) {
             return ctor.newInstance(params);
         }
-        throw new IntrospectionException("constructor resolution error");
+        throw new IllegalArgumentException("constructor resolution error");
     }
 
     @Override

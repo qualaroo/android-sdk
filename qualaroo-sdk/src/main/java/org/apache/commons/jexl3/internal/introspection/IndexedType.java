@@ -20,7 +20,6 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import java.lang.reflect.Method;
-import java.beans.IntrospectionException;
 
 /**
  * Abstract an indexed property container.
@@ -145,7 +144,7 @@ public final class IndexedType implements JexlPropertyGet {
         if (obj != null && clazz.equals(obj.getClass())) {
             return new IndexedContainer(this, obj);
         } else {
-            throw new IntrospectionException("property resolution error");
+            throw new IllegalArgumentException("property resolution error");
         }
     }
 
@@ -197,7 +196,7 @@ public final class IndexedType implements JexlPropertyGet {
                 return invoked;
             }
         }
-        throw new IntrospectionException("property get error: "
+        throw new IllegalArgumentException("property get error: "
                 + object.getClass().toString()
                 + "@" + key.toString());
     }
@@ -232,7 +231,7 @@ public final class IndexedType implements JexlPropertyGet {
                 return invoked;
             }
         }
-        throw new IntrospectionException("property set error: "
+        throw new IllegalArgumentException("property set error: "
                 + object.getClass().toString()
                 + "@" + key.toString());
     }
