@@ -1,3 +1,6 @@
+## 1.8.3
+- [hotfix] fixed invalid dependency on `jexl` module which was preventing building the library
+
 ## 1.8.2
 - [fix] removed dependency of `commons-logging` to avoid crashes on Android Pie
 
