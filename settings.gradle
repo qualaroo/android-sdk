@@ -1,1 +1,1 @@
-include ':demo-app', ':qualaroo-sdk', ':sample', ':jexl'
+include ':demo-app', ':qualaroo-sdk', ':sample'
