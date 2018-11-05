@@ -1,7 +1,7 @@
 package com.qualaroo.internal
 
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockitokotlin2.doReturnConsecutively
+import com.nhaarman.mockitokotlin2.mock
 import com.qualaroo.internal.model.TestModels.survey
 import com.qualaroo.internal.storage.InMemoryLocalStorage
 import org.junit.Assert.assertEquals
@@ -14,7 +14,7 @@ class UserGroupPercentageProviderTest {
 
     val localStorage = InMemoryLocalStorage()
     val random = mock<Random> {
-        on { nextInt(100) } doReturn listOf(10,20,30,40,50,60)
+        on { nextInt(100) } doReturnConsecutively  listOf(10,20,30,40,50,60)
     }
     val provider = UserGroupPercentageProvider(localStorage, random)
 

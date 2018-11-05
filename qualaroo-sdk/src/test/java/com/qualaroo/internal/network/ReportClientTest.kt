@@ -1,6 +1,6 @@
 package com.qualaroo.internal.network
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import com.qualaroo.internal.SdkSession
 import com.qualaroo.internal.SurveySession
 import com.qualaroo.internal.UserInfo

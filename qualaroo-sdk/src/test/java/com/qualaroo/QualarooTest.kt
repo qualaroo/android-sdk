@@ -1,6 +1,6 @@
 package com.qualaroo
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import com.qualaroo.internal.*
 import com.qualaroo.internal.executor.ExecutorSet
 import com.qualaroo.internal.model.Survey

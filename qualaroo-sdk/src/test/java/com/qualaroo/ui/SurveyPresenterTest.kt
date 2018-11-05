@@ -1,6 +1,6 @@
 package com.qualaroo.ui
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.optionMap
 import com.qualaroo.internal.model.TestModels.qscreen

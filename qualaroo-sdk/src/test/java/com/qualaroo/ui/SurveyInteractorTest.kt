@@ -1,6 +1,6 @@
 package com.qualaroo.ui
 
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import com.qualaroo.internal.ReportManager
 import com.qualaroo.internal.event.SurveyEvent
 import com.qualaroo.internal.event.SurveyEventPublisher

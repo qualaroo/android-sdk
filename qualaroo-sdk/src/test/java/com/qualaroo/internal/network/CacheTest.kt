@@ -1,7 +1,7 @@
 package com.qualaroo.internal.network
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import com.qualaroo.util.TimeProvider
 import org.junit.Assert.*
 import org.junit.Test

@@ -1,7 +1,7 @@
 package com.qualaroo
 
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockitokotlin2.*
 import com.qualaroo.internal.ImageProvider
 import com.qualaroo.internal.model.TestModels.optionMap
 import com.qualaroo.internal.model.TestModels.spec
