@@ -2,12 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.qualaroo.demo"
-        minSdkVersion 15
-        targetSdkVersion 26
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -58,30 +57,31 @@ android {
 }
 
 repositories {
+    jcenter()
     maven { url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs' }
     mavenLocal()
-    jcenter()
 }
 
 dependencies {
     stagingImplementation project(':qualaroo-sdk')
     productionImplementation project(':qualaroo-sdk')
-    mavenImplementation 'com.qualaroo:qualaroo-sdk:1.7.2'
+    mavenImplementation 'com.qualaroo:qualaroo-sdk:1.8.3'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.android.support:design:27.1.1"
+    implementation "com.android.support:design:28.0.0"
     implementation 'com.jakewharton:process-phoenix:2.0.0'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
 
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
 }
