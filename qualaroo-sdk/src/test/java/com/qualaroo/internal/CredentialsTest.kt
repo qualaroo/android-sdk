@@ -10,7 +10,7 @@ class CredentialsTest {
 
     companion object {
 
-        private val PROPER_KEY = "API_KEY_HERE"
+        private val PROPER_KEY = "MTIzNDU6NzUyYmQ5OGVjMjEyMTAwMDAwOTIwYjllMGYyZjMyNWY3ZTZhNDU1Yjo2Nzg5MA=="
 
         private fun base64(text: String): String {
             return ByteString.encodeString(text, Charset.forName("UTF-8")).base64()
@@ -21,9 +21,9 @@ class CredentialsTest {
     fun `unpacks credentials`() {
         val credentials = Credentials(PROPER_KEY)
 
-        assertEquals("39241", credentials.apiKey())
-        assertEquals("752bd98ec21216303a92fb9e0f2f325f7e6a455b", credentials.apiSecret())
-        assertEquals("64832", credentials.siteId())
+        assertEquals("12345", credentials.apiKey())
+        assertEquals("752bd98ec212100000920b9e0f2f325f7e6a455b", credentials.apiSecret())
+        assertEquals("67890", credentials.siteId())
     }
 
     @Test(expected = InvalidCredentialsException::class)
