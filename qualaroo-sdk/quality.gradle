@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
+ *
+ * Please refer to the LICENSE.md file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+apply plugin: 'jacoco'
+
+checkstyle {
+    toolVersion = '8.0'
+}
+
+jacoco {
+    toolVersion = '0.8.1'
+}
+
+findbugs {
+    toolVersion = '3.0.1'
+}
+
+task checkstyle(type: Checkstyle) {
+    classpath = files()
+    maxWarnings 0
+    source "src/main/java", "/src/debug/java",
+            "src/release/java", "src/test/java"
+    exclude '**/generated/**'
+    if(project.hasProperty("filesToCheck")) {
+        if (filesToCheck.length() == 0) {
+            exclude '*'
+        }
+        filesToCheck.split('\n')
+                .findAll { it.length() > 0 }
+                .each {
+            String pattern = "**/${file(it).name}"
+            include pattern
+        }
+    }
+    configFile file("${project.rootDir}/qualaroosdk/quality/pmd.xml")
+    configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/qualaroosdk/quality/checkstyle-suppression.xml").absolutePath
+    reports {
+        xml {
+            enabled true
+            destination file("${rootProject.buildDir}/reports/checkstyle/main.xml")
+        }
+
+        html {
+            enabled true
+            destination file("${rootProject.buildDir}/reports/checkstyle/main.html")
+        }
+    }
+}
+
+task pmd(type: Pmd) {
+    classpath = files()
+    ignoreFailures = false
+    ruleSetFiles = files("${project.rootDir}/qualaroosdk/quality/pmd.xml")
+    ruleSets = []
+    consoleOutput true
+    source "src/main/java", "/src/debug/java",
+            "src/release/java", "src/test/java"
+    exclude '**/generated/**'
+    if(project.hasProperty("filesToCheck")) {
+        if (filesToCheck.length() == 0) {
+            exclude '*'
+        }
+        filesToCheck.split('\n')
+                .findAll { it.length() > 0 }
+                .each {
+            String pattern = "**/${file(it).name}"
+            include pattern
+        }
+    }
+
+    reports {
+        html.enabled = true
+        html {
+            destination file("$project.buildDir/reports/pmd/pmd.html")
+        }
+    }
+}
+
+task findbugs(type: FindBugs) {
+    ignoreFailures = false
+    effort = "max"
+    reportLevel = "high"
+    excludeFilter = file("${project.rootDir}/qualaroosdk/quality/findbugs.xml")
+
+    classes = fileTree("${project.buildDir}/intermediates/classes") + fileTree("${project.buildDir}/classes")
+    source "src/main/java", "/src/debug/java",
+            "src/release/java", "src/test/java"
+    include '**/*.java'
+    exclude '**/generated/**'
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html {
+            destination file("$project.buildDir/reports/findbugs/findbugs.html")
+        }
+    }
+    classpath = files()
+}
+
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testStagingDebugUnitTest']) {
+
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
+    def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/androidTest/java"
+
+    classDirectories = files([debugTree], [kotlinDebugTree])
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: "$buildDir", includes: [
+            "jacoco/testDebugUnitTest.exec",
+    ])
+}

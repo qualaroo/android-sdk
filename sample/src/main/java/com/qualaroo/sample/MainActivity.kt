@@ -11,7 +11,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         findViewById<Button>(R.id.main_hello_button).setOnClickListener {
             val options = SurveyOptions.Builder()
                     .ignoreSurveyTargeting(true)

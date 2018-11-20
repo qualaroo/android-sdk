@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
+  ~
+  ~ Please refer to the LICENSE.md file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+    <string name="app_name">Survey Demo APP</string>
+    <string name="hint_api_key">API Key</string>
+    <string name="hint_survey_alias">Survey alias</string>
+    <string name="survey_alias">Survey Alias</string>
+    <string name="apikey_hint">Enter API Key</string>
+    <string name="survey_hint">Enter Survey Alias</string>
+    <string name="show_survey_button">Show Survey</string>
+    <string name="choose_background_color">Choose background color</string>
+    <string name="choose_alpha">Choose background alpha</string>
+    <string name="choose_position">Choose survey position</string>
+    <string name="secretkey_textview">API Secret</string>
+    <string name="secretkey_hint">Enter API Secret key</string>
+    <string name="attach_survey_button">Attach Survey</string>
+    <string name="remove_QM_button">X</string>
+    <string name="get_state_button">Get</string>
+</resources>

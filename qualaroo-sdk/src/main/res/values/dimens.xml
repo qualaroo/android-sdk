@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
+  ~
+  ~ Please refer to the LICENSE.md file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<resources>
+
+    <dimen name="qualaroo__question_title_size">22dp</dimen>
+    <dimen name="qualaroo__question_logo_size">52dp</dimen>
+
+    <dimen name="qualaroo__answer_text_size">20dp</dimen>
+
+    <dimen name="qualaroo__radio_button_drawable_padding">8dp</dimen>
+    <dimen name="qualaroo__radio_button_padding">8dp</dimen>
+    <dimen name="qualaroo__radio_text_size">@dimen/qualaroo__answer_text_size</dimen>
+
+    <dimen name="qualaroo__checkbox_drawable_padding">8dp</dimen>
+    <dimen name="qualaroo__checkbox_padding">8dp</dimen>
+    <dimen name="qualaroo__checkbox_text_size">@dimen/qualaroo__answer_text_size</dimen>
+
+    <dimen name="qualaroo__nps_label_text_size">18dp</dimen>
+
+    <dimen name="qualaroo__dropdown_text_size">@dimen/qualaroo__answer_text_size</dimen>
+    <dimen name="qualaroo__dropdown_item_padding">8dp</dimen>
+
+    <dimen name="qualaroo__message_text_size">22dp</dimen>
+    <dimen name="qualaroo__progress_bar_height">4dp</dimen>
+
+</resources>

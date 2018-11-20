@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
+  ~
+  ~ Please refer to the LICENSE.md file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"

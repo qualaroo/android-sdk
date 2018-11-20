@@ -1,3 +1,15 @@
+## 1.8.4
+- support for running in multiple-process environment
+
+## 1.8.3
+- [hotfix] fixed invalid dependency on `jexl` module which was preventing building the library
+
+## 1.8.2
+- [fix] removed dependency of `commons-logging` to avoid crashes on Android Pie
+
+## 1.8.1
+- [hotfix] fixed the bytecode after removing the need for desugaring process
+
 ## 1.8.0
 - support for displaying progress bars on surveys
 - the SDK does no longer require desugar process to run - an app is no longer required to have a `compileOptions{}` clause to support Java 1.8 features

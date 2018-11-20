@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
+  ~
+  ~ Please refer to the LICENSE.md file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:clipChildren="false"
+    android:orientation="vertical"
+    android:gravity="bottom">
+
+
+    <LinearLayout
+        android:id="@+id/qualaroo__linearlayout"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/qualaroo__survey_logo"
+            android:background="@drawable/qualaroo__survey_logo_background"
+            android:layout_width="@dimen/qualaroo__question_logo_size"
+            android:layout_height="@dimen/qualaroo__question_logo_size"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/qualaroo__question_title_top"
+            android:textStyle="bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            tools:text="This is a title of a question" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/qualaroo__survey_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/qualaroo__ic_close" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/qualaroo__question_title_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="18sp"
+        tools:text="This is a description of an question - I have to tell you that it's a really, really long one!" />
+
+    <FrameLayout
+        android:id="@+id/qualaroo__question_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="8dp"
+        android:clipChildren="false"/>
+
+</LinearLayout>
