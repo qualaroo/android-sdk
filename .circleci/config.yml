@@ -1,0 +1,27 @@
+
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-28-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+      QUALAROO_S3_ACCESS_KEY: access
+      QUALAROO_S3_SECRET_KEY: secret
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "qualaroo-sdk/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies -PQUALAROO_S3_ACCESS_KEY=access -PQUALAROO_S3_SECRET_KEY=secret
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "qualaroo-sdk/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew qualaroo-sdk:build -PQUALAROO_S3_ACCESS_KEY=access -PQUALAROO_S3_SECRET_KEY=secret
+      - store_test_results:
+          path: qualaroo-sdk/build/test-results/testStagingDebugUnitTest

@@ -1,8 +1,18 @@
-[![](img/logo-dark.png?raw=true)](https://qualaroo.com/)
+<p align="center"><img src="img/logo-dark.png?raw=true" align="center" width="300"/></p>
+<h1 align="center">QualarooSDK for Android</h1>
 
-# QualarooSDK for Android
+<p align="center">
+  <a href="https://github.com/qualaroo/android-sdk/blob/dev/CHANGELOG.md">
+    <img src="https://img.shields.io/badge/version-1.8.4-blue.svg">
+  </a>
+  <a href="https://circleci.com/gh/qualaroo/android-sdk/tree/dev">
+    <img src="https://img.shields.io/circleci/project/github/qualaroo/android-sdk/dev.svg">
+  </a>  
+</p>
 
-Qualaroo helps companies identify and capitalize on mobile visitor revenue opportunities.
+<p align="center">
+  Qualaroo helps companies identify and capitalize on mobile visitor revenue opportunities.
+</p>
 
 ## Requirements
 
