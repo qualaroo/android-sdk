@@ -89,6 +89,18 @@ Qualaroo.getInstance().showSurvey("your_survey_alias", options);
 #### Observe survey related events
 In order to be able to listen to events, you need to create your own implementation of `com.qualaroo.QualarooSurveyEventReceiver` class.
 
+In `onSurveyEvent(@NonNull String surveyAlias, @Type int eventType)` method you will be notified of events related to a particular survey. `eventType` can be one of the following:
+```java 
+//survey has just been shown to a user
+QualarooSurveyEventReceiver.EVENT_TYPE_SHOWN 
+
+//survey has been dismissed by a user
+QualarooSurveyEventReceiver.EVENT_TYPE_DISMISSED 
+
+//user has completed the survey by answering all of the questions
+QualarooSurveyEventReceiver.EVENT_TYPE_FINISHED 
+```    
+
 To enable your receiver, register it in your `AndroidManifest.xml` file:
 ```xml
 <application>
