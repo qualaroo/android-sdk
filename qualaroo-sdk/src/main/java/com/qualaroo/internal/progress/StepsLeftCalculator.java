@@ -61,7 +61,11 @@ public class StepsLeftCalculator {
     }
 
     public void setCurrentStep(long id, String type) {
-        GraphNode node = nodes.get(type).get(id);
+        Map<Long, GraphNode> nodeMap = nodes.get(type);
+        GraphNode node = null;
+        if (nodeMap != null) {
+            node = nodeMap.get(id);
+        }
         graph = new Graph(node);
     }
 
@@ -114,7 +118,7 @@ public class StepsLeftCalculator {
         return graphNode;
     }
 
-    private @Nullable GraphNode node(long id, String type) {
+    private GraphNode node(long id, String type) {
         switch (type) {
             case "message":
                 return node(messages.get(id));
@@ -123,7 +127,7 @@ public class StepsLeftCalculator {
             case "qscreen":
                 return node(qScreens.get(id));
             default:
-                return null;
+                return GraphNode.INVALID;
         }
     }
 
@@ -135,6 +139,9 @@ public class StepsLeftCalculator {
         }
 
         int longestPathFromRoot() {
+            if (root == null) {
+                return 0;
+            }
             List<GraphNode> nodes = topologicalSort(root);
             Map<GraphNode, Integer> distanceToNode = new HashMap<>();
             for (GraphNode node : nodes) {
@@ -182,5 +189,7 @@ public class StepsLeftCalculator {
             this.type = type;
             this.children = children;
         }
+
+        static final GraphNode INVALID = new GraphNode(-1, "invalid", Collections.<GraphNode>emptyList());
     }
 }
