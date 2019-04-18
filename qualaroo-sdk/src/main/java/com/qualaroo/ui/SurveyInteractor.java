@@ -159,6 +159,10 @@ public class SurveyInteractor {
                 leadGenQuestions.add(questions.get(questionId));
             }
             eventsObserver.showLeadGen(leadGen, leadGenQuestions);
+        } else {
+            QualarooLogger.error("Survey contains unsupported node type: %s", node.nodeType());
+            markSurveyAsFinished();
+            eventsObserver.closeSurvey();
         }
     }
 
