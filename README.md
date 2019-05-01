@@ -59,6 +59,7 @@ The survey will be displayed if all conditions configured in our dashboard are m
 //Show survey with "your_survey_alias" alias
 Qualaroo.getInstance().showSurvey("your_survey_alias");
 ```
+Surveys are downloaded and then cached for **1 hour**. If you are actively working on your survey's design, clear your application's data/cache or use our [Showcase application](https://play.google.com/store/apps/details?id=com.qualaroo.showcase).
 #### Set user properties
 ```java
 //Set unique user id
