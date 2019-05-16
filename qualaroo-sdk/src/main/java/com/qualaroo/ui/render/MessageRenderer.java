@@ -43,6 +43,7 @@ public class MessageRenderer {
         ThemeUtils.applyTheme(callToAction, theme);
         if (message.type() == MessageType.REGULAR || message.type() == MessageType.UNKNOWN) {
             callToAction.setText(android.R.string.ok);
+            callToAction.setVisibility(View.GONE);
         } else if (message.type() == MessageType.CALL_TO_ACTION) {
             callToAction.setText(message.ctaMap().text());
         }

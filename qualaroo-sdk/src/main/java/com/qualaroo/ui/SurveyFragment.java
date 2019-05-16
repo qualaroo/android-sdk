@@ -283,6 +283,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
     }
 
+    @Override public void showCloseButton() {
+        closeButton.setVisibility(View.VISIBLE);
+    }
+
     @Override public void setProgress(float progress) {
         progressBar.setProgress(progress);
     }

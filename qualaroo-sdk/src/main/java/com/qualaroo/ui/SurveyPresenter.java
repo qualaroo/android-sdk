@@ -13,6 +13,7 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 
 import com.qualaroo.internal.model.Message;
+import com.qualaroo.internal.model.MessageType;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -79,6 +80,9 @@ class SurveyPresenter {
 
         @Override public void showMessage(Message message) {
             boolean shouldAnimate = isDisplayingQuestion;
+            if (message.type() == MessageType.REGULAR) {
+                surveyView.showCloseButton();
+            }
             surveyView.showMessage(message, shouldAnimate);
             isDisplayingQuestion = false;
         }

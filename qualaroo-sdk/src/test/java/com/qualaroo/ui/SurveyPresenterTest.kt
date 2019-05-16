@@ -1,6 +1,7 @@
 package com.qualaroo.ui
 
 import com.nhaarman.mockitokotlin2.*
+import com.qualaroo.internal.model.MessageType
 import com.qualaroo.internal.model.TestModels.message
 import com.qualaroo.internal.model.TestModels.optionMap
 import com.qualaroo.internal.model.TestModels.qscreen
@@ -181,6 +182,20 @@ class SurveyPresenterTest {
         capturedEventsObserver.openUri("someFancyUri")
 
         verify(uriOpener, times(1)).openUri("someFancyUri")
+    }
+
+    @Test
+    fun `explicitly shows close button on regular message`() {
+        capturedEventsObserver.showMessage(message(id = 1, type = MessageType.REGULAR))
+
+        verify(view).showCloseButton()
+    }
+
+    @Test
+    fun `does not explicitly show close button on cta messages`() {
+        capturedEventsObserver.showMessage(message(id = 1, type = MessageType.CALL_TO_ACTION))
+
+        verify(view, never()).showCloseButton()
     }
 
 }

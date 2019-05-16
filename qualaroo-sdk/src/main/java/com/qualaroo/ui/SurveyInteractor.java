@@ -188,11 +188,15 @@ public class SurveyInteractor {
     void requestSurveyToStop() {
         if (!survey.spec().optionMap().isMandatory()) {
             closeSurvey();
+            return;
+        }
+        if (isMessageNode(currentNode) && !isCallToActionMessageNode(currentNode)) {
+            closeSurvey();
         }
     }
 
     private void closeSurvey() {
-        if ("message".equals(currentNode.nodeType())) {
+        if (isMessageNode(currentNode)) {
             markSurveyAsFinished();
         } else {
             surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
@@ -218,6 +222,20 @@ public class SurveyInteractor {
                 localStorage.markSurveyFinished(survey);
             }
         });
+    }
+
+    private boolean isMessageNode(Node node) {
+        return "message".equals(node.nodeType());
+    }
+
+    private boolean isCallToActionMessageNode(Node node) {
+        if (isMessageNode(node)) {
+            Message message = messages.get(node.id());
+            if (message != null) {
+                return message.type() == MessageType.CALL_TO_ACTION;
+            }
+        }
+        return false;
     }
 
     private static class UiThreadEventsObserverDelegate implements EventsObserver {

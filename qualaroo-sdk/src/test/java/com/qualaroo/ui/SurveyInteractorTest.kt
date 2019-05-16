@@ -838,6 +838,35 @@ class SurveyInteractorTest {
         val survey = survey(
                 id = 1,
                 spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "question"
+                                )
+                        ),
+                        questionList = mapOf(
+                                language("en") to listOf(
+                                        question(
+                                                id = 100,
+                                                nextMap = node(
+                                                        id = 200,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 1))
+                                        ),
+                                        question(
+                                                id = 200,
+                                                nextMap = node(
+                                                        id = 300,
+                                                        nodeType = "question"
+                                                ),
+                                                answerList = listOf(answer(id = 2))
+                                        ),
+                                        question(
+                                                id = 300
+                                        )
+                                )
+                        ),
                         optionMap = optionMap(
                                 mandatory = true
                         )
@@ -845,10 +874,11 @@ class SurveyInteractorTest {
         )
         val interactor = interactor(withSurvey = survey)
         interactor.registerObserver(observer)
+        interactor.displaySurvey()
 
         interactor.requestSurveyToStop()
 
-        verifyZeroInteractions(observer)
+        verify(observer, never()).closeSurvey()
     }
 
     @Test
@@ -1211,6 +1241,96 @@ class SurveyInteractorTest {
         interactor.messageConfirmed(message(id = 100))
 
         verify(observer, times(1)).closeSurvey()
+    }
+
+    @Test
+    fun `stopping survey on regular mandatory message finishes it`() {
+        val survey = survey(
+                id = 1,
+                canonicalName = "testSurvey",
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 100, type = MessageType.REGULAR)
+                                )
+                        ),
+                        optionMap = optionMap(
+                                mandatory = true
+                        )
+                )
+        )
+        val interactor = interactor(withSurvey = survey)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        interactor.requestSurveyToStop()
+        verify(surveyEventPublisher).publish(SurveyEvent.finished("testSurvey"))
+    }
+
+    @Test
+    fun `stopping survey on regular message finishes it`() {
+        val survey = survey(
+                id = 1,
+                canonicalName = "testSurvey",
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 100, type = MessageType.REGULAR)
+                                )
+                        ),
+                        optionMap = optionMap(
+                                mandatory = false
+                        )
+                )
+        )
+        val interactor = interactor(withSurvey = survey)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        interactor.requestSurveyToStop()
+        verify(surveyEventPublisher).publish(SurveyEvent.finished("testSurvey"))
+    }
+
+    @Test
+    fun `stopping survey on cta mandatory message does not finish it`() {
+        val survey = survey(
+                id = 1,
+                canonicalName = "testSurvey",
+                spec = spec(
+                        startMap = mapOf(
+                                language("en") to node(
+                                        id = 100,
+                                        nodeType = "message"
+                                )
+                        ),
+                        msgScreenList = mapOf(
+                                language("en") to listOf(
+                                        message(id = 100, type = MessageType.CALL_TO_ACTION)
+                                )
+                        ),
+                        optionMap = optionMap(
+                                mandatory = true
+                        )
+                )
+        )
+        val interactor = interactor(withSurvey = survey)
+        interactor.registerObserver(observer)
+        interactor.displaySurvey()
+
+        interactor.requestSurveyToStop()
+        verify(surveyEventPublisher, never()).publish(SurveyEvent.finished("testSurvey"))
     }
 
 

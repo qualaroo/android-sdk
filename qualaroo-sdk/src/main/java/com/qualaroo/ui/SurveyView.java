@@ -26,6 +26,7 @@ public interface SurveyView {
     void showQuestion(Question question);
     void showMessage(Message message, boolean withAnimation);
     void showLeadGen(QScreen qscreen, List<Question> questions);
+    void showCloseButton();
     void setProgress(@FloatRange(from=0.0f, to=1.0f) float progress);
     void forceShowKeyboardWithDelay(long timeInMillis);
     void closeSurvey();
