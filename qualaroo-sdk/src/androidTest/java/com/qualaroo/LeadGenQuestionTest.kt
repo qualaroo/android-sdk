@@ -122,6 +122,7 @@ class LeadGenQuestionTest {
     @Test
     fun closesAfterConfirm() {
         onEditTextInTextInputLayout(hasTextInputLayoutHint("Phone number *")).perform(typeText("123 123 123"))
+        onView(withId(R.id.qualaroo__view_question_lead_gen_scroll_view)).perform(swipeUp())
         onEditTextInTextInputLayout(hasTextInputLayoutHint("E-mail *")).perform(typeText("test@qualaroo.com"))
 
         onView(withId(R.id.qualaroo__view_question_lead_gen_confirm)).perform(click())

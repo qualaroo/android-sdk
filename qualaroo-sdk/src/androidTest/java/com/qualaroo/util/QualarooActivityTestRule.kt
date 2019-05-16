@@ -13,7 +13,7 @@ class QualarooActivityTestRule(val survey: Survey) : ActivityTestRule<QualarooAc
 
     override fun beforeActivityLaunched() {
         Qualaroo.initializeWith(InstrumentationRegistry.getInstrumentation().targetContext)
-                .setApiKey("API_KEY_HERE")
+                .setApiKey("MTExMTE6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDoxMTExMQ==")
                 .setDebugMode(true)
                 .init()
         postQualarooInitialize?.invoke()

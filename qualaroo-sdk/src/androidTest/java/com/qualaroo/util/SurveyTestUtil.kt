@@ -10,7 +10,7 @@ class SurveyTestUtil {
 
         fun <T : Activity> assertActivityFinishing(activityTestRule: ActivityTestRule<T>) {
             Thread.sleep(650)
-            assertTrue(activityTestRule.activity.isFinishing)
+            assertTrue("Activity has finished", activityTestRule.activity.isFinishing)
         }
 
     }
