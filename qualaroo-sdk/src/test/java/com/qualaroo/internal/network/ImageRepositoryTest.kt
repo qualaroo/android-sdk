@@ -36,7 +36,7 @@ class ImageRepositoryTest {
 
     @Test
     fun cachesResults() {
-        server.enqueue(MockResponse().setBody("Some image"))
+        server.enqueue(MockResponse().setBody("Some image").addHeader("Cache-Control", "max-age=86400"))
         val request = Request.Builder()
                 .url(server.url("/"))
                 .build()
