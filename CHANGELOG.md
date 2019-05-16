@@ -1,3 +1,7 @@
+## 1.9.0
+**Changes:**
+- OK button is no longer displayed on regular **message** screens. Close button (X) is displayed instead. This change unifies Android version with iOS. Please note that mandatory Call To Action messages still won't display the close button.
+
 ## 1.8.4
 - support for running in multiple-process environment
 

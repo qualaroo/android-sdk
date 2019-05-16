@@ -6,8 +6,8 @@
  */
 
 int major = 1
-int minor = 8
-int patch = 4
+int minor = 9
+int patch = 0
 
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
