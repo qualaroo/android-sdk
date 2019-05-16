@@ -1,5 +1,6 @@
 package com.qualaroo
 
+import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.assertion.ViewAssertions
 import android.support.test.espresso.matcher.ViewMatchers
@@ -16,6 +17,9 @@ import com.qualaroo.util.QualarooActivityTestRule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import android.support.test.InstrumentationRegistry.getTargetContext
+
+
 
 @Suppress("MemberVisibilityCanBePrivate")
 @MediumTest
@@ -95,7 +99,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToLocaleIfPreferredNotSet() {
-        Locale.setDefault(Locale("fi"))
+        setLocale(Locale("fi"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.launchActivity()
 
@@ -108,7 +112,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToLocaleIfPreferredNotAvailable() {
-        Locale.setDefault(Locale("fi"))
+        setLocale(Locale("fi"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.postQualarooInitialize = {
             Qualaroo.getInstance().setPreferredLanguage("ru")
@@ -124,7 +128,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToFirstAvailableIfLocaleNotFoundAndPreferred() {
-        Locale.setDefault(Locale("jp"))
+        setLocale(Locale("jp"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.postQualarooInitialize = {
             Qualaroo.getInstance().setPreferredLanguage("ru")
@@ -136,5 +140,13 @@ class SurveyLanguageTest {
                 ViewAssertions.matches(ViewMatchers.withText(expectedText)))
 
         testRule.finishActivity()
+    }
+
+    fun setLocale(locale: Locale) {
+        val resources = InstrumentationRegistry.getTargetContext().resources
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.locale = locale
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }
