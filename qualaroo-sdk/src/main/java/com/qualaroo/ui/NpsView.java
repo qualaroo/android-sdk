@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui;
 
 import android.content.Context;
@@ -14,11 +7,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
-import android.support.annotation.Px;
-import android.support.annotation.RestrictTo;
-import android.support.v7.widget.AppCompatTextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.annotation.RestrictTo;
+import androidx.appcompat.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -37,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class NpsView extends FrameLayout {
@@ -48,8 +41,8 @@ public class NpsView extends FrameLayout {
 
     private static final int MIN_SCORE = 0;
     private static final int MAX_SCORE = 10;
-    private static final int SPACE_WIDTH_IN_DP = 4;
-    private static final int SCORE_CORNER_RADIUS = 2;
+    private static final int SPACE_WIDTH_IN_DP = 1;
+    private static final int SCORE_CORNER_RADIUS = 0;
     private static final int NUM_OF_SCORES = 11;
 
     private final List<AppCompatTextView> scores = new ArrayList<>();
@@ -81,14 +74,15 @@ public class NpsView extends FrameLayout {
     }
 
     public void applyTheme(Theme theme) {
-        inactiveTextColor = theme.buttonTextDisabled();
-        activeTextColor = theme.buttonTextEnabled();
+        inactiveTextColor = theme.textColor();
+        activeTextColor = theme.backgroundColor();
+        scoresContainer.setBackgroundColor(theme.textColor());
         for (TextView score : scores) {
             score.setTextColor(inactiveTextColor);
             score.setBackgroundDrawable(inactiveDrawable);
         }
-        activeDrawable.setColorFilter(theme.buttonEnabledColor(), PorterDuff.Mode.SRC_ATOP);
-        inactiveDrawable.setColorFilter(theme.buttonDisabledColor(), PorterDuff.Mode.SRC_ATOP);
+        activeDrawable.setColorFilter(theme.uiSelected(), PorterDuff.Mode.SRC_ATOP);
+        inactiveDrawable.setColorFilter(theme.backgroundColor(), PorterDuff.Mode.SRC_ATOP);
 
         hintView.setTextColor(inactiveTextColor);
         hintView.setBackgroundDrawable(inactiveDrawable);
@@ -97,7 +91,7 @@ public class NpsView extends FrameLayout {
 
     private void inflateScoreViews() {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.setMargins(0, 0, spaceWidth, 0);
+        params.setMargins(spaceWidth, spaceWidth, 0, spaceWidth);
         params.weight = 1;
         for (int scoreValue = MIN_SCORE; scoreValue <= MAX_SCORE; scoreValue++) {
             AppCompatTextView textView = new AppCompatTextView(getContext());
@@ -106,7 +100,7 @@ public class NpsView extends FrameLayout {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
             if (scoreValue == MAX_SCORE) {
                 LinearLayout.LayoutParams lastItemParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
-                lastItemParams.setMargins(0, 0, 0, 0);
+                lastItemParams.setMargins(spaceWidth, spaceWidth, spaceWidth, spaceWidth);
                 lastItemParams.weight = 1;
                 textView.setLayoutParams(lastItemParams);
             } else {

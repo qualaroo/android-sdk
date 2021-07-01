@@ -1,18 +1,11 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class UriOpener {

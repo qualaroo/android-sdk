@@ -1,16 +1,9 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.RestrictTo;
-import android.support.v7.widget.AppCompatCheckBox;
+import androidx.annotation.RestrictTo;
+import androidx.appcompat.widget.AppCompatCheckBox;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -31,7 +24,7 @@ import com.qualaroo.util.DimenUtils;
 
 import java.util.ArrayList;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class CheckboxQuestionRenderer extends QuestionRenderer {

@@ -1,19 +1,11 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
 
 import com.qualaroo.internal.model.Message;
-import com.qualaroo.internal.model.MessageType;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.Survey;
@@ -24,7 +16,7 @@ import com.qualaroo.util.UriOpener;
 import java.io.Serializable;
 import java.util.List;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 class SurveyPresenter {
@@ -80,9 +72,6 @@ class SurveyPresenter {
 
         @Override public void showMessage(Message message) {
             boolean shouldAnimate = isDisplayingQuestion;
-            if (message.type() == MessageType.REGULAR) {
-                surveyView.showCloseButton();
-            }
             surveyView.showMessage(message, shouldAnimate);
             isDisplayingQuestion = false;
         }

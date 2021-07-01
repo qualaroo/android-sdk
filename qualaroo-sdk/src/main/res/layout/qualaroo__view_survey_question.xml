@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
-  ~
-  ~ Please refer to the LICENSE.md file for the terms and conditions
-  ~ under which redistribution and use of this file is permitted.
-  -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -46,7 +39,7 @@
             android:textSize="18sp"
             tools:text="This is a title of a question" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/qualaroo__survey_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

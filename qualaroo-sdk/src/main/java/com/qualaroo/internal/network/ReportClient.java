@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.internal.network;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
 
 import com.qualaroo.internal.SdkSession;
 import com.qualaroo.internal.SurveySession;
@@ -25,7 +18,7 @@ import java.util.Map;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class ReportClient {

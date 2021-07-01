@@ -1,11 +1,10 @@
 package com.qualaroo
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso
-import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.matcher.ViewMatchers
-import android.support.test.filters.MediumTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.qualaroo.internal.model.Language
 import com.qualaroo.internal.model.MessageType
 import com.qualaroo.internal.model.TestModels.language
@@ -17,9 +16,6 @@ import com.qualaroo.util.QualarooActivityTestRule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
-import android.support.test.InstrumentationRegistry.getTargetContext
-
-
 
 @Suppress("MemberVisibilityCanBePrivate")
 @MediumTest
@@ -99,7 +95,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToLocaleIfPreferredNotSet() {
-        setLocale(Locale("fi"))
+        Locale.setDefault(Locale("fi"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.launchActivity()
 
@@ -112,7 +108,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToLocaleIfPreferredNotAvailable() {
-        setLocale(Locale("fi"))
+        Locale.setDefault(Locale("fi"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.postQualarooInitialize = {
             Qualaroo.getInstance().setPreferredLanguage("ru")
@@ -128,7 +124,7 @@ class SurveyLanguageTest {
 
     @Test
     fun fallbacksToFirstAvailableIfLocaleNotFoundAndPreferred() {
-        setLocale(Locale("jp"))
+        Locale.setDefault(Locale("jp"))
         val testRule = QualarooActivityTestRule(JUST_MESSAGE)
         testRule.postQualarooInitialize = {
             Qualaroo.getInstance().setPreferredLanguage("ru")
@@ -140,13 +136,5 @@ class SurveyLanguageTest {
                 ViewAssertions.matches(ViewMatchers.withText(expectedText)))
 
         testRule.finishActivity()
-    }
-
-    fun setLocale(locale: Locale) {
-        val resources = InstrumentationRegistry.getTargetContext().resources
-        Locale.setDefault(locale)
-        val config = resources.configuration
-        config.locale = locale
-        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

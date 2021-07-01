@@ -1,3 +1,5 @@
+@file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+
 package com.qualaroo.internal.network
 
 import com.google.gson.FieldNamingPolicy

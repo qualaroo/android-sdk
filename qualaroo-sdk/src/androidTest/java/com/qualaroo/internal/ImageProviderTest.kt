@@ -1,24 +1,19 @@
 package com.qualaroo.internal
 
 import android.graphics.Bitmap
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.SmallTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.filters.SmallTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.qualaroo.internal.network.ImageRepository
 import com.qualaroo.util.TestExecutors
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.InputStream
-import java.net.InetAddress
-import javax.net.ssl.SSLSocketFactory
-
 
 @Suppress("MemberVisibilityCanPrivate", "IllegalIdentifier")
 @SmallTest
@@ -29,9 +24,7 @@ class ImageProviderTest {
         const val TEST_FILE = "test_survey_logo.jpg"
     }
 
-    val server = MockWebServer().apply {
-        useHttps(getSSLSocketFactory(), false)
-    }
+    val server = MockWebServer()
     val bitmapListener = CapturingBitmapListener()
     val imageRepository = ImageRepository(
             OkHttpClient.Builder().build(),
@@ -44,16 +37,6 @@ class ImageProviderTest {
                     TestExecutors.currentThread(),
                     TestExecutors.currentThread()
             )
-
-    @Before
-    fun setup() {
-        server.start()
-    }
-
-    @After
-    fun cleanUp() {
-        server.shutdown()
-    }
 
     @Test
     fun works() {
@@ -110,20 +93,5 @@ class ImageProviderTest {
         override fun onBitmapReady(bitmap: Bitmap) {
             capturedBitmap = bitmap
         }
-    }
-
-    @Throws(Exception::class)
-    private fun getSSLSocketFactory(): SSLSocketFactory {
-        val heldCertificate = okhttp3.tls.HeldCertificate.Builder()
-                .commonName("localhost")
-                .addSubjectAlternativeName(InetAddress.getByName("localhost").canonicalHostName)
-                .rsa2048()
-                .build()
-
-        val serverCertificates = okhttp3.tls.HandshakeCertificates.Builder()
-                .heldCertificate(heldCertificate)
-                .build()
-        return serverCertificates.sslSocketFactory()
-
     }
 }

@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui;
 
 import android.animation.LayoutTransition;
@@ -16,13 +9,13 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v4.widget.ImageViewCompat;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.fragment.app.Fragment;
+import androidx.core.view.ViewCompat;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import androidx.core.widget.ImageViewCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +42,7 @@ import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class SurveyFragment extends Fragment implements SurveyView {
@@ -281,10 +274,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         if (viewState != null) {
             restorableView.restoreState(viewState);
         }
-    }
-
-    @Override public void showCloseButton() {
-        closeButton.setVisibility(View.VISIBLE);
     }
 
     @Override public void setProgress(float progress) {

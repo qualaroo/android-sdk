@@ -1,13 +1,6 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.internal;
 
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.model.UserResponse;
@@ -16,7 +9,7 @@ import com.qualaroo.internal.network.ReportClient;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class ReportManager {

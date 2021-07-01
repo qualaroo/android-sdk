@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
-  ~
-  ~ Please refer to the LICENSE.md file for the terms and conditions
-  ~ under which redistribution and use of this file is permitted.
-  -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,7 +7,7 @@
     android:clipToPadding="false"
     android:orientation="vertical">
 
-    <android.support.v4.widget.Space
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>

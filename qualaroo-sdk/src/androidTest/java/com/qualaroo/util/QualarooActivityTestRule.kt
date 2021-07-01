@@ -1,8 +1,8 @@
 package com.qualaroo.util
 
 import android.content.Intent
-import android.support.test.InstrumentationRegistry
-import android.support.test.rule.ActivityTestRule
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.ActivityTestRule
 import com.qualaroo.Qualaroo
 import com.qualaroo.QualarooActivity
 import com.qualaroo.internal.model.Survey
@@ -13,7 +13,7 @@ class QualarooActivityTestRule(val survey: Survey) : ActivityTestRule<QualarooAc
 
     override fun beforeActivityLaunched() {
         Qualaroo.initializeWith(InstrumentationRegistry.getInstrumentation().targetContext)
-                .setApiKey("MTExMTE6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDoxMTExMQ==")
+                .setApiKey("API_KEY_HERE")
                 .setDebugMode(true)
                 .init()
         postQualarooInitialize?.invoke()
