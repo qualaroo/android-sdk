@@ -1,15 +1,8 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.internal.network;
 
 import android.os.Build;
 import android.os.StatFs;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 
 import java.io.File;
 import java.io.IOException;

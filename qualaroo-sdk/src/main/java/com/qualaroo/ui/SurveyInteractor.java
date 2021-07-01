@@ -1,17 +1,10 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui;
 
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
-import android.support.v4.util.LongSparseArray;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
+import androidx.collection.LongSparseArray;
 
 import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.ReportManager;
@@ -39,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class SurveyInteractor {
@@ -159,10 +152,6 @@ public class SurveyInteractor {
                 leadGenQuestions.add(questions.get(questionId));
             }
             eventsObserver.showLeadGen(leadGen, leadGenQuestions);
-        } else {
-            QualarooLogger.error("Survey contains unsupported node type: %s", node.nodeType());
-            markSurveyAsFinished();
-            eventsObserver.closeSurvey();
         }
     }
 
@@ -188,15 +177,11 @@ public class SurveyInteractor {
     void requestSurveyToStop() {
         if (!survey.spec().optionMap().isMandatory()) {
             closeSurvey();
-            return;
-        }
-        if (isMessageNode(currentNode) && !isCallToActionMessageNode(currentNode)) {
-            closeSurvey();
         }
     }
 
     private void closeSurvey() {
-        if (isMessageNode(currentNode)) {
+        if ("message".equals(currentNode.nodeType())) {
             markSurveyAsFinished();
         } else {
             surveyEventPublisher.publish(SurveyEvent.dismissed(survey.canonicalName()));
@@ -222,20 +207,6 @@ public class SurveyInteractor {
                 localStorage.markSurveyFinished(survey);
             }
         });
-    }
-
-    private boolean isMessageNode(Node node) {
-        return "message".equals(node.nodeType());
-    }
-
-    private boolean isCallToActionMessageNode(Node node) {
-        if (isMessageNode(node)) {
-            Message message = messages.get(node.id());
-            if (message != null) {
-                return message.type() == MessageType.CALL_TO_ACTION;
-            }
-        }
-        return false;
     }
 
     private static class UiThreadEventsObserverDelegate implements EventsObserver {

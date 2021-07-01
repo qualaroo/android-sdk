@@ -1,12 +1,9 @@
 /*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
+ * Copyright © 2017 Qualaroo. All rights reserved.
  */
 
-int major = 1
-int minor = 9
+int major = 2
+int minor = 0
 int patch = 0
 
 project.ext {
@@ -21,13 +18,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 28
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdkVersion 30
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         versionCode project.sdkVersionCode
         versionName project.sdkVersion
     }
@@ -43,7 +40,6 @@ android {
         }
         debug {
             minifyEnabled false
-            multiDexEnabled true
         }
     }
 
@@ -63,9 +59,9 @@ android {
 
     flavorDimensions 'api'
     productFlavors {
-        staging {
-            dimension 'api'
-        }
+//        staging {
+//            dimension 'api'
+//        }
 
         production {
             dimension 'api'
@@ -79,26 +75,26 @@ repositories {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:28.0.0"
-    implementation "com.android.support:design:28.0.0"
-    implementation 'com.squareup.okhttp3:okhttp:3.12.3'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.5'
 
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'org.mockito:mockito-core:2.23.0'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:3.12.3'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
 
-    androidTestImplementation 'com.squareup.okhttp3:okhttp-tls:3.12.3'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
-    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:3.12.3'
-    androidTestImplementation 'org.bouncycastle:bcprov-jdk15on:1.60'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    androidTestImplementation ('com.squareup.okhttp3:mockwebserver:3.11.0') {
+        exclude group: 'org.bouncycastle'
+    }
 }
 
 task generateJavadoc(type: Javadoc) {
@@ -135,7 +131,7 @@ gradle.taskGraph.whenReady { taskGraph ->
     logging.captureStandardOutput LogLevel.INFO
     tasks.findAll { it.name == "publish"}.each { task ->
         String msg = "Please use an appropriate task to make sure that you are pushing either production or staging!"
-        throw new StopActionException(msg)
+//        throw new StopActionException(msg)
     }
 }
 
@@ -148,19 +144,21 @@ publishing {
     repositories {
         maven {
             name 'QualarooProduction'
-            url "s3://qualaroo-android-sdk/libs/"
-            credentials(AwsCredentials) {
-                accessKey QUALAROO_S3_ACCESS_KEY
-                secretKey QUALAROO_S3_SECRET_KEY
-            }
+//            url "s3://qualaroo-android-sdk/libs/"
+            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/libs/"
+//            credentials(AwsCredentials) {
+//                accessKey QUALAROO_S3_ACCESS_KEY
+//                secretKey QUALAROO_S3_SECRET_KEY
+//            }
         }
         maven {
             name 'QualarooSnapshots'
-            url "s3://qualaroo-android-sdk/snapshots/"
-            credentials(AwsCredentials) {
-                accessKey QUALAROO_S3_ACCESS_KEY
-                secretKey QUALAROO_S3_SECRET_KEY
-            }
+//            url "s3://qualaroo-android-sdk/snapshots/"
+            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/snapshots/"
+//            credentials(AwsCredentials) {
+//                accessKey QUALAROO_S3_ACCESS_KEY
+//                secretKey QUALAROO_S3_SECRET_KEY
+//            }
         }
         mavenLocal()
     }

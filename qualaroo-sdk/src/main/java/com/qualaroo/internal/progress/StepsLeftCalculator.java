@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.internal.progress;
 
-import android.support.annotation.Nullable;
-import android.support.v4.util.LongSparseArray;
+import androidx.annotation.Nullable;
+import androidx.collection.LongSparseArray;
 
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Message;
@@ -61,11 +54,7 @@ public class StepsLeftCalculator {
     }
 
     public void setCurrentStep(long id, String type) {
-        Map<Long, GraphNode> nodeMap = nodes.get(type);
-        GraphNode node = null;
-        if (nodeMap != null) {
-            node = nodeMap.get(id);
-        }
+        GraphNode node = nodes.get(type).get(id);
         graph = new Graph(node);
     }
 
@@ -118,7 +107,7 @@ public class StepsLeftCalculator {
         return graphNode;
     }
 
-    private GraphNode node(long id, String type) {
+    private @Nullable GraphNode node(long id, String type) {
         switch (type) {
             case "message":
                 return node(messages.get(id));
@@ -127,7 +116,7 @@ public class StepsLeftCalculator {
             case "qscreen":
                 return node(qScreens.get(id));
             default:
-                return GraphNode.INVALID;
+                return null;
         }
     }
 
@@ -139,9 +128,6 @@ public class StepsLeftCalculator {
         }
 
         int longestPathFromRoot() {
-            if (root == null) {
-                return 0;
-            }
             List<GraphNode> nodes = topologicalSort(root);
             Map<GraphNode, Integer> distanceToNode = new HashMap<>();
             for (GraphNode node : nodes) {
@@ -189,7 +175,5 @@ public class StepsLeftCalculator {
             this.type = type;
             this.children = children;
         }
-
-        static final GraphNode INVALID = new GraphNode(-1, "invalid", Collections.<GraphNode>emptyList());
     }
 }

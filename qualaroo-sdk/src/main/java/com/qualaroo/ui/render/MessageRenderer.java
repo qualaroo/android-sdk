@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +15,7 @@ import com.qualaroo.ui.OnMessageConfirmedListener;
 import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class MessageRenderer {
@@ -43,7 +36,6 @@ public class MessageRenderer {
         ThemeUtils.applyTheme(callToAction, theme);
         if (message.type() == MessageType.REGULAR || message.type() == MessageType.UNKNOWN) {
             callToAction.setText(android.R.string.ok);
-            callToAction.setVisibility(View.GONE);
         } else if (message.type() == MessageType.CALL_TO_ACTION) {
             callToAction.setText(message.ctaMap().text());
         }

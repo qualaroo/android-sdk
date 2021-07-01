@@ -1,16 +1,9 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.RestrictTo;
-import android.support.v7.widget.AppCompatTextView;
+import androidx.annotation.RestrictTo;
+import androidx.appcompat.widget.AppCompatTextView;
 import android.widget.TextView;
 
 import com.qualaroo.internal.model.Question;
@@ -18,7 +11,7 @@ import com.qualaroo.ui.OnAnsweredListener;
 
 import java.util.Locale;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 final class UnknownQuestionTypeRenderer extends QuestionRenderer {

@@ -1,14 +1,7 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.internal;
 
-import android.support.annotation.Nullable;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 
 import com.qualaroo.internal.storage.LocalStorage;
 import com.qualaroo.internal.storage.Settings;
@@ -16,7 +9,7 @@ import com.qualaroo.internal.storage.Settings;
 import java.util.Map;
 import java.util.UUID;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class UserInfo {

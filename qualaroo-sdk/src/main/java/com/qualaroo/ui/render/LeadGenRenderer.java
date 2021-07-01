@@ -1,18 +1,11 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.RestrictTo;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.util.LongSparseArray;
+import androidx.annotation.RestrictTo;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.collection.LongSparseArray;
 import android.text.Editable;
 import android.text.InputType;
 import android.view.LayoutInflater;

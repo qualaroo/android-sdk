@@ -1,10 +1,3 @@
-<!--
-  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
-  ~
-  ~ Please refer to the LICENSE.md file for the terms and conditions
-  ~ under which redistribution and use of this file is permitted.
-  -->
-
 <xsl:stylesheet	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <!--
        Licensed to the Apache Software Foundation (ASF) under one or more

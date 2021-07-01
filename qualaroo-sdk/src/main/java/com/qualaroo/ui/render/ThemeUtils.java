@@ -1,20 +1,13 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.RestrictTo;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.TintableBackgroundView;
-import android.support.v4.widget.CompoundButtonCompat;
+import androidx.annotation.ColorInt;
+import androidx.annotation.RestrictTo;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.view.TintableBackgroundView;
+import androidx.core.widget.CompoundButtonCompat;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -23,7 +16,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public class ThemeUtils {

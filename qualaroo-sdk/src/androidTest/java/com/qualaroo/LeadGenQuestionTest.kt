@@ -1,13 +1,13 @@
 package com.qualaroo
 
-import android.support.design.widget.TextInputLayout
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.ViewInteraction
-import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.filters.MediumTest
-import android.support.test.runner.AndroidJUnit4
+import com.google.android.material.textfield.TextInputLayout
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.ViewInteraction
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.filters.MediumTest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import android.view.View
 import android.widget.EditText
 import com.qualaroo.internal.model.QuestionType
@@ -122,7 +122,6 @@ class LeadGenQuestionTest {
     @Test
     fun closesAfterConfirm() {
         onEditTextInTextInputLayout(hasTextInputLayoutHint("Phone number *")).perform(typeText("123 123 123"))
-        onView(withId(R.id.qualaroo__view_question_lead_gen_scroll_view)).perform(swipeUp())
         onEditTextInTextInputLayout(hasTextInputLayoutHint("E-mail *")).perform(typeText("test@qualaroo.com"))
 
         onView(withId(R.id.qualaroo__view_question_lead_gen_confirm)).perform(click())

@@ -1,15 +1,8 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -24,7 +17,7 @@ import com.qualaroo.util.DebouncingOnClickListener;
 import com.qualaroo.util.KeyboardUtil;
 import com.qualaroo.util.TextWatcherAdapter;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 final class TextQuestionRenderer extends QuestionRenderer {

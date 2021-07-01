@@ -1,15 +1,8 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.RestrictTo;
+import androidx.annotation.RestrictTo;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,7 +15,7 @@ import com.qualaroo.ui.NpsView;
 import com.qualaroo.ui.OnAnsweredListener;
 import com.qualaroo.util.DebouncingOnClickListener;
 
-import static android.support.annotation.RestrictTo.Scope.LIBRARY;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
 @RestrictTo(LIBRARY)
 public final class NpsQuestionRenderer extends QuestionRenderer {

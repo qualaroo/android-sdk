@@ -1,11 +1,4 @@
 <?xml version="1.0"?>
-<!--
-  ~ Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
-  ~
-  ~ Please refer to the LICENSE.md file for the terms and conditions
-  ~ under which redistribution and use of this file is permitted.
-  -->
-
 <!DOCTYPE suppressions PUBLIC
     "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
