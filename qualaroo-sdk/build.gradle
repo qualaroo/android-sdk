@@ -143,18 +143,18 @@ artifacts {
 publishing {
     repositories {
         maven {
-            name 'QualarooProduction'
+//            name 'QualarooProduction'
 //            url "s3://qualaroo-android-sdk/libs/"
-            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/libs/"
+//            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/libs/"
 //            credentials(AwsCredentials) {
 //                accessKey QUALAROO_S3_ACCESS_KEY
 //                secretKey QUALAROO_S3_SECRET_KEY
 //            }
         }
         maven {
-            name 'QualarooSnapshots'
+//            name 'QualarooSnapshots'
 //            url "s3://qualaroo-android-sdk/snapshots/"
-            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/snapshots/"
+//            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/snapshots/"
 //            credentials(AwsCredentials) {
 //                accessKey QUALAROO_S3_ACCESS_KEY
 //                secretKey QUALAROO_S3_SECRET_KEY
