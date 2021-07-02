@@ -96,7 +96,7 @@ dependencies {
         exclude group: 'org.bouncycastle'
     }
 }
-
+/*
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
     source android.sourceSets.main.java.srcDirs
@@ -115,7 +115,7 @@ task javadocJar(type: Jar, dependsOn: generateJavadoc) {
     classifier = 'javadoc'
     from generateJavadoc.destinationDir
 }
-
+*/
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     include(
