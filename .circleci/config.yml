@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/android:api-30
+      - image: circleci/android:api-30-alpha
     environment:
       JVM_OPTS: -Xmx3200m
       QUALAROO_S3_ACCESS_KEY: access
