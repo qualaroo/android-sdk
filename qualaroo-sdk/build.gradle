@@ -99,8 +99,7 @@ dependencies {
 
 task generateJavadoc(type: Javadoc) {
     description "Generates Javadoc"
-    /* source android.sourceSets.main.java.srcDirs */
-    source android.sourceSets.main.allSource
+    source android.sourceSets.main.java.srcDirs
     ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
     classpath = files() + files(ext.androidJar)
     options.links("http://docs.oracle.com/javase/7/docs/api/")
