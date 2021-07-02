@@ -9,11 +9,13 @@ package com.qualaroo.demo
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+
+//import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.qualaroo.Qualaroo
 import com.qualaroo.QualarooSurveyEventReceiver

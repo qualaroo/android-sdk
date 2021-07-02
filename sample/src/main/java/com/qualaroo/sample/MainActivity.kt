@@ -1,7 +1,7 @@
 package com.qualaroo.sample
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import com.qualaroo.Qualaroo
 import com.qualaroo.SurveyOptions
