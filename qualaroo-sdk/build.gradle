@@ -137,7 +137,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+    /* archives javadocJar */
 }
 
 publishing {
@@ -170,7 +170,7 @@ publishing {
             version project.sdkVersionMaven
             artifact("$buildDir/outputs/aar/qualaroo-sdk-production-release.aar")
             artifact sourcesJar
-            artifact javadocJar
+            /* artifact javadocJar */
             pom.withXml {
                 println(configurations.implementation.getAllDependencies())
                 def dependenciesNode = asNode().appendNode('dependencies')
