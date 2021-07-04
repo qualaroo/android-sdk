@@ -137,7 +137,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+//    archives javadocJar
 }
 
 publishing {
