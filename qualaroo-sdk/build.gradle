@@ -160,7 +160,7 @@ publishing {
 //                secretKey QUALAROO_S3_SECRET_KEY
 //            }
         }
-        mavenLocal()
+//        mavenLocal()
     }
 
     publications {
