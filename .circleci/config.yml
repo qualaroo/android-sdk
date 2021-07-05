@@ -20,8 +20,8 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "qualaroo-sdk/build.gradle" }}
-      - run:
-          name: Run Tests
-          command: ./gradlew qualaroo-sdk:build -PQUALAROO_S3_ACCESS_KEY=access -PQUALAROO_S3_SECRET_KEY=secret
+#      - run:
+#          name: Run Tests
+#          command: ./gradlew qualaroo-sdk:build -PQUALAROO_S3_ACCESS_KEY=access -PQUALAROO_S3_SECRET_KEY=secret
       - store_test_results:
           path: qualaroo-sdk/build/test-results/testStagingDebugUnitTest
