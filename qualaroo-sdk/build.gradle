@@ -98,17 +98,17 @@ dependencies {
 }
 
 task generateJavadoc(type: Javadoc) {
-    description "Generates Javadoc"
-    source android.sourceSets.main.java.srcDirs
-    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-    classpath = files() + files(ext.androidJar)
-    options.links("http://docs.oracle.com/javase/7/docs/api/")
-    options.links("http://d.android.com/reference/")
-    options.addStringOption('Xdoclint:none', '-quiet')
-    include '**//*Qualaroo.java'
-    include '**//*QualarooSdk.java'
-    include '**//*QualarooSurveyEventReceiver.java'
-    include '**//*SurveyOptions.java'
+//    description "Generates Javadoc"
+//    source android.sourceSets.main.java.srcDirs
+//    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+//    classpath = files() + files(ext.androidJar)
+//    options.links("http://docs.oracle.com/javase/7/docs/api/")
+//    options.links("http://d.android.com/reference/")
+//    options.addStringOption('Xdoclint:none', '-quiet')
+//    include '**//*Qualaroo.java'
+//    include '**//*QualarooSdk.java'
+//    include '**//*QualarooSurveyEventReceiver.java'
+//    include '**//*SurveyOptions.java'
 }
 
 task javadocJar(type: Jar, dependsOn: generateJavadoc) {
