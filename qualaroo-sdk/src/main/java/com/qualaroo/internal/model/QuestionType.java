@@ -13,6 +13,8 @@ public enum QuestionType {
     TEXT_SINGLE("text_single"),
     DROPDOWN("dropdown"),
     BINARY("binary"),
+    EMOJI("emoji"),
+    THUMB("thumb"),
     UNKNOWN("-1");
 
     private final String value;

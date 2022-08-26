@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.RestrictTo;
 import android.view.View;
 
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
@@ -35,6 +36,8 @@ public class Renderer {
         this.questionRenderers.put(QuestionType.TEXT_SINGLE, new TextQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.DROPDOWN, new DropdownQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.BINARY, new BinaryQuestionRenderer(theme));
+        this.questionRenderers.put((QuestionType.EMOJI) , new EmojiQuestionRenderer(theme));
+        this.questionRenderers.put(QuestionType.THUMB, new ThumbsQuestionRenderer(theme));
         this.questionRenderers.put(QuestionType.UNKNOWN, new UnknownQuestionTypeRenderer(theme));
     }
 
@@ -42,7 +45,7 @@ public class Renderer {
         return messageRenderer.render(context, message, onMessageConfirmedListener);
     }
 
-    public RestorableView renderQuestion(Context context, Question question, OnAnsweredListener onAnsweredListener) {
+    public RestorableView renderQuestion(Context context,  Question question, OnAnsweredListener onAnsweredListener) {
         return questionRenderers.get(question.type()).render(context, question, onAnsweredListener);
     }
 

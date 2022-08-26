@@ -3,6 +3,7 @@ package com.qualaroo.ui.render;
 import android.content.Context;
 import androidx.annotation.RestrictTo;
 
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 

@@ -30,12 +30,14 @@ public final class Question implements Serializable {
     private final boolean isRequired;
     private final int minAnswersCount;
     private final int maxAnswersCount;
+    private final String font_style_question;
+    private final String font_style_description;
 
     @VisibleForTesting Question(long id, QuestionType type, String title, String description,
                                 String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap,
                                 String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom,
                                 boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired,
-                                int minAnswersCount, int maxAnswersCount) {
+                                int minAnswersCount, int maxAnswersCount, String font_style_question, String font_style_description) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -54,6 +56,8 @@ public final class Question implements Serializable {
         this.cname = cname;
         this.minAnswersCount = minAnswersCount;
         this.maxAnswersCount = maxAnswersCount;
+        this.font_style_question = font_style_question;
+        this.font_style_description = font_style_description;
     }
 
     @SuppressWarnings("unused") private Question() {
@@ -75,6 +79,8 @@ public final class Question implements Serializable {
         this.cname = null;
         this.minAnswersCount = 0;
         this.maxAnswersCount = 0;
+        this.font_style_question = "normal";
+        this.font_style_description ="normal";
     }
 
     public long id() {
@@ -149,16 +155,23 @@ public final class Question implements Serializable {
         return maxAnswersCount;
     }
 
+    public String getFont_style_question() {
+        return font_style_question;
+    }
+    public String getFont_style_description() {
+        return font_style_description;
+    }
+
     public Question copy(List<Answer> answerList) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired, minAnswersCount, maxAnswersCount);
+                            isRequired, minAnswersCount, maxAnswersCount, font_style_question, font_style_description);
     }
 
     public Question copy(String title, String description) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired, minAnswersCount, maxAnswersCount);
+                            isRequired, minAnswersCount, maxAnswersCount, font_style_question, font_style_description);
     }
 
     @Override public boolean equals(Object o) {

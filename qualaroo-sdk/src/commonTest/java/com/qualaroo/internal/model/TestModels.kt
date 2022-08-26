@@ -25,24 +25,44 @@ object TestModels {
         return Survey.OptionMap(colorThemeMap, mandatory, showFullScreen, logoUrl, progressBarPosition)
     }
 
+
     fun question(id: Long, type: QuestionType = QuestionType.RADIO, title: String = "Title",
                  description: String = "some description", descriptionPlacement: String = "after",
                  answerList: List<Answer> = emptyList(), sendText: String = "send", nextMap: Node? = null,
                  npsMinLabel: String = "", npsMaxLabel: String = "", cname: String = "", disableRandom: Boolean = true,
                  anchorLast: Boolean = false, anchorLastCount: Int = 0, alwaysShowSend: Boolean = true,
-                 isRequired: Boolean = false, minAnswersCount: Int = 0, maxAnswersCount: Int = 0): Question {
-        return Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap, npsMinLabel,
-                npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend, isRequired,
-                minAnswersCount, maxAnswersCount)
+                 isRequired: Boolean = false, minAnswersCount: Int = 0, maxAnswersCount: Int = 0,font_style_question:String ="",font_style_description:String = ""): Question {
+        return Question(
+            id,
+            type,
+            title,
+            description,
+            descriptionPlacement,
+            answerList,
+            sendText,
+            nextMap,
+            npsMinLabel,
+            npsMaxLabel,
+            cname,
+            disableRandom,
+            anchorLast,
+            anchorLastCount,
+            alwaysShowSend,
+            isRequired,
+            minAnswersCount,
+            maxAnswersCount,
+            font_style_question,
+            font_style_description
+        )
     }
 
-    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null, explainType: String? = null): Answer {
-        return Answer(id, title, nextMap, explainType)
+    fun answer(id: Int, title: String = "Answer", nextMap: Node? = null, explainType: String? = null, emoji_url:String? =null): Answer {
+        return Answer(id, title, nextMap, explainType,emoji_url)
     }
 
-    fun qscreen(id: Long, questionList: List<Long> = emptyList(), description: String = "", sendText: String = "",
+    fun qscreen(id: Long, questionList: List<Long> = emptyList(), description: String = "", font_style_description:String ="", sendText: String = "",
                 nextMap: Node? = null): QScreen {
-        return QScreen(id, questionList, description, sendText, nextMap)
+        return QScreen(id, questionList, description,font_style_description, sendText, nextMap)
     }
 
     fun language(value: String) = Language(value)

@@ -104,4 +104,6 @@ public final class ColorThemeMap implements Serializable {
         this.dimOpacity = null;
         this.buttonTextColor = null;
     }
+
+
 }

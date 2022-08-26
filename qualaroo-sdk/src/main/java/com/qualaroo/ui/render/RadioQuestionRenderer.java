@@ -13,6 +13,7 @@ import android.widget.Checkable;
 import android.widget.CompoundButton;
 
 import com.qualaroo.R;
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Answer;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.UserResponse;

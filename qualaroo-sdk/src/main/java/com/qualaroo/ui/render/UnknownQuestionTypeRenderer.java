@@ -6,6 +6,7 @@ import androidx.annotation.RestrictTo;
 import androidx.appcompat.widget.AppCompatTextView;
 import android.widget.TextView;
 
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.ui.OnAnsweredListener;
 

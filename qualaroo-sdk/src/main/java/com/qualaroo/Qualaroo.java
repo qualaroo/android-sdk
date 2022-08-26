@@ -2,9 +2,14 @@ package com.qualaroo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -69,10 +74,12 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     /**
      * Starts initialization phase of the SDK.
      * Make sure to call {@link QualarooSdk.Builder#init()} to finish initialization properly.
+     *
      * @param context application {@link Context}
      * @return {@link QualarooSdk.Builder} that you can use to configure the SDK.
      */
-    @SuppressWarnings({"WeakerAccess", "unused"}) public static QualarooSdk.Builder initializeWith(Context context) {
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    public static QualarooSdk.Builder initializeWith(Context context) {
         return new Builder(context);
     }
 
@@ -80,17 +87,18 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
      * Returns an instance of QualarooSdk that you can use.
      * Make sure to initialize it first with:
      * {@link #initializeWith(Context) initializeWith} method calls.
-     *
+     * <p>
      * Example of initialization:
      * Qualaroo.initializeWith(getApplicationContext())
-     *      .setApiKey("my_own_api_key")
-     *      .setDebugMode(false)
-     *      .init()
+     * .setApiKey("my_own_api_key")
+     * .setDebugMode(false)
+     * .init()
      *
-     * @throws IllegalStateException when SDK was not initialized before
      * @return current instance of {@link QualarooSdk}
+     * @throws IllegalStateException when SDK was not initialized before
      */
-    @SuppressWarnings("WeakerAccess") public static QualarooSdk getInstance() {
+    @SuppressWarnings("WeakerAccess")
+    public static QualarooSdk getInstance() {
         if (INSTANCE == null) {
             throw new IllegalStateException(
                     "Qualaroo SDK has not been properly initialized. Make sure you finish initalizeWith");
@@ -122,13 +130,15 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
     private final SurveyComponent.Factory surveyComponentFactory;
     private final AtomicBoolean requestingForSurvey = new AtomicBoolean(false);
 
-    @Nullable private Language preferredLanguage;
+    @Nullable
+    private Language preferredLanguage;
 
-    @VisibleForTesting Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
-                                SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
-                                SurveyDisplayQualifier abTestDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider,
-                                RestClient restClient, LocalStorage localStorage, AbTestGroupPercentageProvider abTestGroupPercentageProvider,
-                                ExecutorSet executorSet, UserPropertiesInjector userPropertiesInjector) {
+    @VisibleForTesting
+    Qualaroo(SurveyComponent.Factory surveyComponentFactory, SurveysRepository surveysRepository,
+             SurveyStarter surveyStarter, SurveyDisplayQualifier surveyDisplayQualifier,
+             SurveyDisplayQualifier abTestDisplayQualifier, UserInfo userInfo, ImageProvider imageProvider,
+             RestClient restClient, LocalStorage localStorage, AbTestGroupPercentageProvider abTestGroupPercentageProvider,
+             ExecutorSet executorSet, UserPropertiesInjector userPropertiesInjector) {
         this.surveyStarter = surveyStarter;
         this.surveyComponentFactory = surveyComponentFactory;
         this.abTestDisplayQualifier = abTestDisplayQualifier;
@@ -145,11 +155,13 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         this.userPropertiesInjector = userPropertiesInjector;
     }
 
-    @Override public void showSurvey(@NonNull final String alias) {
+    @Override
+    public void showSurvey(@NonNull final String alias) {
         showSurvey(alias, SurveyOptions.defaultOptions());
     }
 
-    @Override public void showSurvey(@NonNull final String alias, @NonNull final SurveyOptions options) {
+    @Override
+    public void showSurvey(@NonNull final String alias, @NonNull final SurveyOptions options) {
         if (alias.length() == 0) {
             throw new IllegalArgumentException("Alias can't be null or empty!");
         }
@@ -158,7 +170,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         }
         QualarooLogger.debug("Trying to show survey: " + alias);
         backgroundExecutor.execute(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 List<Survey> surveys = surveysRepository.getSurveys();
                 Survey surveyToDisplay = null;
                 for (final Survey survey : surveys) {
@@ -184,7 +197,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             final Survey finalSurveyToDisplay =
                     userPropertiesInjector.injectCustomProperties(survey, targetLanguage);
             uiExecutor.execute(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     surveyStarter.start(finalSurveyToDisplay);
                 }
             });
@@ -199,25 +213,31 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         return canInjectProperties && (matchesTargeting || options.ignoreTargeting());
     }
 
-    @Override public void setUserId(@NonNull final String userId) {
+    @Override
+    public void setUserId(@NonNull final String userId) {
         dataExecutor.execute(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 userInfo.setUserId(userId);
             }
         });
     }
 
-    @Override public void setUserProperty(@NonNull final String key, final String value) {
+    @Override
+    public void setUserProperty(@NonNull final String key, final String value) {
         dataExecutor.execute(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 userInfo.setUserProperty(key, value);
             }
         });
     }
 
-    @Override public void removeUserProperty(@NonNull final String key) {
+    @Override
+    public void removeUserProperty(@NonNull final String key) {
         dataExecutor.execute(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 //implicit removal of a key from local storage
                 //TODO: expose removeUserProperty method
                 userInfo.setUserProperty(key, null);
@@ -225,7 +245,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         });
     }
 
-    @Override public synchronized void setPreferredLanguage(@Nullable String iso2Language) {
+    @Override
+    public synchronized void setPreferredLanguage(@Nullable String iso2Language) {
         if (iso2Language != null) {
             this.preferredLanguage = new Language(iso2Language);
         } else {
@@ -233,7 +254,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         }
     }
 
-    @Override public AbTestBuilder abTest() {
+    @Override
+    public AbTestBuilder abTest() {
         return new AbTestBuilderImpl(abTestGroupPercentageProvider);
     }
 
@@ -241,19 +263,23 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         return surveyComponentFactory.create(survey, preferredLanguage);
     }
 
-    @Override LocalStorage localStorage() {
+    @Override
+    LocalStorage localStorage() {
         return localStorage;
     }
 
-    @Override RestClient restClient() {
+    @Override
+    RestClient restClient() {
         return restClient;
     }
 
-    @Override SurveysRepository surveysRepository() {
+    @Override
+    SurveysRepository surveysRepository() {
         return surveysRepository;
     }
 
-    @Override ImageProvider imageProvider() {
+    @Override
+    ImageProvider imageProvider() {
         return imageProvider;
     }
 
@@ -266,18 +292,21 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             this.percentageProvider = percentageProvider;
         }
 
-        @Override public AbTestBuilder fromSurveys(List<String> aliases) {
+        @Override
+        public AbTestBuilder fromSurveys(List<String> aliases) {
             this.aliases.clear();
             this.aliases.addAll(aliases);
             return this;
         }
 
-        @Override public void show() {
+        @Override
+        public void show() {
             if (aliases.isEmpty()) return;
 
             if (!requestingForSurvey.getAndSet(true)) {
                 backgroundExecutor.execute(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         List<Survey> abTestSurveys = getSurveys(aliases);
                         if (!abTestSurveys.isEmpty()) {
                             int percentage = percentageProvider.abTestGroupPercent(abTestSurveys);
@@ -365,10 +394,15 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             }
             setSharedInstance(createInstance());
             QualarooLogger.info("Initialized QualarooSdk");
-            QualarooJobIntentService.start(context);
+            Constraints networkConstraint = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+            OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(QualarooWorker.class)
+                    .setConstraints(networkConstraint)
+                    .build();
+            WorkManager.getInstance(context).enqueue(workRequest);
         }
 
-        @SuppressWarnings("WeakerAccess") public QualarooSdk createInstance() {
+        @SuppressWarnings("WeakerAccess")
+        public QualarooSdk createInstance() {
             try {
                 if (debugMode) {
                     QualarooLogger.setDebugMode();
@@ -388,7 +422,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 SdkSession sdkSession = new SdkSession(this.context, new DeviceTypeMatcher.AndroidDeviceTypeProvider(context));
                 SurveyStarter surveyStarter = new SurveyStarter(context);
                 TimeProvider timeProvider = new TimeProvider() {
-                    @Override public long currentTimeMillis() {
+                    @Override
+                    public long currentTimeMillis() {
                         return System.currentTimeMillis();
                     }
                 };
@@ -419,7 +454,7 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
                 AbTestGroupPercentageProvider abTestGroupPercentageProvider = new AbTestGroupPercentageProvider(localStorage, new SecureRandom());
                 return new Qualaroo(componentFactory, surveysRepository, surveyStarter, surveyDisplayQualifier,
                         abTestDisplayQualifier, userInfo, imageProvider, restClient, localStorage, abTestGroupPercentageProvider, executorSet,
-                                        userPropertiesInjector);
+                        userPropertiesInjector);
             } catch (InvalidCredentialsException e) {
                 return new InvalidApiKeyQualarooSdk(apiKey);
             } catch (Exception e) {
@@ -432,7 +467,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             if (BuildConfig.DEBUG) {
                 final HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                    @Override public void log(String message) {
+                    @Override
+                    public void log(String message) {
                         QualarooLogger.info(message);
                     }
                 });
@@ -446,7 +482,8 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             final String authToken = okhttp3.Credentials.basic(credentials.apiKey(), credentials.apiSecret());
             OkHttpClient.Builder builder = okHttpClient.newBuilder();
             builder.addInterceptor(new Interceptor() {
-                @Override public Response intercept(Chain chain) throws IOException {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
                     Request request = chain.request().newBuilder()
                             .header("Authorization", authToken)
                             .build();
@@ -477,31 +514,38 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
             logErrorMessage();
         }
 
-        @Override public void showSurvey(@NonNull String alias) {
+        @Override
+        public void showSurvey(@NonNull String alias) {
             logErrorMessage();
         }
 
-        @Override public void showSurvey(@NonNull String alias, @NonNull SurveyOptions options) {
+        @Override
+        public void showSurvey(@NonNull String alias, @NonNull SurveyOptions options) {
             logErrorMessage();
         }
 
-        @Override public void setUserId(@NonNull String userId) {
+        @Override
+        public void setUserId(@NonNull String userId) {
             logErrorMessage();
         }
 
-        @Override public void setUserProperty(@NonNull String key, @Nullable String value) {
+        @Override
+        public void setUserProperty(@NonNull String key, @Nullable String value) {
             logErrorMessage();
         }
 
-        @Override public void removeUserProperty(@NonNull String key) {
+        @Override
+        public void removeUserProperty(@NonNull String key) {
             logErrorMessage();
         }
 
-        @Override public void setPreferredLanguage(@Nullable String iso2Language) {
+        @Override
+        public void setPreferredLanguage(@Nullable String iso2Language) {
             logErrorMessage();
         }
 
-        @Override public AbTestBuilder abTest() {
+        @Override
+        public AbTestBuilder abTest() {
             return new AbTestBuilderStub();
         }
 
@@ -517,11 +561,13 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
 
         private class AbTestBuilderStub implements AbTestBuilder {
 
-            @Override public AbTestBuilder fromSurveys(List<String> aliases) {
+            @Override
+            public AbTestBuilder fromSurveys(List<String> aliases) {
                 return this;
             }
 
-            @Override public void show() {
+            @Override
+            public void show() {
                 logErrorMessage();
             }
         }

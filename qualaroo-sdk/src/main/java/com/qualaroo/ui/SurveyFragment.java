@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.ImageViewCompat;
+
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +54,10 @@ public class SurveyFragment extends Fragment implements SurveyView {
 
     private static final String DESCRIPTION_PLACEMENT_BEFORE = "before";
     private static final String DESCRIPTION_PLACEMENT_AFTER = "after";
+
+//    private static final String TYPEFACE_BOLD = "bold";
+    private static final String TYPEFACE_ITALIC = "italic";
+    private static final String TYPEFACE_OBLIQUE = "oblique";
 
     SurveyPresenter surveyPresenter;
     Renderer renderer;
@@ -220,23 +226,25 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.removeAllViews();
         String title = ContentUtils.sanitazeText(question.title());
         String description = ContentUtils.sanitazeText(question.description());
+        questionsTitleTop.setTextSize(22);
         if (description != null && description.length() > 0) {
             if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
-                questionsTitleBottom.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
                 questionsTitleBottom.setText(title);
-                questionsTitleTop.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+                setFontType(question.getFont_style_question(),questionsTitleBottom);
                 questionsTitleTop.setText(description);
+                setFontType(question.getFont_style_description(),questionsTitleTop);
             } else if (DESCRIPTION_PLACEMENT_AFTER.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
-                questionsTitleBottom.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
                 questionsTitleBottom.setText(description);
-                questionsTitleTop.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                setFontType(question.getFont_style_description(),questionsTitleBottom);
                 questionsTitleTop.setText(title);
+                setFontType(question.getFont_style_question(),questionsTitleTop);
             }
         } else {
             questionsTitleBottom.setVisibility(View.GONE);
             questionsTitleTop.setText(title);
+            setFontType(question.getFont_style_question(),questionsTitleTop);
         }
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
             @Override public void onResponse(UserResponse userResponse) {
@@ -246,6 +254,22 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsContent.addView(restorableView.view());
         if (viewState != null) {
             restorableView.restoreState(viewState);
+        }
+    }
+
+    void setFontType(String fontType, TextView textView){
+        switch (fontType){
+//            case TYPEFACE_BOLD:
+//                textView.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+//                break;
+            case TYPEFACE_ITALIC:
+                textView.setTypeface(Typeface.DEFAULT,Typeface.ITALIC);
+                break;
+            case TYPEFACE_OBLIQUE:
+                textView.setTypeface(Typeface.DEFAULT,Typeface.BOLD_ITALIC);
+                break;
+            default:
+                textView.setTypeface(Typeface.DEFAULT,Typeface.NORMAL);
         }
     }
 
@@ -265,6 +289,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitleTop.setText(ContentUtils.sanitazeText(qscreen.description()));
+        setFontType(qscreen.getFont_style_description(),questionsTitleTop);
         restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
             @Override public void onResponse(List<UserResponse> userResponses) {
                 surveyPresenter.onLeadGenResponse(userResponses);

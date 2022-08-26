@@ -3,7 +3,7 @@
  */
 
 int major = 2
-int minor = 0
+int minor = 1
 int patch = 0
 
 project.ext {
@@ -12,18 +12,18 @@ project.ext {
     sdkVersionMaven = "$sdkVersion"
 }
 
-apply from: 'quality.gradle'
+//apply from: 'quality.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 30
+        targetSdkVersion 32
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         versionCode project.sdkVersionCode
         versionName project.sdkVersion
@@ -37,9 +37,12 @@ android {
                 abortOnError true
                 disable 'InvalidPackage'
             }
-        }
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")        }
         debug {
             minifyEnabled false
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
         }
     }
 
@@ -75,14 +78,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.5'
-
+    implementation "androidx.work:work-runtime:2.7.1"
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    // Glide v4 uses this new annotation processor -- see https://bumptech.github.io/glide/doc/generatedapi.html
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    testImplementation 'org.mockito:mockito-core:2.23.0'
+    testImplementation 'org.mockito:mockito-core:4.7.0'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
@@ -98,17 +104,17 @@ dependencies {
 }
 
 task generateJavadoc(type: Javadoc) {
-//    description "Generates Javadoc"
-//    source android.sourceSets.main.java.srcDirs
-//    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-//    classpath = files() + files(ext.androidJar)
-//    options.links("http://docs.oracle.com/javase/7/docs/api/")
-//    options.links("http://d.android.com/reference/")
-//    options.addStringOption('Xdoclint:none', '-quiet')
-//    include '**//*Qualaroo.java'
-//    include '**//*QualarooSdk.java'
-//    include '**//*QualarooSurveyEventReceiver.java'
-//    include '**//*SurveyOptions.java'
+    description "Generates Javadoc"
+    source android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath = files() + files(ext.androidJar)
+    options.links("http://docs.oracle.com/javase/7/docs/api/")
+    options.links("http://d.android.com/reference/")
+    options.addStringOption('Xdoclint:none', '-quiet')
+    include '**//*Qualaroo.java'
+    include '**//*QualarooSdk.java'
+    include '**//*QualarooSurveyEventReceiver.java'
+    include '**//*SurveyOptions.java'
 }
 
 task javadocJar(type: Jar, dependsOn: generateJavadoc) {
@@ -143,24 +149,24 @@ artifacts {
 publishing {
     repositories {
         maven {
-//            name 'QualarooProduction'
+            name 'QualarooProduction'
 //            url "s3://qualaroo-android-sdk/libs/"
-//            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/libs/"
+            url "/Users/ajaymandrawal/Documents/Office/QualrooAndroidSDK/v210/"
 //            credentials(AwsCredentials) {
 //                accessKey QUALAROO_S3_ACCESS_KEY
 //                secretKey QUALAROO_S3_SECRET_KEY
 //            }
         }
         maven {
-//            name 'QualarooSnapshots'
+            name 'QualarooSnapshots'
 //            url "s3://qualaroo-android-sdk/snapshots/"
-//            url "F://Office/Qualaroo_10_05_2021/qualaroo-android-sdk/snapshots/"
+            url "/Users/ajaymandrawal/Documents/Office/QualrooAndroidSDK/v210/"
 //            credentials(AwsCredentials) {
 //                accessKey QUALAROO_S3_ACCESS_KEY
 //                secretKey QUALAROO_S3_SECRET_KEY
 //            }
         }
-//        mavenLocal()
+        mavenLocal()
     }
 
     publications {
@@ -170,7 +176,7 @@ publishing {
             version project.sdkVersionMaven
             artifact("$buildDir/outputs/aar/qualaroo-sdk-production-release.aar")
             artifact sourcesJar
-            artifact javadocJar
+//            artifact javadocJar
             pom.withXml {
                 println(configurations.implementation.getAllDependencies())
                 def dependenciesNode = asNode().appendNode('dependencies')

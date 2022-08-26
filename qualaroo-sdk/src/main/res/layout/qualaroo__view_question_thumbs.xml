@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:weightSum="10"
+        android:layout_margin="10dp"
+        android:baselineAligned="false"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="@dimen/qualaroo_emoji_icon_height"
+            android:layout_weight="2"/>
+        <LinearLayout
+            android:background="@drawable/qualaroo__border"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:id="@+id/thumbs_up_layout"
+            android:layout_marginRight="10dp"
+            android:layout_height="@dimen/qualaroo_emoji_icon_height"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_margin="1dp"
+                android:layout_height="match_parent"
+                android:id="@+id/thumbs_up"
+                android:padding="@dimen/qualaroo_emoji_icon_padding"
+                android:src="@drawable/qualaroo__ic_close"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:background="@drawable/qualaroo__border"
+            android:id="@+id/thumbs_down_layout"
+            android:layout_height="@dimen/qualaroo_emoji_icon_height"
+            android:layout_marginLeft="10dp"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_margin="1dp"
+                android:layout_height="match_parent"
+                android:id="@+id/thumbs_down"
+                android:padding="@dimen/qualaroo_emoji_icon_padding"
+                android:src="@drawable/qualaroo__ic_close"
+                />
+        </LinearLayout>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="@dimen/qualaroo_emoji_icon_height"
+            android:layout_weight="2"/>
+    </LinearLayout>
+
+
+</LinearLayout>

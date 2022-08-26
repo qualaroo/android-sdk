@@ -1,5 +1,6 @@
 package com.qualaroo.ui.render;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -46,7 +47,7 @@ public class ThemeUtils {
 
     private static void setCursorDrawableColor(EditText editText, @ColorInt int color) {
         try {
-            Field cursorDrawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
+            @SuppressLint("SoonBlockedPrivateApi") Field cursorDrawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
             cursorDrawableResField.setAccessible(true);
             int cursorDrawableRes = cursorDrawableResField.getInt(editText);
             Field editorField = TextView.class.getDeclaredField("mEditor");

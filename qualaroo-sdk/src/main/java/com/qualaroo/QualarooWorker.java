@@ -1,12 +1,15 @@
 package com.qualaroo;
 
 import android.content.Context;
-import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.RestrictTo;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.app.JobIntentService;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
+import com.qualaroo.QualarooBase;
+import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ResponseHelper;
@@ -20,37 +23,28 @@ import java.util.List;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
-import static androidx.annotation.RestrictTo.Scope.LIBRARY;
-
-@RestrictTo(LIBRARY)
-public class QualarooJobIntentService extends JobIntentService {
-
-    static final String ACTION_UPLOAD_REQUESTS = "upload";
-    private static final int JOB_ID = 192017;
+public class QualarooWorker extends Worker {
     private static final int MAX_UPLOADS_PER_JOB = 50;
-
-    static void start(Context context) {
-        final Intent uploadIntent = new Intent();
-        uploadIntent.setAction(ACTION_UPLOAD_REQUESTS);
-        enqueueWork(context, QualarooJobIntentService.class, JOB_ID, uploadIntent);
+    public QualarooWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
-    @Override protected void onHandleWork(@NonNull Intent intent) {
-        if (!ACTION_UPLOAD_REQUESTS.equals(intent.getAction())) {
-            QualarooLogger.error("Invalid Qualaroo's Service action.");
-            return;
-        }
+    @NonNull
+    @Override
+    public Result doWork() {
         QualarooBase qualaroo;
         try {
             qualaroo = getQualarooInstance();
+            prefetchSurveyWithImages(qualaroo);
+            uploadFailedRequests(qualaroo);
         } catch (QualarooSdkNotProperlyInitializedException e) {
             QualarooLogger.error("Qualaroo instance is not available to Qularoo's Service");
-            return;
+
         }
-        prefetchSurveyWithImages(qualaroo);
-        uploadFailedRequests(qualaroo);
+        return Result.success();
     }
-    
+
+
     private void prefetchSurveyWithImages(QualarooBase qualarooBase) {
         ImageProvider imageProvider = qualarooBase.imageProvider();
         SurveysRepository surveysRepository = qualarooBase.surveysRepository();
@@ -83,18 +77,15 @@ public class QualarooJobIntentService extends JobIntentService {
             }
         }
     }
-
-    @Override public boolean onStopCurrentWork() {
-        return false;
-    }
-    
-    @VisibleForTesting @NonNull QualarooBase getQualarooInstance() throws QualarooSdkNotProperlyInitializedException {
+    @VisibleForTesting
+    @NonNull QualarooBase getQualarooInstance() throws QualarooWorker.QualarooSdkNotProperlyInitializedException {
         QualarooSdk instance = Qualaroo.getInstance();
         if (instance instanceof QualarooBase) {
             return (QualarooBase) instance;
         }
-        throw new QualarooSdkNotProperlyInitializedException();
+        throw new QualarooWorker.QualarooSdkNotProperlyInitializedException();
     }
 
     private static class QualarooSdkNotProperlyInitializedException extends Exception {}
+
 }

@@ -6,6 +6,7 @@ import androidx.annotation.RestrictTo;
 import com.qualaroo.internal.model.Message;
 import com.qualaroo.internal.model.QScreen;
 import com.qualaroo.internal.model.Question;
+import com.qualaroo.ui.render.Theme;
 
 import java.util.List;
 

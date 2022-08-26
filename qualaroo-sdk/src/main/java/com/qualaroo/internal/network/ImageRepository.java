@@ -16,7 +16,7 @@ import okhttp3.Response;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class ImageRepository {
 
-    private static final int MIN_DISK_CACHE_SIZE = 1 * 1024 * 1024; // 1MB
+    private static final int MIN_DISK_CACHE_SIZE = 1024 * 1024; // 1MB
     private static final int MAX_DISK_CACHE_SIZE = 2 * 1024 * 1024; // 2MB
 
     private final OkHttpClient okHttpClient;

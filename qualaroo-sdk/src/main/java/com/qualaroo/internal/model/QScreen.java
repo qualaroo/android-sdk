@@ -11,21 +11,25 @@ public final class QScreen implements Serializable{
     private final long id;
     private final List<Long> questionList;
     private final String description;
+    private final String font_style_description;
     private final String sendText;
     private final Node nextMap;
 
-    @VisibleForTesting QScreen(long id, List<Long> questionList, String description, String sendText, Node nextMap) {
+    @VisibleForTesting QScreen(long id, List<Long> questionList, String description,String font_style_description,String sendText, Node nextMap) {
         this.id = id;
         this.questionList = questionList;
         this.description = description;
+        this.font_style_description = font_style_description;
         this.sendText = sendText;
         this.nextMap = nextMap;
     }
 
     @SuppressWarnings("unused") private QScreen() {
+
         this.id = 0;
         this.questionList = null;
         this.description = null;
+        this.font_style_description = null;
         this.sendText = null;
         this.nextMap = null;
     }
@@ -42,6 +46,10 @@ public final class QScreen implements Serializable{
         return description;
     }
 
+    public String getFont_style_description() {
+        return font_style_description;
+    }
+
     public String sendText() {
         return sendText;
     }
@@ -51,7 +59,7 @@ public final class QScreen implements Serializable{
     }
 
     public QScreen copy(String description) {
-        return new QScreen(id, questionList, description, sendText, nextMap);
+        return new QScreen(id, questionList, description, font_style_description, sendText, nextMap);
     }
 
     @Override public boolean equals(Object o) {

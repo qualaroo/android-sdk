@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.qualaroo.R;
+import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Question;
 import com.qualaroo.internal.model.UserResponse;
 import com.qualaroo.ui.OnAnsweredListener;

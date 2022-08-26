@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/qualaroo/android-sdk/blob/dev/CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-2.0.0-blue.svg">
+    <img src="https://img.shields.io/badge/version-2.1.0-blue.svg">
   </a>
   <a href="https://circleci.com/gh/qualaroo/android-sdk/tree/dev">
     <img src="https://img.shields.io/circleci/project/github/qualaroo/android-sdk/dev.svg">
@@ -26,16 +26,16 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:2.0.0` dependency to your app's `build.gradle` file:
+Simply add the `com.qualaroo:qualaroo-sdk:2.1.0` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
     maven {
-        url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs/v3'
+        url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs/'
     }
 }
 dependencies {
-    implementation 'com.qualaroo:qualaroo-sdk:2.0.0'
+    implementation 'com.qualaroo:qualaroo-sdk:2.1.0'
 }
 ```
 ## Step 2. Code Integration

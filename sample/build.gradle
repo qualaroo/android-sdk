@@ -10,11 +10,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
         applicationId "com.qualaroo.sample"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 
@@ -28,16 +28,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 repositories {
     maven {
-        url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs/v3'
+        url 'https://s3.amazonaws.com/qualaroo-android-sdk/libs/'
     }
 }
 
 dependencies {
-    implementation 'com.qualaroo:qualaroo-sdk:2.0.0'
+    implementation 'com.qualaroo:qualaroo-sdk:2.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
