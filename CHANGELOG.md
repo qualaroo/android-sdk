@@ -1,3 +1,8 @@
+## 2.1.0
+- Emoji and Thumb type question supported
+- Font Style added for Question Title and Description
+- Fixed App crashing because JobIntentService
+
 ## 2.0.0
 - Upgraded to AndroidX 
 - Fixed a theme related issue 
