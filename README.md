@@ -61,11 +61,11 @@ Qualaroo.getInstance().showSurvey("your_survey_alias");
 ```
 Surveys are downloaded and then cached for **1 hour**. If you are actively working on your survey's design, clear your application's data/cache or use our [Showcase application](https://play.google.com/store/apps/details?id=com.qualaroo.showcase).
 
-#### Check survey has showed or not .
-It will return a true or false value for survey showed or not on basis of surveyId
+#### Detect if the survey has showed up
+Returns true, if the survey showed up. Else it will return false.
 ```java
-//Show survey with "surveyId" surveyId
-Qualaroo.getInstance().isSurveyShown("surveyId")
+//Detect if the survey is shown. "surveyID" is the ID of the the survey.
+Qualaroo.getInstance().isSurveyShown("surveyID")
 ```
 #### Set user properties
 ```java
