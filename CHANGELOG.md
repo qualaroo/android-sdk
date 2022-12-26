@@ -1,3 +1,6 @@
+## 2.1.1
+- New method added for check survey showed or not
+
 ## 2.1.0
 - Emoji and Thumb type question supported
 - Font Style added for Question Title and Description

@@ -29,7 +29,7 @@ class Settings(context: Context) {
         sharedPreferences.edit().putString(KEY_API_KEY, apiKey).commit()
     }
 
-    fun apiKey(): String {
+    fun apiKey(): String? {
         return sharedPreferences.getString(KEY_API_KEY, DEFAULT_STAGING_API_KEY)
     }
 
@@ -37,7 +37,7 @@ class Settings(context: Context) {
         sharedPreferences.edit().putString(KEY_RECENTLY_SHOWN_SURVEY, alias).apply()
     }
 
-    fun recentSurveyAlias(): String {
+    fun recentSurveyAlias(): String? {
         return sharedPreferences.getString(KEY_RECENTLY_SHOWN_SURVEY, "")
     }
 

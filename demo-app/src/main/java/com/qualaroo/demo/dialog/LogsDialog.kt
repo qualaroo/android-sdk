@@ -43,7 +43,7 @@ class LogsDialog : BottomSheetDialogFragment() {
         val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
         if (clipboard != null) {
             val clip = ClipData.newPlainText("logcat", textView.text.toString())
-            clipboard.primaryClip = clip
+//            clipboard.primaryClip = clip
             Toast.makeText(context, "Logs copied to clipboard", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Could not copy logs", Toast.LENGTH_SHORT).show()

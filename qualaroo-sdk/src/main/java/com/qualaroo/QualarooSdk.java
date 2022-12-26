@@ -20,6 +20,12 @@ public interface QualarooSdk {
     void showSurvey(@NonNull String alias, @NonNull SurveyOptions options);
 
     /**
+     * Return a boolean value for survey showed or not on basis of surveyId
+     * @param surveyId surveyId of a survey that should be checked
+     */
+    boolean isSurveyShown(@NonNull String surveyId);
+
+    /**
      * Sets unique user id for tracking purposes.
      * @param userId unique user's id
      */

@@ -57,7 +57,7 @@ class SurveyDemoActivity : AppCompatActivity() {
         val apiKeyEditText = findViewById<EditText>(R.id.qualaroo__demo_api_key_edit_text)
         apiKeyEditText.setText(apiKey)
 
-        surveyAliasesRepository = DependenciesComponent(apiKey).surveysRepository()
+        surveyAliasesRepository = apiKey?.let { DependenciesComponent(it).surveysRepository() }!!
 
         findViewById<View>(R.id.qualaroo__demo_set_api_key_button).setOnClickListener {
             settings.storeApiKey(apiKeyEditText.text.toString())

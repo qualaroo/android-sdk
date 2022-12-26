@@ -5,4 +5,4 @@
  * under which redistribution and use of this file is permitted.
  */
 
-include ':demo-app', ':qualaroo-sdk', ':sample'
+include  ':qualaroo-sdk', ':sample'

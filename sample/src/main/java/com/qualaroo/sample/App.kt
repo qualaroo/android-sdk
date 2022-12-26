@@ -15,7 +15,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Qualaroo.initializeWith(this)
-                .setApiKey("API_KEY_HERE")
+                .setApiKey("NzQ4MTQ6YTJkMzA3OTY4MWNjMWVmYWYzM2VjMDM0ZWY4Nzg2YzBlN2ExMjI2ZDo3Nzc3Mw==")
                 .init()
     }
 }

@@ -21,6 +21,7 @@ public interface LocalStorage {
     void markSurveyAsSeen(Survey survey);
     void markSurveyFinished(Survey survey);
     SurveyStatus getSurveyStatus(Survey survey);
+    SurveyStatus isSurveyShowed(int surveyId);
     void updateUserProperty(@NonNull String key, @Nullable String value);
     Map<String, String> getUserProperties();
     void storeUserGroupPercent(Survey survey, int percent);

@@ -52,8 +52,12 @@ public class SurveysRepository {
             } else if (cache.isStale()) {
                 refreshDataAsync();
             }
-            return returnSafely(cache.get());
+            return getCachedSurveys();
         }
+    }
+
+    public List<Survey> getCachedSurveys() {
+        return returnSafely(cache.get());
     }
 
     private void refreshData() {
