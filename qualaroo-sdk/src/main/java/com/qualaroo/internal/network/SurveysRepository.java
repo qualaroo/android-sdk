@@ -22,6 +22,8 @@ import okhttp3.HttpUrl;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
+import android.util.Log;
+
 @RestrictTo(LIBRARY)
 public class SurveysRepository {
 
@@ -90,6 +92,7 @@ public class SurveysRepository {
         if (result.isSuccessful()) {
             List<Survey> surveys = filterOutInvalidSurveys(result.getData());
             QualarooLogger.debug("Acquired %1$d surveys", surveys.size());
+//            Log.d("filter_result",surveys.toString());
             return surveys;
         } else {
             QualarooLogger.debug("Could not acquire surveys");
@@ -109,6 +112,7 @@ public class SurveysRepository {
             }
             result.add(survey);
         }
+//        Log.d("filter_result",result.toString());
         return result;
     }
 

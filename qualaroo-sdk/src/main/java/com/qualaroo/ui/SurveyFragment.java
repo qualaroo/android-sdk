@@ -16,8 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.ImageViewCompat;
-
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +38,7 @@ import com.qualaroo.ui.render.ViewState;
 import com.qualaroo.util.ColorStateListUtils;
 import com.qualaroo.util.ContentUtils;
 import com.qualaroo.util.DebouncingOnClickListener;
+import com.qualaroo.util.DimenUtils;
 import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
@@ -231,20 +230,20 @@ public class SurveyFragment extends Fragment implements SurveyView {
             if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(title);
-                setFontType(question.getFont_style_question(),questionsTitleBottom);
+                setFontType(question.fontStyleQuestion(),questionsTitleBottom);
                 questionsTitleTop.setText(description);
-                setFontType(question.getFont_style_description(),questionsTitleTop);
+                setFontType(question.fontStyleDescription(),questionsTitleTop);
             } else if (DESCRIPTION_PLACEMENT_AFTER.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(description);
-                setFontType(question.getFont_style_description(),questionsTitleBottom);
+                setFontType(question.fontStyleDescription(),questionsTitleBottom);
                 questionsTitleTop.setText(title);
-                setFontType(question.getFont_style_question(),questionsTitleTop);
+                setFontType(question.fontStyleQuestion(),questionsTitleTop);
             }
         } else {
             questionsTitleBottom.setVisibility(View.GONE);
             questionsTitleTop.setText(title);
-            setFontType(question.getFont_style_question(),questionsTitleTop);
+            setFontType(question.fontStyleQuestion(),questionsTitleTop);
         }
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
             @Override public void onResponse(UserResponse userResponse) {
@@ -258,10 +257,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     void setFontType(String fontType, TextView textView){
-        switch (fontType){
-//            case TYPEFACE_BOLD:
-//                textView.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-//                break;
+        switch (String.valueOf(fontType)){
             case TYPEFACE_ITALIC:
                 textView.setTypeface(Typeface.DEFAULT,Typeface.ITALIC);
                 break;

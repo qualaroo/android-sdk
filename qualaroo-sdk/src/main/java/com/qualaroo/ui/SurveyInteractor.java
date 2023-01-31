@@ -34,8 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
-import android.util.Log;
-
 @RestrictTo(LIBRARY)
 public class SurveyInteractor {
 

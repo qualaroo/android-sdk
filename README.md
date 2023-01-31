@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/qualaroo/android-sdk/blob/dev/CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-2.1.1-blue.svg">
+    <img src="https://img.shields.io/badge/version-2.1.2-blue.svg">
   </a>
   <a href="https://circleci.com/gh/qualaroo/android-sdk/tree/dev">
     <img src="https://img.shields.io/circleci/project/github/qualaroo/android-sdk/dev.svg">
@@ -26,7 +26,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:2.1.1` dependency to your app's `build.gradle` file:
+Simply add the `com.qualaroo:qualaroo-sdk:2.1.2` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -35,7 +35,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'com.qualaroo:qualaroo-sdk:2.1.1'
+    implementation 'com.qualaroo:qualaroo-sdk:2.1.2'
 }
 ```
 ## Step 2. Code Integration
@@ -61,12 +61,6 @@ Qualaroo.getInstance().showSurvey("your_survey_alias");
 ```
 Surveys are downloaded and then cached for **1 hour**. If you are actively working on your survey's design, clear your application's data/cache or use our [Showcase application](https://play.google.com/store/apps/details?id=com.qualaroo.showcase).
 
-#### Detect if the survey has showed up
-Returns true, if the survey showed up. Else it will return false.
-```java
-//Detect if the survey is shown. "surveyID" is the ID of the the survey.
-Qualaroo.getInstance().isSurveyShown("surveyID")
-```
 #### Set user properties
 ```java
 //Set unique user id

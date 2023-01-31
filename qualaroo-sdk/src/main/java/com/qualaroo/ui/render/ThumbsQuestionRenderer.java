@@ -2,7 +2,6 @@ package com.qualaroo.ui.render;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;

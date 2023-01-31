@@ -140,33 +140,6 @@ public class DatabaseLocalStorage implements LocalStorage {
         return builder.build();
     }
 
-    @Override
-    public SurveyStatus isSurveyShowed(int surveyId) {
-        SurveyStatus.Builder builder = SurveyStatus.builder();
-        builder.setSurveyId(surveyId);
-        Cursor cursor = null;
-        try {
-            cursor = writeableDb().query(
-                    SURVEY_STATUS_TABLE,
-                    new String[]{SURVEY_STATUS_HAS_SEEN, SURVEY_STATUS_HAS_FINISHED, SURVEY_STATUS_TIMESTAMP},
-                    SURVEY_STATUS_ID + "=?", new String[]{String.valueOf(surveyId)},
-                    null, null, null, String.valueOf(1));
-            cursor.moveToFirst();
-            if (!cursor.isAfterLast()) {
-                builder.setHasBeenSeen(cursor.getInt(0) > 0);
-                builder.setHasBeenFinished(cursor.getInt(1) > 0);
-                builder.setSeenAtInMillis(cursor.getInt(2));
-            }
-        } catch (Exception ex) {
-            QualarooLogger.debug("Could not acquire survey status for surveyId: " + surveyId);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return builder.build();
-    }
-
     @Override public void updateUserProperty(@NonNull String key, @Nullable String value) {
         if (value == null) {
             delete(USER_PROPERTIES_TABLE, USER_PROPERTIES_KEY + "=?", new String[]{key});
