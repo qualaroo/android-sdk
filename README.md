@@ -26,7 +26,24 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 The recommended way to install the library for Android is with build system like Gradle.
 
-Simply add the `com.qualaroo:qualaroo-sdk:2.1.2` dependency to your app's `build.gradle` file:
+For version 2.1.2
+
+Simply add the `com.github.qualaroo:android-sdk:2.1.2` dependency to your app's `build.gradle` file:
+
+```javascript
+repositories {
+    maven {
+       url 'https://jitpack.io'
+    }
+}
+dependencies {
+    implementation 'com.github.qualaroo:android-sdk:2.1.2'
+}
+```
+
+For version 2.1.1 or below
+
+Simply add the `com.qualaroo:qualaroo-sdk:2.1.1` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -35,7 +52,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'com.qualaroo:qualaroo-sdk:2.1.2'
+    implementation 'com.qualaroo:qualaroo-sdk:2.1.1'
 }
 ```
 ## Step 2. Code Integration
@@ -44,12 +61,12 @@ In order to be able to use Qualaroo SDK you need to to initialize it first.
 This procedure needs to be done only once and because of this, we recommended initializing the SDK in your `Application` subclass.
 ```java
 public class MyApp extends Application {
-  @Override public void onCreate() {
-    // Initialize the Qualaroo client with the given API Key.
-    Qualaroo.initializeWith(this)
-            .setApiKey("<your_api_key>")
-            .init();
-  }
+    @Override public void onCreate() {
+        // Initialize the Qualaroo client with the given API Key.
+        Qualaroo.initializeWith(this)
+                .setApiKey("<your_api_key>")
+                .init();
+    }
 }        
 ```
 After initialization, the SDK will be accessible via `Qualaroo.getInstance()` method.
@@ -66,9 +83,9 @@ Surveys are downloaded and then cached for **1 hour**. If you are actively worki
 //Set unique user id
 Qualaroo.getInstance().setUserId("HAL_9000");
 //Set user property "name" to "Hal"
-Qualaroo.getInstance().setUserProperty("name", "Hal");
+        Qualaroo.getInstance().setUserProperty("name", "Hal");
 //remove property "name"
-Qualaroo.getInstance().removeProperty("name");
+        Qualaroo.getInstance().removeProperty("name");
 ```
 
 #### Set preferred language
@@ -83,9 +100,9 @@ Language that you provide should be an ISO 639-1 compatible language code (two l
 ```java
 //Omit targetting options
 SurveyOptions options = new SurveyOptions.Builder()
-            .ignoreSurveyTargeting(true)
-            .build();
-Qualaroo.getInstance().showSurvey("your_survey_alias", options);
+        .ignoreSurveyTargeting(true)
+        .build();
+        Qualaroo.getInstance().showSurvey("your_survey_alias", options);
 ```
 
 #### Observe survey related events
@@ -107,7 +124,7 @@ To enable your receiver, register it in your `AndroidManifest.xml` file:
 ```xml
 <application>
     ...
-    <receiver 
+    <receiver
         android:name="com.example.MySurveyEventReceiver"
         android:exported="false">
         <intent-filter>
@@ -125,13 +142,13 @@ This choice will be stored throught multiple app launches.
 To run an AB test out of surveys "A", "B" and "C":
 ```java
 Qualaroo.getInstance().abTest()
-       .fromSurveys(Arrays.asList("my_survey_A", "my_survey_B", "my_survey_C"))
-       .show();
+        .fromSurveys(Arrays.asList("my_survey_A", "my_survey_B", "my_survey_C"))
+        .show();
 ```
 Keep in mind that this is an experimental feature and it's implementation might change in future releases.
 
 ## Debugging
-If you run into any issues while using the Android library, we recommend turning on logging to help you trace the issue. 
+If you run into any issues while using the Android library, we recommend turning on logging to help you trace the issue.
 You can do this by setting debug mode to true.
 ```java
 Qualaroo.initializeWith(context)
