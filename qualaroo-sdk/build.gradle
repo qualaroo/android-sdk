@@ -18,12 +18,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 32
+        targetSdkVersion 33
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         versionCode project.sdkVersionCode
         versionName project.sdkVersion
