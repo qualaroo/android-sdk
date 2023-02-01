@@ -1,4 +1,5 @@
 ## 2.1.2
+- Installation via jitpack
 - Bug fixes
 
 ## 2.1.1
