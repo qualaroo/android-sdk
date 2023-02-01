@@ -1,5 +1,9 @@
+## 2.1.2
+- Installation via jitpack
+- Bug fixes
+
 ## 2.1.1
-- New method added for check survey showed or not
+- New method added for check survey showed or not - Depreciated
 
 ## 2.1.0
 - Emoji and Thumb type question supported

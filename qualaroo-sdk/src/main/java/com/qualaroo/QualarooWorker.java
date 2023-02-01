@@ -1,15 +1,11 @@
 package com.qualaroo;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
-import com.qualaroo.QualarooBase;
-import com.qualaroo.QualarooLogger;
 import com.qualaroo.internal.ImageProvider;
 import com.qualaroo.internal.model.Survey;
 import com.qualaroo.internal.network.ResponseHelper;

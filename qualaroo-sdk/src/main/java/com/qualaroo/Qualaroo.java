@@ -2,8 +2,6 @@ package com.qualaroo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -208,15 +206,6 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         }
         return false;
     }
-
-    public boolean isSurveyShown(@NonNull final String surveyId){
-        if (surveyId.length() == 0) {
-            throw new IllegalArgumentException("SurveyId can't be null or empty!");
-        }
-        SurveyStatus status =   localStorage.isSurveyShowed(Integer.parseInt(surveyId));
-        return  status.hasBeenSeen();
-    }
-
 
     private boolean canDisplaySurvey(Survey survey, SurveyOptions options, SurveyDisplayQualifier surveyDisplayQualifier) {
         boolean matchesTargeting = surveyDisplayQualifier.doesQualify(survey);
@@ -533,11 +522,6 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         @Override
         public void showSurvey(@NonNull String alias, @NonNull SurveyOptions options) {
             logErrorMessage();
-        }
-
-        @Override
-        public boolean isSurveyShown(@NonNull String surveyId) {
-            return false;
         }
 
         @Override

@@ -4,7 +4,7 @@
 
 int major = 2
 int minor = 1
-int patch = 1
+int patch = 2
 
 project.ext {
     sdkVersionCode = 10000 * major + 100 * minor + patch
@@ -18,12 +18,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     resourcePrefix 'qualaroo__'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 32
+        targetSdkVersion 33
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         versionCode project.sdkVersionCode
         versionName project.sdkVersion
@@ -147,64 +147,14 @@ artifacts {
 }
 
 publishing {
-    repositories {
-        maven {
-            name 'QualarooProduction'
-//            url "s3://qualaroo-android-sdk/libs/"
-            url "/Users/ajaymandrawal/Documents/Office/QualrooAndroidSDK/v211/"
-//            credentials(AwsCredentials) {
-//                accessKey QUALAROO_S3_ACCESS_KEY
-//                secretKey QUALAROO_S3_SECRET_KEY
-//            }
-        }
-        maven {
-            name 'QualarooSnapshots'
-//            url "s3://qualaroo-android-sdk/snapshots/"
-            url "/Users/ajaymandrawal/Documents/Office/QualrooAndroidSDK/v211/"
-//            credentials(AwsCredentials) {
-//                accessKey QUALAROO_S3_ACCESS_KEY
-//                secretKey QUALAROO_S3_SECRET_KEY
-//            }
-        }
-        mavenLocal()
-    }
-
-    publications {
-        aar(MavenPublication) {
-            groupId 'com.qualaroo'
-            artifactId 'qualaroo-sdk'
-            version project.sdkVersionMaven
-            artifact("$buildDir/outputs/aar/qualaroo-sdk-production-release.aar")
-            artifact sourcesJar
-//            artifact javadocJar
-            pom.withXml {
-                println(configurations.implementation.getAllDependencies())
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                // List all compile dependencies and write to POM
-                configurations.implementation.getAllDependencies().each { Dependency dep ->
-                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
-                        return // ignore invalid dependencies
-
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', dep.group)
-                    dependencyNode.appendNode('artifactId', dep.name)
-                    dependencyNode.appendNode('version', dep.version)
-
-                    if (!dep.transitive) {
-                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
-                        def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
-                        exclusionNode.appendNode('groupId', '*')
-                        exclusionNode.appendNode('artifactId', '*')
-                    } else if (!dep.properties.excludeRules.empty) {
-                        // Otherwise add specified exclude rules
-                        def exclusionsNode = dependencyNode.appendNode('exclusions')
-                        dep.properties.excludeRules.each { ExcludeRule rule ->
-                            def exclusionNode = exclusionsNode.appendNode('exclusion')
-                            exclusionNode.appendNode('groupId', rule.group ?: '*')
-                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
-                        }
-                    }
+    afterEvaluate {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    from components.productionRelease
+                    groupId 'com.qualaroo'
+                    artifactId 'qualaroo-sdk'
+                    version project.sdkVersionMaven
                 }
             }
         }

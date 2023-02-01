@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
+
 @RestrictTo(LIBRARY)
 public final class UserPropertiesMatcher extends SurveySpecMatcher {
 
