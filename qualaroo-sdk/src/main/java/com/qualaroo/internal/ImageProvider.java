@@ -11,13 +11,14 @@ import androidx.collection.LruCache;
 import com.qualaroo.internal.network.ImageRepository;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Executor;
 
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.internal.Util;
+//import okhttp3.internal.Util;
 import okio.BufferedSource;
 import okio.Okio;
 
@@ -94,7 +95,7 @@ public final class ImageProvider {
         }
     }
 
-    @Nullable private static Bitmap decodeBitmapFromResponse(Response response) {
+    @Nullable private static Bitmap decodeBitmapFromResponse(Response response) throws IOException {
         BufferedSource source = Okio.buffer(response.body().source());
         try {
             InputStream inputStream = new BufferedInputStream(source.inputStream());
@@ -104,7 +105,8 @@ public final class ImageProvider {
         } catch (OutOfMemoryError e) {
             return null;
         } finally {
-            Util.closeQuietly(source);
+//            Util.closeQuietly(source);
+            source.close();
         }
     }
 
