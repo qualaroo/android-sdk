@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.annotation.WorkerThread;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
@@ -153,6 +154,46 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         this.imageProvider = imageProvider;
         this.surveyDisplayQualifier = surveyDisplayQualifier;
         this.userPropertiesInjector = userPropertiesInjector;
+    }
+
+    @NonNull
+    @Override
+    @WorkerThread
+    public List<String> getSurveysAliases() {
+        List<Survey> surveys = surveysRepository.getSurveys();
+        ArrayList<String> aliases = new ArrayList<>(surveys.size());
+        for (Survey survey : surveys) {
+            aliases.add(survey.canonicalName());
+        }
+        return aliases;
+    }
+
+    @Override
+    @WorkerThread
+    public boolean willSurveyBeShown(@NonNull final String alias) {
+        if (alias.length() == 0) {
+            throw new IllegalArgumentException("Alias can't be null or empty!");
+        }
+        QualarooLogger.debug("Checking if survey will be shown: " + alias);
+        if (requestingForSurvey.getAndSet(true)) {
+            return false;
+        }
+
+        List<Survey> surveys = surveysRepository.getSurveys();
+        Survey surveyToDisplay = null;
+        for (final Survey survey : surveys) {
+            if (alias.equals(survey.canonicalName())) {
+                surveyToDisplay = survey;
+                break;
+            }
+        }
+        requestingForSurvey.set(false);
+        if (surveyToDisplay != null) {
+            return canDisplaySurvey(surveyToDisplay, SurveyOptions.defaultOptions(), surveyDisplayQualifier);
+        } else {
+            QualarooLogger.info("Survey %s not found", alias);
+            return false;
+        }
     }
 
     @Override
@@ -512,6 +553,19 @@ public final class Qualaroo extends QualarooBase implements QualarooSdk {
         InvalidApiKeyQualarooSdk(String providedApiKey) {
             this.providedApiKey = providedApiKey;
             logErrorMessage();
+        }
+
+        @NonNull
+        @Override
+        public List<String> getSurveysAliases() {
+            logErrorMessage();
+            return new ArrayList<>();
+        }
+
+        @Override
+        public boolean willSurveyBeShown(@NonNull String alias) {
+            logErrorMessage();
+            return false;
         }
 
         @Override
