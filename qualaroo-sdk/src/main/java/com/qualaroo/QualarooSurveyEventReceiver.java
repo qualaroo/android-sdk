@@ -57,7 +57,7 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
         }
         SurveyEvent surveyEvent = intent.getParcelableExtra(EXTRA_KEY_SURVEY_EVENT);
         if (surveyEvent != null) {
-            onSurveyEvent(surveyEvent.alias(), surveyEvent.type());
+            onSurveyEvent(surveyEvent.alias(), surveyEvent.type(), context);
         }
     }
 
@@ -70,5 +70,5 @@ public abstract class QualarooSurveyEventReceiver extends BroadcastReceiver {
      * @param surveyAlias alias of a survey
      * @param eventType one of EVENT_TYPE_SHOWN, EVENT_TYPE_DISMISSED, EVENT_TYPE_FINISHED
      */
-    public abstract void onSurveyEvent(@NonNull String surveyAlias, @Type int eventType);
+    public abstract void onSurveyEvent(@NonNull String surveyAlias, @Type int eventType, Context context);
 }

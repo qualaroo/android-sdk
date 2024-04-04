@@ -18,9 +18,11 @@ class ExampleSurveyEventReceiver : QualarooSurveyEventReceiver() {
         super.onReceive(context, intent)
 //        Toast.makeText(context ,"onReceive", Toast.LENGTH_SHORT).show()
     }
-    override fun onSurveyEvent(surveyAlias: String, eventType: Int) {
+    override fun onSurveyEvent(surveyAlias: String, eventType: Int, context: Context?) {
         when (eventType) {
-            EVENT_TYPE_SHOWN -> log("$surveyAlias has been shown")
+            EVENT_TYPE_SHOWN -> {
+                Toast.makeText(context,surveyAlias,Toast.LENGTH_SHORT).show()
+            }
             EVENT_TYPE_DISMISSED -> log("$surveyAlias has been dismissed")
             EVENT_TYPE_FINISHED ->{
 

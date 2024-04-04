@@ -15,7 +15,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Qualaroo.initializeWith(this)
-            .setApiKey("alias-key")
+            .setApiKey("NzQ4MTQ6YTJkMzA3OTY4MWNjMWVmYWYzM2VjMDM0ZWY4Nzg2YzBlN2ExMjI2ZDo3MjEzMg==")
             .init()
     }
 }
