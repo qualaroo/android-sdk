@@ -62,13 +62,13 @@ android {
 
     flavorDimensions 'api'
     productFlavors {
-//        staging {
-//            dimension 'api'
-//        }
-
-        production {
+        staging {
             dimension 'api'
         }
+
+//        production {
+//            dimension 'api'
+//        }
     }
 }
 
@@ -151,7 +151,7 @@ publishing {
         publishing {
             publications {
                 release(MavenPublication) {
-                    from components.productionRelease
+                    from components.findByName('productionRelease')
                     groupId 'com.qualaroo'
                     artifactId 'qualaroo-sdk'
                     version project.sdkVersionMaven

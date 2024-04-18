@@ -32,12 +32,15 @@ public final class Question implements Serializable {
     private final int maxAnswersCount;
     private final String fontStyleQuestion;
     private final String fontStyleDescription;
+    private  final String fontSizeQuestion;
+    private  final String fontSizeDescription;
 
     @VisibleForTesting Question(long id, QuestionType type, String title, String description,
                                 String descriptionPlacement, List<Answer> answerList, String sendText, Node nextMap,
                                 String npsMinLabel, String npsMaxLabel, String cname, boolean disableRandom,
                                 boolean anchorLast, int anchorLastCount, boolean alwaysShowSend, boolean isRequired,
-                                int minAnswersCount, int maxAnswersCount, String fontStyleQuestion, String fontStyleDescription) {
+                                int minAnswersCount, int maxAnswersCount, String fontStyleQuestion, String fontStyleDescription,
+                                String fontSizeQuestion, String fontSizeDescription) {
         this.id = id;
         this.type = type;
         this.title = title;
@@ -58,6 +61,8 @@ public final class Question implements Serializable {
         this.maxAnswersCount = maxAnswersCount;
         this.fontStyleQuestion = fontStyleQuestion;
         this.fontStyleDescription = fontStyleDescription;
+        this.fontSizeQuestion = fontSizeQuestion;
+        this.fontSizeDescription = fontSizeDescription;
     }
 
     @SuppressWarnings("unused") private Question() {
@@ -81,6 +86,8 @@ public final class Question implements Serializable {
         this.maxAnswersCount = 0;
         this.fontStyleQuestion = "normal";
         this.fontStyleDescription ="normal";
+        this.fontSizeQuestion = "12px";
+        this.fontSizeDescription = "12px";
     }
 
     public long id() {
@@ -160,17 +167,19 @@ public final class Question implements Serializable {
     }
 
     public String fontStyleDescription() { return fontStyleDescription; }
+    public String fontSizeQuestion() { return fontSizeQuestion; }
+    public String fontSizeDescription() { return fontSizeDescription; }
 
     public Question copy(List<Answer> answerList) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired, minAnswersCount, maxAnswersCount, fontStyleQuestion, fontStyleDescription);
+                            isRequired, minAnswersCount, maxAnswersCount, fontStyleQuestion, fontStyleDescription, fontSizeQuestion, fontSizeDescription);
     }
 
     public Question copy(String title, String description) {
         return new Question(id, type, title, description, descriptionPlacement, answerList, sendText, nextMap,
                             npsMinLabel, npsMaxLabel, cname, disableRandom, anchorLast, anchorLastCount, alwaysShowSend,
-                            isRequired, minAnswersCount, maxAnswersCount, fontStyleQuestion, fontStyleDescription);
+                            isRequired, minAnswersCount, maxAnswersCount, fontStyleQuestion, fontStyleDescription,fontSizeQuestion,fontSizeDescription);
     }
 
     @Override public boolean equals(Object o) {

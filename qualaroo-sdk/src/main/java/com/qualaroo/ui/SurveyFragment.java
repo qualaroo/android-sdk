@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.ImageViewCompat;
+
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +44,7 @@ import com.qualaroo.util.DimenUtils;
 import com.qualaroo.util.KeyboardUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -226,24 +229,32 @@ public class SurveyFragment extends Fragment implements SurveyView {
         String title = ContentUtils.sanitazeText(question.title());
         String description = ContentUtils.sanitazeText(question.description());
         questionsTitleTop.setTextSize(22);
+        Log.d("sizeinte", question.fontSizeQuestion());
+        Log.d("sizeinte", question.fontSizeDescription());
         if (description != null && description.length() > 0) {
             if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(title);
                 setFontType(question.fontStyleQuestion(),questionsTitleBottom);
+
+                setFontSize(question.fontSizeQuestion(),questionsTitleBottom);
                 questionsTitleTop.setText(description);
                 setFontType(question.fontStyleDescription(),questionsTitleTop);
+                setFontSize(question.fontSizeDescription(),questionsTitleTop);
             } else if (DESCRIPTION_PLACEMENT_AFTER.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(description);
                 setFontType(question.fontStyleDescription(),questionsTitleBottom);
+                setFontSize(question.fontSizeDescription(),questionsTitleBottom);
                 questionsTitleTop.setText(title);
                 setFontType(question.fontStyleQuestion(),questionsTitleTop);
+                setFontSize(question.fontSizeQuestion(),questionsTitleTop);
             }
         } else {
             questionsTitleBottom.setVisibility(View.GONE);
             questionsTitleTop.setText(title);
             setFontType(question.fontStyleQuestion(),questionsTitleTop);
+            setFontSize(question.fontSizeQuestion(),questionsTitleTop);
         }
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
             @Override public void onResponse(UserResponse userResponse) {
@@ -267,6 +278,12 @@ public class SurveyFragment extends Fragment implements SurveyView {
             default:
                 textView.setTypeface(Typeface.DEFAULT,Typeface.NORMAL);
         }
+    }
+
+    void  setFontSize(String fontSize, TextView textView){
+        int pxInt = Integer.parseInt(fontSize.split("px")[0]);
+       float dpSize = DimenUtils.toPx(requireContext(),pxInt);
+       textView.setTextSize(dpSize);
     }
 
     @Override public void showMessage(Message message, boolean withAnimation) {
