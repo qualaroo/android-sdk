@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         findViewById<Button>(R.id.main_hello_button).setOnClickListener {
             Qualaroo.getInstance().showSurvey("nps__net_promoter_score")
+//            Qualaroo.getInstance().showSurvey("help_cta")
         }
     }
 }

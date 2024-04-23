@@ -229,8 +229,6 @@ public class SurveyFragment extends Fragment implements SurveyView {
         String title = ContentUtils.sanitazeText(question.title());
         String description = ContentUtils.sanitazeText(question.description());
         questionsTitleTop.setTextSize(22);
-        Log.d("sizeinte", question.fontSizeQuestion());
-        Log.d("sizeinte", question.fontSizeDescription());
         if (description != null && description.length() > 0) {
             if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
@@ -281,9 +279,11 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     void  setFontSize(String fontSize, TextView textView){
+        Log.d("Size", fontSize);
         int pxInt = Integer.parseInt(fontSize.split("px")[0]);
        float dpSize = DimenUtils.toPx(requireContext(),pxInt);
-       textView.setTextSize(dpSize);
+       Log.d("Size", String.valueOf(dpSize) + "dp");
+       textView.setTextSize(pxInt);
     }
 
     @Override public void showMessage(Message message, boolean withAnimation) {
