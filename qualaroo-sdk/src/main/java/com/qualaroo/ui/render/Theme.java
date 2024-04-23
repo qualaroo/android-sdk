@@ -34,6 +34,11 @@ public final class Theme {
         theme.buttonTextDisabled = Color.parseColor(map.buttonTextDisabled());
         theme.uiNormal = Color.parseColor(map.uiNormal());
         theme.uiSelected = Color.parseColor(map.uiSelected());
+        theme.npsBackgroundColor = Color.parseColor(map.npsBackgroundColor());
+        theme.npsSelectedColor = Color.parseColor(map.npsSelectedColor());
+        theme.ansSelectedColor = Color.parseColor(map.ansSelectedColor());
+        theme.ansColor = Color.parseColor(map.ansColor());
+        theme.buttonsRadius = map.buttonsRadius();
         Float dimOpacity = map.dimOpacity();
         if (dimOpacity != null) {
             theme.dimOpacity = dimOpacity;
@@ -54,6 +59,11 @@ public final class Theme {
         theme.buttonTextDisabled = Color.parseColor(map.buttonTextColor());
         theme.uiNormal = Color.parseColor(map.buttonDisabledColor());
         theme.uiSelected = Color.parseColor(map.buttonEnabledColor());
+        theme.npsBackgroundColor = Color.parseColor(map.npsBackgroundColor());
+        theme.npsSelectedColor = Color.parseColor(map.npsSelectedColor());
+        theme.ansSelectedColor = Color.parseColor(map.ansSelectedColor());
+        theme.ansColor = Color.parseColor(map.ansColor());
+        theme.buttonsRadius = map.buttonsRadius();
         theme.dimOpacity = 1.0f;
         return theme;
     }
@@ -71,6 +81,11 @@ public final class Theme {
         theme.uiNormal = Color.DKGRAY;
         theme.uiSelected = Color.BLACK;
         theme.dimOpacity = 1.0f;
+        theme.npsBackgroundColor = Color.BLACK;
+        theme.npsSelectedColor = Color.BLACK;
+        theme.ansSelectedColor = Color.BLACK;
+        theme.ansColor = Color.BLACK;
+        theme.buttonsRadius = "13px";
         return theme;
     }
 
@@ -110,11 +125,18 @@ public final class Theme {
     private int uiSelected;
     private float dimOpacity;
 
+    private int npsBackgroundColor;
+    private int npsSelectedColor;
+    private int ansColor;
+    private int ansSelectedColor;
+    private String buttonsRadius;
+
     private Theme() {
         //for static factory methods
     }
 
-    @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected, float dimOpacity) {
+    @VisibleForTesting Theme(int backgroundColor, int dimColor, int textColor, int buttonEnabledColor, int buttonDisabledColor, int buttonTextEnabled, int buttonTextDisabled, int uiNormal, int uiSelected, float dimOpacity,
+                             int npsBackgroundColor, int npsSelectedColor, int ansSelectedColor, int ansColor, String buttonsRadius) {
         this.backgroundColor = backgroundColor;
         this.dimColor = dimColor;
         this.textColor = textColor;
@@ -125,6 +147,11 @@ public final class Theme {
         this.uiNormal = uiNormal;
         this.uiSelected = uiSelected;
         this.dimOpacity = dimOpacity;
+        this.npsBackgroundColor = npsBackgroundColor;
+        this.npsSelectedColor = npsSelectedColor;
+        this.ansSelectedColor = ansSelectedColor;
+        this.ansColor = ansColor;
+        this.buttonsRadius = buttonsRadius;
     }
 
     @ColorInt public int backgroundColor() {
@@ -165,5 +192,21 @@ public final class Theme {
 
     public float dimOpacity() {
         return dimOpacity;
+    }
+
+    @ColorInt public int npsBackgroundColor() {
+        return npsBackgroundColor;
+    }
+    @ColorInt public int npsSelectedColor() {
+        return npsSelectedColor;
+    }
+    @ColorInt public int ansSelectedColor() {
+        return ansSelectedColor;
+    }
+    @ColorInt public int ansColor() {
+        return ansColor;
+    }
+    public String buttonsRadius() {
+        return buttonsRadius;
     }
 }

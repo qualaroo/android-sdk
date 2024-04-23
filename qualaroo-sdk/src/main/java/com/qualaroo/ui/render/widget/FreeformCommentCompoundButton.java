@@ -2,10 +2,13 @@ package com.qualaroo.ui.render.widget;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.appcompat.widget.AppCompatEditText;
+
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -18,6 +21,7 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Liste
 
     private final EditText freeformComment;
     private final CompoundButton compoundButton;
+    private final LinearLayout linearLayout;
 
     public FreeformCommentCompoundButton(Context context, CompoundButton compoundButton) {
         super(context);
@@ -30,13 +34,15 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Liste
             getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
         }
         addView(compoundButton);
-        addView(freeformComment);
+        linearLayout = new LinearLayout(getContext());
+        addView(linearLayout);
     }
 
     @Override
     public void setOnCheckedChangeListener(final CompoundButton.OnCheckedChangeListener listener) {
         compoundButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 listener.onCheckedChanged(buttonView, isChecked);
                 if (isChecked) {
                     freeformComment.setVisibility(VISIBLE);
@@ -48,26 +54,30 @@ public class FreeformCommentCompoundButton extends LinearLayout implements Liste
         });
     }
 
-    @Override public void setChecked(boolean checked) {
+    @Override
+    public void setChecked(boolean checked) {
         compoundButton.setChecked(checked);
     }
 
-    @Override public boolean isChecked() {
+    @Override
+    public boolean isChecked() {
         return compoundButton.isChecked();
     }
 
-    @Override public void toggle() {
+    @Override
+    public void toggle() {
         compoundButton.toggle();
     }
 
-    @Override public void setEnabled(boolean enabled) {
+    @Override
+    public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         compoundButton.setEnabled(enabled);
     }
 
     public void acceptTheme(Theme theme) {
         ThemeUtils.applyTheme(compoundButton, theme);
-        ThemeUtils.applyTheme(freeformComment, theme);
+        ThemeUtils.applyTheme(freeformComment, linearLayout, theme);
     }
 
     public String getText() {
