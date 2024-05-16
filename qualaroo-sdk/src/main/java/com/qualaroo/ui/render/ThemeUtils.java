@@ -15,6 +15,8 @@ import androidx.core.view.TintableBackgroundView;
 import androidx.core.widget.CompoundButtonCompat;
 
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -117,6 +119,10 @@ public class ThemeUtils {
                 theme.buttonTextDisabled(),
                 theme.buttonTextEnabled()
         };
+//       int buttonRadius = Integer.parseInt(theme.buttonsRadius().split("px")[0]);
+//        GradientDrawable shape =  new GradientDrawable();
+//        shape.setCornerRadius( buttonRadius );
+//        button.setBackgroundDrawable(shape);
         button.setTextColor(new ColorStateList(states, colors));
     }
 

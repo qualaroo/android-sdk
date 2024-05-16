@@ -62,13 +62,13 @@ android {
 
     flavorDimensions 'api'
     productFlavors {
-        staging {
-            dimension 'api'
-        }
-
-//        production {
+//        staging {
 //            dimension 'api'
 //        }
+
+        production {
+            dimension 'api'
+        }
     }
 }
 
