@@ -74,11 +74,9 @@ public class NpsView extends FrameLayout {
     }
 
     public void applyTheme(Theme theme) {
-//        inactiveTextColor = theme.textColor();
-//        activeTextColor = theme.backgroundColor();
         inactiveTextColor = theme.ansColor();
         activeTextColor = theme.ansSelectedColor();
-        scoresContainer.setBackgroundColor(theme.textColor());
+        scoresContainer.setBackgroundColor(theme.ansColor());
         for (TextView score : scores) {
             score.setTextColor(inactiveTextColor);
             score.setBackgroundDrawable(inactiveDrawable);

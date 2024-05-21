@@ -295,9 +295,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
     }
 
     void setFontSize(String fontSize, TextView textView) {
-        Log.d("f_size",fontSize);
         int pxInt = Integer.parseInt(fontSize.split("px")[0]);
-        textView.setTextSize(pxInt);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,pxInt);
     }
 
     @Override
