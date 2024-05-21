@@ -2,16 +2,22 @@ package com.qualaroo.ui.render;
 
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.RestrictTo;
+
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.view.TintableBackgroundView;
 import androidx.core.widget.CompoundButtonCompat;
+
+import android.graphics.drawable.GradientDrawable;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -35,12 +41,36 @@ public class ThemeUtils {
         CompoundButtonCompat.setButtonTintList(compoundButton, new ColorStateList(states, colors));
     }
 
+
     public static void applyTheme(EditText editText, Theme theme) {
         if (editText instanceof TintableBackgroundView) {
             int[][] states = new int[][]{new int[]{-android.R.attr.state_focused}, new int[]{android.R.attr.state_focused}};
             int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableBackgroundView) editText).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
+        editText.setTextColor(theme.textColor());
+        setCursorDrawableColor(editText, theme.uiSelected());
+    }
+
+    public static void applyTheme(EditText editText, LinearLayout linearLayout, Theme theme) {
+
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setCornerRadii(new float[]{10, 10, 10, 10, 10, 10, 10, 10});
+        gradientDrawable.setColor(theme.uiSelected());
+        linearLayout.setBackgroundDrawable(gradientDrawable);
+        LinearLayout.LayoutParams ll_layoutparams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        linearLayout.setLayoutParams(ll_layoutparams);
+        LinearLayout.LayoutParams ffc_layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        ffc_layoutParams.setMargins(5, 5, 5, 5);
+        editText.setPadding(8, 20, 8, 20);
+        editText.setLayoutParams(ffc_layoutParams);
+        editText.setBackgroundColor(Color.WHITE);
+        linearLayout.addView(editText);
         editText.setTextColor(theme.textColor());
         setCursorDrawableColor(editText, theme.uiSelected());
     }
@@ -69,31 +99,35 @@ public class ThemeUtils {
     static void applyTheme(Button button, Theme theme) {
         if (button instanceof TintableBackgroundView) {
             int[][] states = new int[][]{
-                    new int[] {-android.R.attr.state_enabled},
-                    new int[] {android.R.attr.state_enabled}
+                    new int[]{-android.R.attr.state_enabled},
+                    new int[]{android.R.attr.state_enabled}
             };
-            int[] colors = new int[] {
+            int[] colors = new int[]{
                     theme.buttonDisabledColor(),
                     theme.buttonEnabledColor(),
             };
             ((TintableBackgroundView) button).setSupportBackgroundTintList(new ColorStateList(states, colors));
         }
-        int[][] states = new int[][] {
-                new int[] {-android.R.attr.state_enabled},
-                new int[] {android.R.attr.state_enabled}
+        int[][] states = new int[][]{
+                new int[]{-android.R.attr.state_enabled},
+                new int[]{android.R.attr.state_enabled}
         };
-        int[] colors = new int[] {
+        int[] colors = new int[]{
                 theme.buttonTextDisabled(),
                 theme.buttonTextEnabled()
         };
+       int buttonRadius = Integer.parseInt(theme.buttonsRadius().split("px")[0]) * 10;
+        GradientDrawable shape =  new GradientDrawable();
+        shape.setCornerRadius( buttonRadius );
+        button.setBackgroundDrawable(shape);
         button.setTextColor(new ColorStateList(states, colors));
     }
 
     static void applyTheme(Spinner spinner, Theme theme) {
         if (spinner instanceof TintableBackgroundView) {
             int[][] states = new int[][]{
-                    new int[] {android.R.attr.state_enabled},
-                    new int[] {android.R.attr.state_enabled, android.R.attr.state_pressed}
+                    new int[]{android.R.attr.state_enabled},
+                    new int[]{android.R.attr.state_enabled, android.R.attr.state_pressed}
             };
             int[] colors = new int[]{theme.uiNormal(), theme.uiSelected()};
             ((TintableBackgroundView) spinner).setSupportBackgroundTintList(new ColorStateList(states, colors));
@@ -108,11 +142,11 @@ public class ThemeUtils {
         try {
             Field defaultTextColorField = TextInputLayout.class.getDeclaredField("mDefaultTextColor");
             defaultTextColorField.setAccessible(true);
-            defaultTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ defaultColor}));
+            defaultTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{defaultColor}));
 
             Field focusedTextColorField = TextInputLayout.class.getDeclaredField("mFocusedTextColor");
             focusedTextColorField.setAccessible(true);
-            focusedTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{ focusedColor }));
+            focusedTextColorField.set(textInputLayout, new ColorStateList(new int[][]{{0}}, new int[]{focusedColor}));
         } catch (Exception ignored) {
             //ignore
         }

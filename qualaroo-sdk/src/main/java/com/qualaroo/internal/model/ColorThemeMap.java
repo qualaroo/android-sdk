@@ -22,6 +22,12 @@ public final class ColorThemeMap implements Serializable {
     private final String uiNormal;
     private final String uiSelected;
     private final Float dimOpacity;
+    private  final  String npsBackgroundColor;
+    private  final  String npsSelectedColor;
+    private final  String ansColor;
+    private  final  String ansSelectedColor;
+    private  final  String buttonsRadius;
+
 
     public String dimType() {
         return dimType;
@@ -64,6 +70,23 @@ public final class ColorThemeMap implements Serializable {
         return dimOpacity;
     }
 
+    public String npsBackgroundColor() {
+        return npsBackgroundColor;
+    }
+    public String npsSelectedColor() {
+        return npsSelectedColor;
+    }
+
+    public String ansColor() {
+        return ansColor;
+    }
+    public String ansSelectedColor() {
+        return ansSelectedColor;
+    }
+    public String buttonsRadius() {
+        return buttonsRadius;
+    }
+
     @Deprecated public String buttonTextColor() {
         return buttonTextColor;
     }
@@ -77,7 +100,13 @@ public final class ColorThemeMap implements Serializable {
                                      String buttonTextDisabled,
                                      String uiNormal,
                                      String uiSelected,
-                                     Float dimOpacity) {
+                                     Float dimOpacity,
+                                     String npsBackgroundColor,
+                                     String npsSelectedColor,
+                                     String ansColor,
+                                     String ansSelectedColor,
+                                     String buttonsRadius
+                                     ) {
         this.backgroundColor = backgroundColor;
         this.dimType = dimType;
         this.textColor = textColor;
@@ -89,6 +118,11 @@ public final class ColorThemeMap implements Serializable {
         this.uiSelected = uiSelected;
         this.dimOpacity = dimOpacity;
         this.buttonTextColor = null;
+        this.npsBackgroundColor = npsBackgroundColor;
+        this.npsSelectedColor = npsSelectedColor;
+        this.ansColor = ansColor;
+        this.ansSelectedColor = ansSelectedColor;
+        this.buttonsRadius = buttonsRadius;
     }
 
     @SuppressWarnings("unused") private ColorThemeMap() {
@@ -103,6 +137,11 @@ public final class ColorThemeMap implements Serializable {
         this.uiSelected = null;
         this.dimOpacity = null;
         this.buttonTextColor = null;
+        this.npsBackgroundColor = null;
+        this.npsSelectedColor = null;
+        this.ansColor = null;
+        this.ansSelectedColor = null;
+        this.buttonsRadius = null;
     }
 
 

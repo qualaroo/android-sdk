@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
@@ -18,6 +19,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.ImageViewCompat;
 
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +59,7 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private static final String DESCRIPTION_PLACEMENT_BEFORE = "before";
     private static final String DESCRIPTION_PLACEMENT_AFTER = "after";
 
-//    private static final String TYPEFACE_BOLD = "bold";
+    //    private static final String TYPEFACE_BOLD = "bold";
     private static final String TYPEFACE_ITALIC = "italic";
     private static final String TYPEFACE_OBLIQUE = "oblique";
 
@@ -78,11 +80,14 @@ public class SurveyFragment extends Fragment implements SurveyView {
     private RestorableView restorableView;
     private ViewState viewState;
 
-    @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.qualaroo__fragment_survey, container, false);
     }
 
-    @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         backgroundView = view.findViewById(R.id.qualaroo__fragment_survey_container);
         questionsTitleTop = view.findViewById(R.id.qualaroo__question_title_top);
@@ -98,13 +103,15 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
         closeButton = view.findViewById(R.id.qualaroo__survey_close);
         closeButton.setOnClickListener(new DebouncingOnClickListener() {
-            @Override public void doClick(View v) {
+            @Override
+            public void doClick(View v) {
                 surveyPresenter.onCloseClicked();
             }
         });
     }
 
-    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         SurveyComponentHelper.get(getContext()).inject(this);
         surveyPresenter.setView(this);
@@ -116,7 +123,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         surveyPresenter.init(presentersState);
     }
 
-    @Override public void onSaveInstanceState(Bundle outState) {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
         if (restorableView != null) {
             outState.putParcelable(RESTORABLE_VIEW_STATE, restorableView.getCurrentState());
         }
@@ -137,14 +145,16 @@ public class SurveyFragment extends Fragment implements SurveyView {
                 .start();
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         restorableView = null;
         KeyboardUtil.hideKeyboard(surveyContainer);
         surveyPresenter.dropView();
         super.onDestroyView();
     }
 
-    @Override public void setup(SurveyViewModel viewModel) {
+    @Override
+    public void setup(SurveyViewModel viewModel) {
         questionsTitleTop.setTextColor(viewModel.textColor());
         questionsTitleBottom.setTextColor(viewModel.textColor());
         surveyContainer.setBackgroundColor(viewModel.backgroundColor());
@@ -166,7 +176,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
         ViewCompat.setBackgroundTintList(surveyLogo, ColorStateList.valueOf(viewModel.backgroundColor()));
         imageProvider.getImage(viewModel.logoUrl(), new ImageProvider.OnBitmapLoadedListener() {
-            @Override public void onBitmapReady(Bitmap bitmap) {
+            @Override
+            public void onBitmapReady(Bitmap bitmap) {
                 surveyLogo.setImageBitmap(bitmap);
             }
         });
@@ -197,14 +208,16 @@ public class SurveyFragment extends Fragment implements SurveyView {
         return Color.argb(newAlpha, Color.red(dimColor), Color.green(dimColor), Color.blue(dimColor));
     }
 
-    @Override public void showWithAnimation() {
+    @Override
+    public void showWithAnimation() {
         backgroundView.setAlpha(0.0f);
         backgroundView.animate()
                 .alpha(1.0f)
                 .setDuration(300)
                 .start();
         surveyContainer.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 surveyContainer.setTranslationY(surveyContainer.getHeight());
                 surveyContainer.setVisibility(View.VISIBLE);
                 surveyContainer.animate()
@@ -217,47 +230,48 @@ public class SurveyFragment extends Fragment implements SurveyView {
         });
     }
 
-    @Override public void showImmediately() {
+    @Override
+    public void showImmediately() {
         backgroundView.setAlpha(1.0f);
         surveyContainer.setVisibility(View.VISIBLE);
         surveyContainer.setTranslationY(0);
     }
 
-    @Override public void showQuestion(Question question) {
+    @Override
+    public void showQuestion(Question question) {
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         String title = ContentUtils.sanitazeText(question.title());
         String description = ContentUtils.sanitazeText(question.description());
         questionsTitleTop.setTextSize(22);
-        Log.d("sizeinte", question.fontSizeQuestion());
-        Log.d("sizeinte", question.fontSizeDescription());
         if (description != null && description.length() > 0) {
             if (DESCRIPTION_PLACEMENT_BEFORE.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(title);
-                setFontType(question.fontStyleQuestion(),questionsTitleBottom);
+                setFontType(question.fontStyleQuestion(), questionsTitleBottom);
 
-                setFontSize(question.fontSizeQuestion(),questionsTitleBottom);
+                setFontSize(question.fontSizeQuestion(), questionsTitleBottom);
                 questionsTitleTop.setText(description);
-                setFontType(question.fontStyleDescription(),questionsTitleTop);
-                setFontSize(question.fontSizeDescription(),questionsTitleTop);
+                setFontType(question.fontStyleDescription(), questionsTitleTop);
+                setFontSize(question.fontSizeDescription(), questionsTitleTop);
             } else if (DESCRIPTION_PLACEMENT_AFTER.equals(question.descriptionPlacement())) {
                 questionsTitleBottom.setVisibility(View.VISIBLE);
                 questionsTitleBottom.setText(description);
-                setFontType(question.fontStyleDescription(),questionsTitleBottom);
-                setFontSize(question.fontSizeDescription(),questionsTitleBottom);
+                setFontType(question.fontStyleDescription(), questionsTitleBottom);
+                setFontSize(question.fontSizeDescription(), questionsTitleBottom);
                 questionsTitleTop.setText(title);
-                setFontType(question.fontStyleQuestion(),questionsTitleTop);
-                setFontSize(question.fontSizeQuestion(),questionsTitleTop);
+                setFontType(question.fontStyleQuestion(), questionsTitleTop);
+                setFontSize(question.fontSizeQuestion(), questionsTitleTop);
             }
         } else {
             questionsTitleBottom.setVisibility(View.GONE);
             questionsTitleTop.setText(title);
-            setFontType(question.fontStyleQuestion(),questionsTitleTop);
-            setFontSize(question.fontSizeQuestion(),questionsTitleTop);
+            setFontType(question.fontStyleQuestion(), questionsTitleTop);
+            setFontSize(question.fontSizeQuestion(), questionsTitleTop);
         }
         restorableView = renderer.renderQuestion(getContext(), question, new OnAnsweredListener() {
-            @Override public void onResponse(UserResponse userResponse) {
+            @Override
+            public void onResponse(UserResponse userResponse) {
                 surveyPresenter.onResponse(userResponse);
             }
         });
@@ -267,44 +281,47 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
     }
 
-    void setFontType(String fontType, TextView textView){
-        switch (String.valueOf(fontType)){
+    void setFontType(String fontType, TextView textView) {
+        switch (String.valueOf(fontType)) {
             case TYPEFACE_ITALIC:
-                textView.setTypeface(Typeface.DEFAULT,Typeface.ITALIC);
+                textView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
                 break;
             case TYPEFACE_OBLIQUE:
-                textView.setTypeface(Typeface.DEFAULT,Typeface.BOLD_ITALIC);
+                textView.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
                 break;
             default:
-                textView.setTypeface(Typeface.DEFAULT,Typeface.NORMAL);
+                textView.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
         }
     }
 
-    void  setFontSize(String fontSize, TextView textView){
+    void setFontSize(String fontSize, TextView textView) {
         int pxInt = Integer.parseInt(fontSize.split("px")[0]);
-       float dpSize = DimenUtils.toPx(requireContext(),pxInt);
-       textView.setTextSize(dpSize);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,pxInt);
     }
 
-    @Override public void showMessage(Message message, boolean withAnimation) {
+    @Override
+    public void showMessage(Message message, boolean withAnimation) {
         restorableView = null;
         transformToMessageStyle(withAnimation);
         questionsContent.removeAllViews();
         questionsContent.addView(renderer.renderMessage(getContext(), message, new OnMessageConfirmedListener() {
-            @Override public void onMessageConfirmed(Message message) {
+            @Override
+            public void onMessageConfirmed(Message message) {
                 surveyPresenter.onMessageConfirmed(message);
             }
         }));
     }
 
-    @Override public void showLeadGen(QScreen qscreen, List<Question> questions) {
+    @Override
+    public void showLeadGen(QScreen qscreen, List<Question> questions) {
         questionsTitleBottom.setVisibility(View.GONE);
         transformToQuestionStyle();
         questionsContent.removeAllViews();
         questionsTitleTop.setText(ContentUtils.sanitazeText(qscreen.description()));
-        setFontType(qscreen.getFont_style_description(),questionsTitleTop);
+        setFontType(qscreen.getFont_style_description(), questionsTitleTop);
         restorableView = renderer.renderLeadGen(getContext(), qscreen, questions, new OnLeadGenAnswerListener() {
-            @Override public void onResponse(List<UserResponse> userResponses) {
+            @Override
+            public void onResponse(List<UserResponse> userResponses) {
                 surveyPresenter.onLeadGenResponse(userResponses);
             }
         });
@@ -314,22 +331,26 @@ public class SurveyFragment extends Fragment implements SurveyView {
         }
     }
 
-    @Override public void setProgress(float progress) {
+    @Override
+    public void setProgress(float progress) {
         progressBar.setProgress(progress);
     }
 
-    @Override public void forceShowKeyboardWithDelay(long delayInMillis) {
+    @Override
+    public void forceShowKeyboardWithDelay(long delayInMillis) {
         final EditText editText = findEditText(questionsContent);
         if (editText != null) {
             editText.postDelayed(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     KeyboardUtil.showKeyboard(editText);
                 }
             }, delayInMillis);
         }
     }
 
-    @Nullable private EditText findEditText(View view) {
+    @Nullable
+    private EditText findEditText(View view) {
         if (view instanceof EditText) {
             return (EditText) view;
         }
@@ -349,7 +370,8 @@ public class SurveyFragment extends Fragment implements SurveyView {
         questionsTitleTop.setText(null);
         questionsTitleBottom.setVisibility(View.GONE);
         surveyContainer.post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 float translationX = surveyContainer.getWidth() / 2 - surveyLogo.getX() - surveyLogo.getWidth() / 2;
                 float translationY = isFullScreen ? 0 : -surveyLogo.getY() - surveyLogo.getHeight() / 2;
                 float alpha = 0.0f;
@@ -379,10 +401,12 @@ public class SurveyFragment extends Fragment implements SurveyView {
         surveyLogo.animate().scaleY(1.0f);
     }
 
-    @Override public void closeSurvey() {
+    @Override
+    public void closeSurvey() {
         runCloseAnimation();
         surveyContainer.postDelayed(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (getActivity() != null) {
                     getActivity().finish();
                     getActivity().overridePendingTransition(0, 0);
