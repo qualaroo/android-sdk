@@ -1,3 +1,10 @@
+## 2.1.3
+New Features
+- NPS custom design
+- Dynamic Button Radius
+- Dynamic  Question Font Size
+- Dynamic Description Font Size
+
 ## 2.1.2
 - Installation via jitpack
 - Bug fixes
