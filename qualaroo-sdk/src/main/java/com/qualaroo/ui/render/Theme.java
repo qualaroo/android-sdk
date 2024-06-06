@@ -76,18 +76,24 @@ public final class Theme {
         theme.textColor = Color.BLACK;
         theme.buttonEnabledColor = Color.DKGRAY;
         theme.buttonDisabledColor = Color.LTGRAY;
-        theme.buttonTextEnabled = Color.BLACK;
-        theme.buttonTextDisabled = Color.BLACK;
+        theme.buttonTextEnabled = Color.WHITE;
+        theme.buttonTextDisabled = Color.WHITE;
         theme.uiNormal = Color.DKGRAY;
         theme.uiSelected = Color.BLACK;
         theme.dimOpacity = 1.0f;
-        theme.npsBackgroundColor = Color.BLACK;
-        theme.npsSelectedColor = Color.BLACK;
-        theme.ansSelectedColor = Color.BLACK;
-        theme.ansColor = Color.BLACK;
+        theme.npsBackgroundColor = Color.parseColor(NPS_BACKGROUND_COLOR);
+        theme.npsSelectedColor = Color.parseColor(NPS_SELECTED_COLOR);
+        theme.ansSelectedColor = Color.parseColor(ANS_SELECTED_COLOR);
+        theme.ansColor = Color.parseColor(ANS_COLOR);
         theme.buttonsRadius = "13px";
         return theme;
     }
+
+    private  static  final  String NPS_BACKGROUND_COLOR = "#ffffff";
+    private  static  final  String NPS_SELECTED_COLOR = "#82BF4A";
+    private  static  final  String ANS_COLOR = "#000000";
+    private  static  final  String ANS_SELECTED_COLOR = "#ffffff";
+
 
     private static final String LIGHT_DIM_COLOR = "#D4CACED6";
     private static final String VERY_LIGHT_DIM_COLOR = "#D4FAFAFA";

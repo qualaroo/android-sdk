@@ -1,3 +1,6 @@
+## 2.1.4
+- NPS Theme Bug Fix
+
 ## 2.1.3
 New Features
 - NPS custom design

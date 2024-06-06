@@ -10,10 +10,15 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.RestrictTo;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.qualaroo.util.DimenUtils;
+
 import androidx.core.view.TintableBackgroundView;
 import androidx.core.widget.CompoundButtonCompat;
 
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -22,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY;
 
@@ -116,9 +122,10 @@ public class ThemeUtils {
                 theme.buttonTextDisabled(),
                 theme.buttonTextEnabled()
         };
-       int buttonRadius = Integer.parseInt(theme.buttonsRadius().split("px")[0]) * 10;
-        GradientDrawable shape =  new GradientDrawable();
-        shape.setCornerRadius( buttonRadius );
+       int buttonRadius = (int) (Integer.parseInt(theme.buttonsRadius().split("px")[0]));
+        float[] cornerRadius = new float[8];
+        Arrays.fill(cornerRadius, DimenUtils.toPx(button.getContext(), buttonRadius));
+        ShapeDrawable shape = new ShapeDrawable(new RoundRectShape(cornerRadius, null, null));
         button.setBackgroundDrawable(shape);
         button.setTextColor(new ColorStateList(states, colors));
     }
