@@ -21,10 +21,12 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 - Minimum deployment target set to Android 4.0.3 or later
 
 ### Released Versions
-```
-2.1.4(Latest)- 6 June 2024 (Note: Before updating the SDK version here, please ensure that you have saved the design changes in the Qualaroo Nudge Editor)
+
+#### Note: Before updating the SDK version here, please ensure that you have saved the design changes in the Qualaroo Nudge Editor
+
+2.1.4(Latest)- 6 June 2024 
+
 2.1.2(Previous)- 1 Feb 2023
-```
 
 ## Step 1. Integration
 
