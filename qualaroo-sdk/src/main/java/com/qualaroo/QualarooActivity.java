@@ -2,7 +2,12 @@ package com.qualaroo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
@@ -48,6 +53,31 @@ public class QualarooActivity extends AppCompatActivity {
                     .replace(android.R.id.content, new SurveyFragment(), "survey")
                     .commit();
         }
+        getWindow().setGravity(Gravity.BOTTOM);
+
+        // Get root view of your survey layout
+        final View rootView = findViewById(android.R.id.content);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            rootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                    // Add bottom inset as padding
+                    v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom() + dpToPx(12));
+                    return insets;
+                }
+            });
+            rootView.requestApplyInsets();
+        } else {
+            // Fallback for old devices
+            rootView.setPadding(0, 0, 0, dpToPx(16));
+        }
+    }
+
+    // Helper to convert dp to px
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
     }
 
     @Override public Object getSystemService(@NonNull String name) {

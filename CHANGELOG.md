@@ -1,3 +1,12 @@
+## 2.1.3
+**Compatibility Updates:**
+- Updated to Android Gradle Plugin 8.1.4 for Gradle 8.5 compatibility
+- Fixed namespace issues for Android 13+ compatibility
+- Updated dependencies to latest stable versions
+- Fixed deprecated API usage in tests
+- Improved survey dialog positioning and theming
+- Added proper window insets handling for modern Android devices
+
 ## 2.1.4
 - NPS Theme Bug Fix
 

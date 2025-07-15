@@ -28,11 +28,11 @@ class ImageProviderTest {
     val bitmapListener = CapturingBitmapListener()
     val imageRepository = ImageRepository(
             OkHttpClient.Builder().build(),
-            InstrumentationRegistry.getTargetContext().cacheDir
+            InstrumentationRegistry.getInstrumentation().targetContext.cacheDir
     )
     val imageProvider =
             ImageProvider(
-                    InstrumentationRegistry.getTargetContext(),
+                    InstrumentationRegistry.getInstrumentation().targetContext,
                     imageRepository,
                     TestExecutors.currentThread(),
                     TestExecutors.currentThread()
@@ -84,7 +84,7 @@ class ImageProviderTest {
     }
 
     private fun getAsset(assetPath: String): InputStream {
-        return InstrumentationRegistry.getTargetContext().assets.open(assetPath)
+        return InstrumentationRegistry.getInstrumentation().targetContext.assets.open(assetPath)
     }
 
     class CapturingBitmapListener : ImageProvider.OnBitmapLoadedListener {

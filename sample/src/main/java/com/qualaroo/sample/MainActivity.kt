@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         findViewById<Button>(R.id.main_hello_button).setOnClickListener {
-            Qualaroo.getInstance().showSurvey("alias key")
+            Qualaroo.getInstance().showSurvey("your_survey_alias")
         }
     }
 }
