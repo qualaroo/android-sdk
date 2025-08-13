@@ -19,7 +19,7 @@ class DatabaseLocalStorageTest {
     @Before
     fun setup() {
         InstrumentationRegistry.getContext().deleteDatabase(DatabaseLocalStorage.DB_NAME)
-        localStorage = DatabaseLocalStorage(InstrumentationRegistry.getTargetContext())
+        localStorage = DatabaseLocalStorage(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     @Test

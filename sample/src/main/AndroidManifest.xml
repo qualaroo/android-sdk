@@ -6,8 +6,7 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.qualaroo.sample">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:name=".App"

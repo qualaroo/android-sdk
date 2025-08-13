@@ -27,24 +27,24 @@ class ImageProviderTest {
     val server = MockWebServer()
     val bitmapListener = CapturingBitmapListener()
     val imageRepository = ImageRepository(
-            OkHttpClient.Builder().build(),
-            InstrumentationRegistry.getTargetContext().cacheDir
+        OkHttpClient.Builder().build(),
+        InstrumentationRegistry.getInstrumentation().targetContext.cacheDir
     )
     val imageProvider =
-            ImageProvider(
-                    InstrumentationRegistry.getTargetContext(),
-                    imageRepository,
-                    TestExecutors.currentThread(),
-                    TestExecutors.currentThread()
-            )
+        ImageProvider(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            imageRepository,
+            TestExecutors.currentThread(),
+            TestExecutors.currentThread()
+        )
 
     @Test
     fun works() {
         var buffer = Buffer()
         buffer = buffer.readFrom(getAsset(TEST_FILE))
         server.enqueue(MockResponse()
-                .addHeader("Content-Type:image/jpeg")
-                .setBody(buffer))
+            .addHeader("Content-Type:image/jpeg")
+            .setBody(buffer))
 
         imageProvider.getImage(server.url("/").toString(), bitmapListener)
 
@@ -57,12 +57,12 @@ class ImageProviderTest {
         var buffer = Buffer()
         buffer = buffer.readFrom(getAsset(TEST_FILE))
         server.enqueue(MockResponse()
-                .addHeader("Content-Type:image/jpeg")
-                .setBody(buffer))
+            .addHeader("Content-Type:image/jpeg")
+            .setBody(buffer))
 
         server.enqueue(MockResponse()
-                .setResponseCode(404)
-                .setBody("image not found"))
+            .setResponseCode(404)
+            .setBody("image not found"))
 
         imageProvider.getImage(server.url("/").toString(), bitmapListener)
         imageProvider.getImage(server.url("/").toString(), bitmapListener)
@@ -76,15 +76,15 @@ class ImageProviderTest {
         var buffer = Buffer()
         buffer = buffer.readFrom(getAsset(TEST_FILE))
         server.enqueue(MockResponse()
-                .addHeader("Content-Type:image/jpeg")
-                .setBody(buffer))
+            .addHeader("Content-Type:image/jpeg")
+            .setBody(buffer))
 
         imageProvider.getImage(server.url("/").toString(), null)
         imageProvider.getImage(server.url("/").toString(), null)
     }
 
     private fun getAsset(assetPath: String): InputStream {
-        return InstrumentationRegistry.getTargetContext().assets.open(assetPath)
+        return InstrumentationRegistry.getInstrumentation().targetContext.assets.open(assetPath)
     }
 
     class CapturingBitmapListener : ImageProvider.OnBitmapLoadedListener {

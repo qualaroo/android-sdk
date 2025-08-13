@@ -1,26 +1,19 @@
-/*
- * Copyright (c) 2018, Qualaroo, Inc. All Rights Reserved.
- *
- * Please refer to the LICENSE.md file for the terms and conditions
- * under which redistribution and use of this file is permitted.
- */
-
 buildscript {
-    ext.kotlin_version = '1.6.0'
+    ext.kotlin_version = '1.8.20'
     repositories {
-        jcenter()
         google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.android.tools.build:gradle:8.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
     }
 }
 
