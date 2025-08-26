@@ -6,7 +6,8 @@
     android:animateLayoutChanges="true"
     android:clipChildren="false"
     android:orientation="vertical"
-    android:gravity="bottom">
+    android:gravity="bottom"
+    android:paddingBottom="16dp">
 
 
     <LinearLayout

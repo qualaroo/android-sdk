@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
     <include
         android:id="@+id/qualaroo__survey_container"
@@ -14,6 +15,7 @@
         layout="@layout/qualaroo__view_survey_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="0dp"/>
 
 </FrameLayout>
