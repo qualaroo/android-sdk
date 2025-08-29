@@ -1,3 +1,9 @@
+## 2.1.8
+- Fixed custom properties evaluation by removing JEXL dependency
+- Implemented custom expression evaluator for better stability
+- Added comprehensive logging for debugging user property matching
+- Improved error handling in UserPropertiesMatcher
+
 ## 2.1.4
 - NPS Theme Bug Fix
 
