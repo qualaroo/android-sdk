@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/qualaroo/android-sdk/blob/dev/CHANGELOG.md">
-    <img src="https://img.shields.io/badge/version-2.1.4-blue.svg">
+    <img src="https://img.shields.io/badge/version-2.1.8-blue.svg">
   </a>
   <a href="https://circleci.com/gh/qualaroo/android-sdk/tree/dev">
     <img src="https://img.shields.io/circleci/project/github/qualaroo/android-sdk/dev.svg">
@@ -24,9 +24,9 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 #### Note: Before updating the SDK version here, please ensure that you have saved the design changes in the Qualaroo Nudge Editor
 
-2.1.4(Latest)- 6 June 2024 
+2.1.8(Latest)- 29 August 2024 
 
-2.1.2(Previous)- 1 Feb 2023
+2.1.4(Previous)- 6 June 2024
 
 ## Step 1. Integration
 
@@ -35,7 +35,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 The recommended way to install the library for Android is with build system like Gradle.
 
 
-Simply add the `com.github.qualaroo:android-sdk:2.1.4` dependency to your app's `build.gradle` file:
+Simply add the `com.github.qualaroo:android-sdk:2.1.8` dependency to your app's `build.gradle` file:
 
 ```javascript
 repositories {
@@ -44,7 +44,7 @@ repositories {
     }
 }
 dependencies {
-    implementation 'com.github.qualaroo:android-sdk:2.1.4'
+    implementation 'com.github.qualaroo:android-sdk:2.1.8'
 }
 ```
 
