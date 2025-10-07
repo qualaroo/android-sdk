@@ -24,7 +24,7 @@ In order to integrate the Qualaroo SDK into a 3rd-party app, the app must satisf
 
 #### Note: Before updating the SDK version here, please ensure that you have saved the design changes in the Qualaroo Nudge Editor
 
-2.1.8(Latest)- 29 August 2024 
+2.1.8(Latest)- 29 August 2025 
 
 2.1.4(Previous)- 6 June 2024
 
