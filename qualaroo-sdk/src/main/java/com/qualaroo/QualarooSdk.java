@@ -2,10 +2,27 @@ package com.qualaroo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 import java.util.List;
 
 public interface QualarooSdk {
+
+    /**
+     * Returns a list of all available surveys aliases.
+     * @return list of all available surveys aliases
+     */
+    @NonNull
+    @WorkerThread
+    List<String> getSurveysAliases();
+
+    /**
+     * Allows to check whether specific survey will be displayed after showSurvey call
+     * @param alias alias of the survey
+     */
+    @WorkerThread
+    boolean willSurveyBeShown(@NonNull String alias);
+
     /**
      * Shows a survey with specified alias if all targeting conditions are met.
      * @param alias alias of a survey that should be displayed
